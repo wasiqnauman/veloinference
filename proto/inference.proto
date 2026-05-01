@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package adip;
+
+service InferenceService {
+  rpc PredictBatch(BatchRequest) returns (BatchResponse);
+}
+
+message PredictRequest {
+  string request_id = 1;
+  string model = 2;
+  string input_text = 3;
+  uint32 deadline_ms = 4;
+}
+
+message BatchRequest {
+  repeated PredictRequest requests = 1;
+}
+
+message PredictResponse {
+  string request_id = 1;
+  string output_text = 2;
+}
+
+message BatchResponse {
+  repeated PredictResponse responses = 1;
+}

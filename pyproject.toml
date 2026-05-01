@@ -1,0 +1,28 @@
+[project]
+name = "adip"
+version = "0.1.0"
+description = "Async Dynamic Inference Proxy"
+requires-python = ">=3.14,<3.15"
+dependencies = [
+    "fastapi>=0.115.0,<1.0.0",
+    "uvicorn>=0.30.0,<1.0.0",
+    "pydantic>=2.8.0,<3.0.0",
+    "pydantic-settings>=2.3.0,<3.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.27.0,<1.0.0",
+    "pytest>=8.2.0,<9.0.0",
+    "pytest-asyncio>=0.23.0,<1.0.0",
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
