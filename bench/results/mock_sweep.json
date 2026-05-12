@@ -1,0 +1,122 @@
+[
+  {
+    "direct": {
+      "mode": "direct",
+      "requests": 500,
+      "concurrency": 8,
+      "workload": "mixed-prompts",
+      "total_duration_ms": 10627.64,
+      "throughput_rps": 47.05,
+      "avg_latency_ms": 165.76,
+      "p95_latency_ms": 170.93,
+      "p99_latency_ms": 216.04,
+      "avg_batch_size": 1
+    },
+    "batched": {
+      "mode": "batched",
+      "requests": 500,
+      "concurrency": 8,
+      "workload": "mixed-prompts",
+      "total_duration_ms": 4099.81,
+      "throughput_rps": 121.96,
+      "avg_latency_ms": 63.8,
+      "p95_latency_ms": 69.58,
+      "p99_latency_ms": 84.5,
+      "avg_batch_size": 4.06
+    },
+    "throughput_gain_pct": 159.21,
+    "avg_latency_delta_ms": -101.96,
+    "p95_latency_delta_ms": -101.35,
+    "avg_batch_size_gain": 3.06
+  },
+  {
+    "direct": {
+      "mode": "direct",
+      "requests": 500,
+      "concurrency": 16,
+      "workload": "mixed-prompts",
+      "total_duration_ms": 10463.35,
+      "throughput_rps": 47.79,
+      "avg_latency_ms": 328.65,
+      "p95_latency_ms": 337.84,
+      "p99_latency_ms": 350.98,
+      "avg_batch_size": 1
+    },
+    "batched": {
+      "mode": "batched",
+      "requests": 500,
+      "concurrency": 16,
+      "workload": "mixed-prompts",
+      "total_duration_ms": 3439.21,
+      "throughput_rps": 145.38,
+      "avg_latency_ms": 105.47,
+      "p95_latency_ms": 173.8,
+      "p99_latency_ms": 273.37,
+      "avg_batch_size": 7.58
+    },
+    "throughput_gain_pct": 204.21,
+    "avg_latency_delta_ms": -223.18,
+    "p95_latency_delta_ms": -164.04,
+    "avg_batch_size_gain": 6.58
+  },
+  {
+    "direct": {
+      "mode": "direct",
+      "requests": 500,
+      "concurrency": 32,
+      "workload": "mixed-prompts",
+      "total_duration_ms": 10522.49,
+      "throughput_rps": 47.52,
+      "avg_latency_ms": 650.85,
+      "p95_latency_ms": 704.63,
+      "p99_latency_ms": 707.27,
+      "avg_batch_size": 1
+    },
+    "batched": {
+      "mode": "batched",
+      "requests": 500,
+      "concurrency": 32,
+      "workload": "mixed-prompts",
+      "total_duration_ms": 3089.15,
+      "throughput_rps": 161.86,
+      "avg_latency_ms": 188.19,
+      "p95_latency_ms": 199.25,
+      "p99_latency_ms": 231.4,
+      "avg_batch_size": 7.97
+    },
+    "throughput_gain_pct": 240.61,
+    "avg_latency_delta_ms": -462.66,
+    "p95_latency_delta_ms": -505.38,
+    "avg_batch_size_gain": 6.97
+  },
+  {
+    "direct": {
+      "mode": "direct",
+      "requests": 500,
+      "concurrency": 64,
+      "workload": "mixed-prompts",
+      "total_duration_ms": 10475.14,
+      "throughput_rps": 47.73,
+      "avg_latency_ms": 1251.31,
+      "p95_latency_ms": 1333.71,
+      "p99_latency_ms": 1337.61,
+      "avg_batch_size": 1
+    },
+    "batched": {
+      "mode": "batched",
+      "requests": 500,
+      "concurrency": 64,
+      "workload": "mixed-prompts",
+      "total_duration_ms": 3132.32,
+      "throughput_rps": 159.63,
+      "avg_latency_ms": 370.34,
+      "p95_latency_ms": 390.91,
+      "p99_latency_ms": 444.84,
+      "avg_batch_size": 7.97
+    },
+    "throughput_gain_pct": 234.44,
+    "avg_latency_delta_ms": -880.97,
+    "p95_latency_delta_ms": -942.8,
+    "avg_batch_size_gain": 6.97
+  }
+]

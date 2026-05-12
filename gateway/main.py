@@ -7,17 +7,15 @@ import uvicorn
 from fastapi import FastAPI
 
 from gateway.api.routes import router
-from gateway.backends.mock import MockBackend
+from gateway.backends.factory import build_backend
 from gateway.config import settings
 from gateway.core.batcher import DynamicBatcher
+from gateway.core.service import InferenceService
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    backend = MockBackend(
-        base_latency_ms=settings.mock_backend_base_latency_ms,
-        per_item_latency_ms=settings.mock_backend_per_item_latency_ms,
-    )
+    backend = build_backend(settings)
     batcher = DynamicBatcher(
         backend=backend,
         max_batch_size=settings.batch_max_size,
@@ -25,12 +23,15 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         queue_max_size=settings.queue_max_size,
     )
     await batcher.start()
-    app.state.batcher = batcher
+    app.state.inference_service = InferenceService(backend=backend, batcher=batcher)
 
     try:
         yield
     finally:
         await batcher.stop()
+        aclose = getattr(backend, "aclose", None)
+        if aclose is not None:
+            await aclose()
 
 
 def create_app() -> FastAPI:

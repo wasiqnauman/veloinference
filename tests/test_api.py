@@ -25,3 +25,17 @@ def test_infer_returns_batched_response_shape() -> None:
     assert body["model"] == "mock"
     assert body["output_text"] == "mock:hello|batch=1"
     assert body["batch_size"] == 1
+
+
+def test_infer_direct_returns_unbatched_response_shape() -> None:
+    with TestClient(create_app()) as client:
+        response = client.post(
+            "/v1/infer/direct",
+            json={"input_text": "hello", "model": "mock"},
+        )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["model"] == "mock"
+    assert body["output_text"] == "mock:hello|batch=1"
+    assert body["batch_size"] == 1

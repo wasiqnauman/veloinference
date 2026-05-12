@@ -86,6 +86,17 @@ class DynamicBatcher:
 
     async def _collect_batch(self) -> list[PendingRequest]:
         while len(self._pending) < self._max_batch_size:
+            while len(self._pending) < self._max_batch_size:
+                try:
+                    request = self._queue.get_nowait()
+                except asyncio.QueueEmpty:
+                    break
+                else:
+                    self._pending.append(request)
+
+            if len(self._pending) >= self._max_batch_size:
+                break
+
             first_request = self._pending[0]
             timeout = remaining_wait_time(first_request, self._max_wait_ms)
             if timeout <= 0:
