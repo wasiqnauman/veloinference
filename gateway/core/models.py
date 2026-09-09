@@ -1,11 +1,14 @@
 """Shared core models."""
 
+import asyncio
 from dataclasses import dataclass
 from time import monotonic
 from typing import Self
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
+
+from gateway.core.clock import Clock
 
 
 class InferenceRequest(BaseModel):
@@ -60,13 +63,13 @@ class BatchMetadata(BaseModel):
     temperature: float = Field(default=0.0, ge=0.0, le=2.0)
 
     @classmethod
-    def create(cls, request: InferenceRequest) -> Self:
+    def create(cls, request: InferenceRequest, clock: Clock | None = None) -> Self:
         return cls(
             request_id=str(uuid4()),
             model=request.model,
             max_tokens=request.max_tokens,
             temperature=request.temperature,
-            enqueued_at=monotonic(),
+            enqueued_at=clock.monotonic() if clock is not None else monotonic(),
             deadline_ms=request.deadline_ms,
         )
 
@@ -84,4 +87,4 @@ class BatchMetadata(BaseModel):
 class PendingRequest:
     metadata: BatchMetadata
     payload: InferenceRequest
-    future: object
+    future: asyncio.Future[InferenceResponse] | None
