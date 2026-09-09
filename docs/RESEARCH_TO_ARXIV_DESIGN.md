@@ -4,7 +4,7 @@ Status: normative execution plan
 Baseline branch: main  
 Baseline commit: 81ac3224ecbdf3c22c4b0b675d156e945598efa0  
 Primary machine: Windows host with one NVIDIA GeForce RTX 3060, 12 GB VRAM  
-Primary execution environment: Ubuntu 24.04 under WSL2, stored on the D: drive  
+Primary execution environment: Ubuntu 24.04 under WSL2, stored on the C: drive
 Primary paper category target: arXiv cs.DC; consider cs.LG as a cross-list  
 
 ## 1. Purpose
@@ -180,8 +180,9 @@ task in this specification.
 - Host uv: 0.10.4.
 - WSL: not installed at baseline.
 - Docker: not installed at baseline.
-- C: free space at baseline: approximately 4.2 GB.
-- D: free space at baseline: approximately 65.7 GB.
+- C: free space at the original baseline was approximately 4.2 GB; the operator
+  has since freed sufficient space for the complete local experiment.
+- D: not required for the execution plan.
 
 ### 5.2 Required local topology
 
@@ -214,7 +215,7 @@ Run in administrator PowerShell:
 
 ~~~powershell
 wsl --list --online
-wsl --install --distribution Ubuntu-24.04 --location D:\WSL\Ubuntu-24.04
+wsl --install --distribution Ubuntu-24.04 --location C:\WSL\Ubuntu-24.04
 ~~~
 
 If Ubuntu-24.04 is not the exact listed distribution name, use the exact Ubuntu
@@ -254,17 +255,19 @@ first.
 
 ### 5.4 Storage placement
 
-The WSL distribution MUST reside on D:. The Linux repository MUST be cloned or
+The WSL distribution MUST reside on C:. The Linux repository MUST be cloned or
 copied to:
 
 ~~~text
 ~/src/veloinference
 ~~~
 
-Do not run experiments from /mnt/c because C: has insufficient free space and
-mounted Windows filesystem performance can distort measurements.
+Do not run experiments from /mnt/c. Keep the project inside the WSL ext4
+virtual disk so Linux package, model-cache, and benchmark I/O are not routed
+through the mounted Windows filesystem.
 
-The following directories MUST remain inside the WSL ext4 virtual disk:
+The following directories MUST remain inside the WSL ext4 virtual disk, which
+is physically stored on C::
 
 ~~~text
 ~/src/veloinference
@@ -2059,7 +2062,7 @@ next dependent task begins.
 Owner: human operator assisted by agent.  
 Inputs: Windows administrator access.  
 Changes: host configuration only.  
-Output: Ubuntu 24.04 WSL2 on D:.  
+Output: Ubuntu 24.04 WSL2 on C:.
 Verify: wsl -l -v and nvidia-smi inside WSL.  
 Stop if: reboot is pending or GPU is not visible.  
 
@@ -2388,7 +2391,7 @@ and paper results in one commit.
 
 Gate A: Environment ready
 
-- WSL2 on D:.
+- WSL2 on C:.
 - GPU visible in WSL.
 - Python 3.12.
 - Tests pass.
@@ -2460,7 +2463,7 @@ answer is that no meaningful benefit was observed.
 
 When implementation begins, perform exactly this sequence:
 
-1. ENV-001: install WSL2 on D: and reboot.
+1. ENV-001: install WSL2 on C: and reboot.
 2. ENV-002: create the Linux-native working copy and research branch.
 3. REP-001: establish Python 3.12, dependencies, lockfile, ignore rules, README,
    and CI.
