@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: ENV-001 blocked; BACKEND-001 complete
+Status: ENV-001 blocked; CORE-002 complete
 Last updated: 2026-09-09
 Current branch: main
-Current commit before this tracker: f4f6615
+Current commit before this tracker: fa74453
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -35,8 +35,8 @@ evidence.
 The repository contains the complete research execution design, the progress
 tracker, reproducibility scaffolding, a frozen research proposal, typed core
 contracts, and a tested shared backend HTTP client. CPU-only application
-implementation has started, but no live vLLM experiment or numerical paper
-result exists yet.
+implementation has started, including the fixed-window policy, but no live
+vLLM experiment or numerical paper result exists yet.
 
 WSL is not installed on the host, so the next agent must not attempt vLLM or
 Linux repository setup yet. The repository-only scaffolding in REP-001A and
@@ -47,7 +47,7 @@ The user must run the Windows feature-enablement commands from an
 Administrator PowerShell. The current Codex shell cannot elevate to Windows
 Administrator privileges.
 
-The immediate implementation sequence is CORE-002, then CORE-003 and other
+The immediate implementation sequence is CORE-003 and other
 CPU-safe work where possible. ENV-001 remains a hard dependency for BACKEND-002,
 ENV-002, ENV-003, and all live vLLM experiments.
 
@@ -313,6 +313,61 @@ Implement CORE-002, the fixed-window scheduling policy, with deterministic
 FakeClock tests. Preserve the existing public behavior until CORE-003 performs
 the planned batching compatibility and shutdown refactor.
 
+### CORE-002 — Implement fixed-window batching policy
+
+Status: complete
+Date: 2026-09-09
+Commit: fa74453
+Commit message: feat: add fixed window batching policy
+
+Files changed:
+
+- gateway/core/policies/__init__.py
+- gateway/core/policies/base.py
+- gateway/core/policies/fixed.py
+- tests/test_fixed_policy.py
+
+Changes made:
+
+- Added immutable `QueueSnapshot` input and `DispatchDecision` output types.
+- Added the `BatchPolicy` protocol so policies decide without sleeping or I/O.
+- Added the finite dispatch reason type required for later telemetry and
+  analysis aggregation.
+- Implemented `FixedWindowPolicy` with deterministic checks for full batches,
+  elapsed wait windows, deadline service slack, and safe configured waiting.
+- Added five policy tests covering all fixed-policy branches and the
+  non-negative wait invariant.
+
+Commands run:
+
+~~~powershell
+git diff --check
+python -m pytest tests/test_scheduler.py tests/test_models.py tests/test_fixed_policy.py -q
+python -m compileall -q gateway bench tests
+~~~
+
+Observed result:
+
+- `9 passed` in the host Python 3.13 environment.
+- Compilation completed without errors.
+- The host emitted the known `asyncio_mode` warning because pytest-asyncio is
+  not installed outside the project environment.
+
+Current status:
+
+CORE-002 is complete and committed. The existing DynamicBatcher still uses
+its legacy inline timing helpers; CORE-003 must wire policy decisions into the
+batcher and address compatibility, cancellation, queue capacity, and shutdown
+semantics. WSL and live inference remain blocked.
+
+Exact next action:
+
+Implement CORE-003 by refactoring DynamicBatcher to use `BatchPolicy`, group
+only equal `BatchKey` requests, use precise future typing, and guarantee
+idempotent shutdown with no unresolved futures. Add deterministic async tests
+where the host environment permits, plus direct coroutine checks if the
+host lacks pytest-asyncio.
+
 ## ENV-001 — Install and verify WSL2
 
 Status: blocked  
@@ -489,6 +544,6 @@ agent should execute.
 
 ## Next task
 
-CORE-002 — Implement the fixed-window scheduling policy with deterministic
-FakeClock tests; leave ENV-001 blocked until Administrator PowerShell enables
-WSL2 and the host is rebooted.
+CORE-003 — Refactor DynamicBatcher to consume BatchPolicy, enforce BatchKey
+compatibility, and make cancellation and shutdown safe; leave ENV-001 blocked
+until Administrator PowerShell enables WSL2 and the host is rebooted.
