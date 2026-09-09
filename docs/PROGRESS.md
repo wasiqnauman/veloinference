@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: ENV-001 blocked; CORE-001 complete
+Status: ENV-001 blocked; BACKEND-001 complete
 Last updated: 2026-09-09
 Current branch: main
-Current commit before this tracker: 60e5c8d
+Current commit before this tracker: f4f6615
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -33,9 +33,10 @@ evidence.
 ## Current handoff
 
 The repository contains the complete research execution design, the progress
-tracker, reproducibility scaffolding, a frozen research proposal, and the first
-typed core contracts. CPU-only application implementation has started, but no
-live vLLM experiment or numerical paper result exists yet.
+tracker, reproducibility scaffolding, a frozen research proposal, typed core
+contracts, and a tested shared backend HTTP client. CPU-only application
+implementation has started, but no live vLLM experiment or numerical paper
+result exists yet.
 
 WSL is not installed on the host, so the next agent must not attempt vLLM or
 Linux repository setup yet. The repository-only scaffolding in REP-001A and
@@ -46,8 +47,8 @@ The user must run the Windows feature-enablement commands from an
 Administrator PowerShell. The current Codex shell cannot elevate to Windows
 Administrator privileges.
 
-The immediate implementation sequence is BACKEND-001, then CORE-002 and
-CORE-003 where possible. ENV-001 remains a hard dependency for BACKEND-002,
+The immediate implementation sequence is CORE-002, then CORE-003 and other
+CPU-safe work where possible. ENV-001 remains a hard dependency for BACKEND-002,
 ENV-002, ENV-003, and all live vLLM experiments.
 
 ## Completed tasks
@@ -259,6 +260,59 @@ Implement BACKEND-001, the shared async HTTP client, with deterministic unit
 tests using a local fake transport. Do not add vLLM-specific code until
 ENV-001 succeeds.
 
+### BACKEND-001 — Implement shared async HTTP client
+
+Status: complete
+Date: 2026-09-09
+Commit: f4f6615
+Commit message: feat: add shared backend HTTP client
+
+Files changed:
+
+- gateway/clients/backend_http.py
+- tests/test_backend_http.py
+
+Changes made:
+
+- Added `BackendHttpClient` around one reusable `httpx.AsyncClient`.
+- Added normalized base URL and path joining for JSON POST requests.
+- Added optional bearer authentication; no authorization header is sent when
+  no API key is configured.
+- Propagated `httpx.HTTPStatusError` for non-2xx responses.
+- Rejected malformed JSON and valid JSON values that are not objects.
+- Added an idempotent `aclose()` and a clear error when a closed client is
+  reused.
+- Added six deterministic `httpx.MockTransport` tests with no live server.
+
+Commands run:
+
+~~~powershell
+git diff --check
+python -m compileall -q gateway bench tests
+python -m pytest tests/test_api.py tests/test_models.py tests/test_bench.py tests/test_scheduler.py -q
+python -c "<direct asyncio MockTransport runner for all six backend HTTP tests>"
+~~~
+
+Observed result:
+
+- The direct runner completed successfully for all six backend HTTP tests.
+- Compilation completed without errors.
+- The available synchronous regression suite passed: `8 passed`.
+- The host does not have `ruff` or `pytest-asyncio`; both are declared in the
+  project dependencies and must be checked in the Python 3.12 environment.
+
+Current status:
+
+BACKEND-001 is complete and committed. The client is transport-only; no
+vLLM-specific payload parsing has been added. ENV-001 is still blocked, so no
+live backend request is authorized by the experiment protocol.
+
+Exact next action:
+
+Implement CORE-002, the fixed-window scheduling policy, with deterministic
+FakeClock tests. Preserve the existing public behavior until CORE-003 performs
+the planned batching compatibility and shutdown refactor.
+
 ## ENV-001 — Install and verify WSL2
 
 Status: blocked  
@@ -435,6 +489,6 @@ agent should execute.
 
 ## Next task
 
-BACKEND-001 — Implement and test the shared async HTTP client using a local
-fake transport; leave ENV-001 blocked until Administrator PowerShell enables
+CORE-002 — Implement the fixed-window scheduling policy with deterministic
+FakeClock tests; leave ENV-001 blocked until Administrator PowerShell enables
 WSL2 and the host is rebooted.
