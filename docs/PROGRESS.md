@@ -3,7 +3,7 @@
 Status: ENV-001 blocked; REP-001A complete  
 Last updated: 2026-09-09  
 Current branch: main  
-Current commit before this tracker: 9d952bf  
+Current commit before this tracker: 5f53cca  
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -33,8 +33,8 @@ evidence.
 ## Current handoff
 
 The repository contains the complete research execution design, the progress
-tracker, and the first reproducibility scaffolding. No application behavior
-has been changed yet.
+tracker, reproducibility scaffolding, and a frozen research proposal. No
+application behavior or live experiment has been completed yet.
 
 The next agent must continue with ENV-001. WSL is not installed on the host,
 so the next agent must not attempt vLLM or Linux repository setup yet. The
@@ -164,6 +164,37 @@ Current status:
 Repository scaffolding is committed. The complete REP-001 task is not complete
 until WSL setup, uv lock generation, full dependency installation, linting, and
 the complete test suite succeed.
+
+### DOC-001 — Freeze research proposal and experiment protocol
+
+Status: complete  
+Commit: 5f53cca  
+Commit message: docs: freeze research proposal and experiment protocol
+
+Files changed:
+
+- docs/RESEARCH_PROPOSAL.md
+- docs/EXPERIMENT_PROTOCOL.md
+- docs/EXPERIMENT_LOG.md
+- docs/RESULT_CLAIMS.md
+
+Changes made:
+
+- Frozen the research question, hypotheses, variables, baselines, SLO rule,
+  experiment matrix, and exclusion policy.
+- Added exact operator commands for WSL, Python, vLLM, ADIP, calibration,
+  pilots, final experiments, analysis, and paper build.
+- Added an append-only experiment log containing all observed setup attempts.
+- Added a claim ledger that currently contains no numerical claims.
+
+Current status:
+
+The study design is frozen before live data collection. No result has been
+measured, and no numerical paper claim is approved.
+
+Next dependency:
+
+ENV-001 must succeed before ENV-002, ENV-003, or live vLLM work.
 
 ## ENV-001 — Install and verify WSL2
 
