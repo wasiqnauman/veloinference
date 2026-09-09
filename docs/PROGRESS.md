@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: ENV-001 blocked; REP-001A complete  
-Last updated: 2026-09-09  
-Current branch: main  
-Current commit before this tracker: 5f53cca  
+Status: ENV-001 blocked; CORE-001 complete
+Last updated: 2026-09-09
+Current branch: main
+Current commit before this tracker: 60e5c8d
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -33,16 +33,22 @@ evidence.
 ## Current handoff
 
 The repository contains the complete research execution design, the progress
-tracker, reproducibility scaffolding, and a frozen research proposal. No
-application behavior or live experiment has been completed yet.
+tracker, reproducibility scaffolding, a frozen research proposal, and the first
+typed core contracts. CPU-only application implementation has started, but no
+live vLLM experiment or numerical paper result exists yet.
 
-The next agent must continue with ENV-001. WSL is not installed on the host,
-so the next agent must not attempt vLLM or Linux repository setup yet. The
-repository-only scaffolding in REP-001A is already committed.
+WSL is not installed on the host, so the next agent must not attempt vLLM or
+Linux repository setup yet. The repository-only scaffolding in REP-001A and
+the CPU-safe CORE-001 contracts are already committed. Work that does not
+require Linux or a live model may continue while ENV-001 is blocked.
 
 The user must run the Windows feature-enablement commands from an
 Administrator PowerShell. The current Codex shell cannot elevate to Windows
 Administrator privileges.
+
+The immediate implementation sequence is BACKEND-001, then CORE-002 and
+CORE-003 where possible. ENV-001 remains a hard dependency for BACKEND-002,
+ENV-002, ENV-003, and all live vLLM experiments.
 
 ## Completed tasks
 
@@ -195,6 +201,63 @@ measured, and no numerical paper claim is approved.
 Next dependency:
 
 ENV-001 must succeed before ENV-002, ENV-003, or live vLLM work.
+
+### CORE-001 — Define typed core scheduling contracts
+
+Status: complete
+Date: 2026-09-09
+Commit: 60e5c8d
+Commit message: feat: add typed core scheduling contracts
+
+Files changed:
+
+- gateway/core/clock.py
+- gateway/core/models.py
+- gateway/backends/base.py
+- tests/conftest.py
+- tests/test_models.py
+
+Changes made:
+
+- Added a small `Clock` protocol and production `SystemClock` based on
+  `time.monotonic()` so scheduling code can be tested deterministically.
+- Added validated `max_tokens` and `temperature` request fields with bounded
+  defaults.
+- Added frozen `BatchKey` identity for model and generation settings.
+- Added matching generation metadata to `BatchMetadata`, while retaining
+  defaults so older callers remain compatible.
+- Added default single-request inference and async close hooks to the backend
+  interface without breaking the existing batch backend contract.
+- Added a reusable `FakeClock` test fixture and model contract tests.
+
+Commands run:
+
+~~~powershell
+git diff --check
+python -m pytest tests/test_api.py tests/test_models.py tests/test_bench.py tests/test_scheduler.py -q
+python -m compileall -q gateway bench tests
+~~~
+
+Observed result:
+
+- `8 passed` in the host Python 3.13 environment.
+- Compilation completed without errors.
+- The full async tests were not run successfully on the host because
+  `pytest-asyncio` is not installed there; it is declared in the project
+  development dependencies and must be verified in Python 3.12 later.
+
+Current status:
+
+CORE-001 is complete and committed. `PendingRequest.future` is still typed as
+`object`; it will be made precise when the batching/service lifecycle is
+refactored in CORE-003. No network client, real model adapter, or live
+experiment has been implemented.
+
+Exact next action:
+
+Implement BACKEND-001, the shared async HTTP client, with deterministic unit
+tests using a local fake transport. Do not add vLLM-specific code until
+ENV-001 succeeds.
 
 ## ENV-001 — Install and verify WSL2
 
@@ -372,5 +435,6 @@ agent should execute.
 
 ## Next task
 
-ENV-001 — Wait for Administrator PowerShell feature enablement and reboot,
-then install Ubuntu 24.04 under C:\WSL and verify GPU access inside WSL.
+BACKEND-001 — Implement and test the shared async HTTP client using a local
+fake transport; leave ENV-001 blocked until Administrator PowerShell enables
+WSL2 and the host is rebooted.
