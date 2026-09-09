@@ -10,7 +10,9 @@ from pydantic import BaseModel, Field
 
 class InferenceRequest(BaseModel):
     input_text: str = Field(min_length=1)
-    model: str = "mock"
+    model: str = Field(default="mock", min_length=1)
+    max_tokens: int = Field(default=64, ge=1, le=256)
+    temperature: float = Field(default=0.0, ge=0.0, le=2.0)
     deadline_ms: int | None = Field(default=None, ge=1)
 
 
@@ -19,10 +21,34 @@ class InferenceResponse(BaseModel):
     model: str
     output_text: str
     batch_size: int
+    output_tokens: int | None = None
+    batch_id: str | None = None
+    queue_ms: float = 0.0
+    backend_ms: float = 0.0
+    total_ms: float = 0.0
+    deadline_met: bool | None = None
 
 
 class HealthResponse(BaseModel):
     status: str
+
+
+@dataclass(frozen=True, slots=True)
+class BatchKey:
+    """Request attributes that must match for backend batching."""
+
+    model: str
+    max_tokens: int
+    temperature: float
+
+    @classmethod
+    def from_request(cls, request: InferenceRequest) -> Self:
+        """Create a compatibility key from a validated request."""
+        return cls(
+            model=request.model,
+            max_tokens=request.max_tokens,
+            temperature=request.temperature,
+        )
 
 
 class BatchMetadata(BaseModel):
@@ -30,14 +56,27 @@ class BatchMetadata(BaseModel):
     model: str
     enqueued_at: float
     deadline_ms: int | None
+    max_tokens: int = Field(default=64, ge=1, le=256)
+    temperature: float = Field(default=0.0, ge=0.0, le=2.0)
 
     @classmethod
     def create(cls, request: InferenceRequest) -> Self:
         return cls(
             request_id=str(uuid4()),
             model=request.model,
+            max_tokens=request.max_tokens,
+            temperature=request.temperature,
             enqueued_at=monotonic(),
             deadline_ms=request.deadline_ms,
+        )
+
+    @property
+    def batch_key(self) -> BatchKey:
+        """Return the compatibility key for this request."""
+        return BatchKey(
+            model=self.model,
+            max_tokens=self.max_tokens,
+            temperature=self.temperature,
         )
 
 
