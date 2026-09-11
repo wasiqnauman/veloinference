@@ -1,0 +1,10 @@
+# Purpose: exact local vLLM calibration model configuration.
+model_id = "Qwen/Qwen2.5-1.5B-Instruct"
+served_name = "Qwen/Qwen2.5-1.5B-Instruct"
+revision = "989aa7980e4cf806f80c7fef2b1adb7bc71aa306"
+dtype = "float16"
+max_model_len = 2048
+gpu_memory_utilization = 0.85
+max_num_seqs = 8
+temperature = 0.0
+max_tokens = 64

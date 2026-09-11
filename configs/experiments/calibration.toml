@@ -1,0 +1,15 @@
+# Purpose: EXP-001 direct-vLLM capacity calibration on the local RTX 3060.
+name = "exp001-calibration"
+model_config = "../models/qwen2_5_1_5b.toml"
+workload_config = "../workloads/calibration_short_constant.toml"
+target_endpoint = "direct"
+adip_gateway_mode = "pass_through"
+policy = "fixed"
+max_batch_size = 8
+max_wait_ms = 0
+repetition_seeds = [1729]
+cooldown_s = 2.0
+output_dir = "../../results/raw"
+slo_derivation_rule = "derive_after_capacity_calibration"
+health_url = "http://127.0.0.1:8001/health"
+calibration_rates_rps = [0.5, 1.0, 2.0, 4.0, 8.0, 16.0]

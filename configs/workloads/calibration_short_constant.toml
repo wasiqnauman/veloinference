@@ -1,0 +1,13 @@
+# Purpose: 60-second direct-vLLM calibration workload.
+name = "calibration-short-constant"
+arrival_kind = "constant"
+duration_s = 60.0
+warmup_requests = 50
+seed = 1729
+rate_fraction_of_capacity = 0.25
+
+[[prompt_buckets]]
+name = "short"
+minimum_tokens = 8
+maximum_tokens = 128
+weight = 1.0

@@ -89,6 +89,7 @@ class ExperimentConfig:
     slo_derivation_rule: str
     health_url: str
     source_path: Path
+    calibration_rates_rps: tuple[float, ...] | None = None
 
 
 @dataclass(frozen=True, slots=True)

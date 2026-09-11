@@ -74,6 +74,9 @@ def load_experiment_config(path: Path) -> ExperimentConfig:
             "experiment.adip_gateway_mode must be pass_through when "
             "experiment.target_endpoint is direct"
         )
+    calibration_rates_rps = _optional_positive_float_tuple(
+        experiment, "calibration_rates_rps", "experiment"
+    )
 
     return ExperimentConfig(
         name=name,
@@ -92,6 +95,7 @@ def load_experiment_config(path: Path) -> ExperimentConfig:
         slo_derivation_rule=slo_derivation_rule,
         health_url=health_url,
         source_path=source_path,
+        calibration_rates_rps=calibration_rates_rps,
     )
 
 
@@ -282,6 +286,20 @@ def _positive_int_tuple(values: dict[str, Any], key: str, section: str) -> tuple
         raise ConfigError(f"{section}.{key} must contain only integers")
     if any(item < 0 for item in result):
         raise ConfigError(f"{section}.{key} must contain only non-negative integers")
+    return result
+
+
+def _optional_positive_float_tuple(
+    values: dict[str, Any], key: str, section: str
+) -> tuple[float, ...] | None:
+    if key not in values:
+        return None
+    value = values[key]
+    if not isinstance(value, list) or not value:
+        raise ConfigError(f"{section}.{key} must be a non-empty array of numbers")
+    result = tuple(float(item) for item in value if not isinstance(item, bool))
+    if len(result) != len(value) or any(not math.isfinite(item) or item <= 0 for item in result):
+        raise ConfigError(f"{section}.{key} must contain only finite numbers greater than 0")
     return result
 
 

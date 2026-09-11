@@ -37,6 +37,29 @@ class WhitespaceTokenCounter:
         return len(text.split())
 
 
+class HuggingFaceTokenCounter:
+    """Count tokens with an exact locally cached Hugging Face revision."""
+
+    def __init__(self, model_id: str, revision: str) -> None:
+        try:
+            from transformers import AutoTokenizer
+        except ImportError as exc:
+            raise PromptGenerationError(
+                "HuggingFaceTokenCounter requires transformers in the active environment"
+            ) from exc
+        self.revision = revision
+        self._tokenizer = AutoTokenizer.from_pretrained(
+            model_id,
+            revision=revision,
+            local_files_only=True,
+            use_fast=True,
+        )
+
+    def count(self, text: str) -> int:
+        encoded = self._tokenizer(text, add_special_tokens=True)
+        return len(encoded["input_ids"])
+
+
 def load_prompt_seeds(path: Path = DEFAULT_SEEDS_PATH) -> tuple[tuple[str, str], ...]:
     """Load ``(seed_id, text)`` pairs from project-authored JSONL."""
 
