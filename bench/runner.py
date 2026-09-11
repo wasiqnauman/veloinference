@@ -8,7 +8,7 @@ from dataclasses import asdict
 from time import monotonic
 from typing import Protocol
 
-from bench.client import ClientResult, InferenceClient
+from bench.client import InferenceClient
 from bench.schema import PlannedRequest, RequestResult
 from bench.storage import append_jsonl
 
