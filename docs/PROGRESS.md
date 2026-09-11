@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: BENCH-004 complete; next BENCH-005
+Status: BENCH-005 complete; next BENCH-006
 Last updated: 2026-09-11
 Current branch: main
-Current commit before this tracker: af464b7
+Current commit before this tracker: a914eba
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -49,16 +49,16 @@ available on `main`.
 The next agent must use the actual distro name `Ubuntu` in WSL commands. The
 Linux-native repository is available at `/home/kennarr/src/veloinference`
 on branch `codex/research-preprint`. Its Python 3.12 environment and lockfile
-are created there, and the branch is synchronized through `af464b7`. The
+are created there, and the branch is synchronized through `a914eba`. The
 Windows `main` checkout and the WSL research branch have the same source state.
 
-OBS-001 through BENCH-004 are complete. Structured JSON events, redaction,
+OBS-001 through BENCH-005 are complete. Structured JSON events, redaction,
 counters, API error-path coverage, immutable benchmark schemas, strict TOML
 validation, config-relative path resolution, deterministic arrivals, and
 token-bucket prompt preparation are implemented without changing the gateway
-request/response contract. The next agent must begin BENCH-005 by adding
-independent `nvidia-smi` sampling and parser tests that preserve unavailable
-telemetry as an explicit state.
+request/response contract. The next agent must begin BENCH-006 by converting
+raw request/GPU records into exact summaries and deterministic publication
+figures.
 
 ## Completed tasks
 
@@ -1149,6 +1149,65 @@ Execute BENCH-005: implement `nvidia-smi` sampling with explicit query fields,
 record per-sample errors without fabricating zeros, and verify parsing with a
 stored sample fixture plus one local machine sample.
 
+### BENCH-005 — Implement GPU telemetry monitor
+
+Status: complete  
+Date: 2026-09-11  
+Commit: 8a3a668, a914eba  
+
+Files changed:
+
+- `bench/gpu_monitor.py` — fixed `nvidia-smi` query, CSV parser, explicit
+  unavailable/error samples, async independent monitor loop, and telemetry
+  availability helper.
+- `tests/fixtures/nvidia_smi_sample.csv` — deterministic parser fixture.
+- `tests/test_gpu_monitor.py` — command, numeric parsing, `N/A`, and missing
+  executable tests.
+
+Commands run:
+
+~~~text
+wsl.exe -d Ubuntu -- bash -lc 'cd /home/kennarr/src/veloinference; uv run --python 3.12 ruff check .; uv run --python 3.12 pytest -q'
+wsl.exe -d Ubuntu -- bash -lc 'nvidia-smi --query-gpu=timestamp,index,name,utilization.gpu,memory.used,memory.total,power.draw,temperature.gpu --format=csv,noheader,nounits'
+wsl.exe -d Ubuntu -- bash -lc 'cd /home/kennarr/src/veloinference; uv run --python 3.12 python -c "from bench.gpu_monitor import sample_gpu; print(sample_gpu(\"bench-005\", \"local-sample\"))"'
+~~~
+
+Observed result:
+
+- Ruff: `All checks passed!`.
+- Pytest: `64 passed, 2 warnings in 0.86s`.
+- The warnings are upstream FastAPI/Starlette/httpx deprecations and do not
+  represent project failures.
+- The WSL branch `codex/research-preprint` is clean and synchronized through
+  `a914eba`.
+- Direct WSL query returned: RTX 3060, 12,288 MiB total, 701 MiB used, 17%
+  utilization, 21.36 W, 61 C.
+- The monitor wrapper returned an error-free `GpuSample` for the RTX 3060:
+  12,288 MiB total, 691 MiB used, 14% utilization, 21.46 W, 61 C.
+
+Verification:
+
+- Explicit query fields and no-header/no-units CSV format: pass.
+- Fixture parsing into typed samples: pass.
+- `N/A` numeric fields remain `None`: pass.
+- Missing `nvidia-smi` becomes an explicit error sample, not fabricated zeros:
+  pass.
+- Real local WSL RTX 3060 sample through the wrapper: pass.
+- Full WSL Ruff gate: pass.
+- Full WSL pytest gate: pass.
+
+Current status:
+
+BENCH-005 is complete. The project can collect independent GPU evidence and
+represent unavailable telemetry honestly. No raw-record summarizer or paper
+figure generator exists yet.
+
+Exact next action:
+
+Execute BENCH-006: implement warm-up exclusion, failure-safe aggregate
+metrics, NumPy quantiles, and deterministic PDF/PNG plots using a checked-in
+synthetic fixture.
+
 ## Remaining task sequence
 
 The remaining tasks are defined in docs/RESEARCH_TO_ARXIV_DESIGN.md:
@@ -1220,5 +1279,5 @@ agent should execute.
 
 ## Next task
 
-BENCH-005 — Implement independent `nvidia-smi` GPU sampling and unavailable-
-telemetry handling with parser tests.
+BENCH-006 — Implement raw-record summarization and deterministic PDF/PNG plots
+with exact synthetic-fixture tests.
