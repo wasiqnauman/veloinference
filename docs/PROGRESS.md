@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: ENV-002 complete; REP-001 pending
+Status: CORE-003 complete; REP-001 pending ledger update
 Last updated: 2026-09-11
 Current branch: main
-Current commit before this tracker: 059ff31
+Current commit before this tracker: 7d71947
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -35,10 +35,9 @@ evidence.
 The repository contains the complete research execution design, the progress
 tracker, reproducibility scaffolding, a frozen research proposal, typed core
 contracts, and a tested shared backend HTTP client. CPU-only application
-implementation has started, including the fixed-window policy, but no live
-vLLM experiment or numerical paper result exists yet. The last agent added
-CORE-003 code in commit `36a9696`, but that commit has not yet been tested or
-documented.
+implementation has reached a verified CORE-003 batcher and a reproducible
+Python 3.12 WSL environment. No live vLLM experiment or numerical paper result
+exists yet.
 
 WSL 2 and Ubuntu are now installed on the host, and WSL-side GPU access has
 been verified. The installed distribution is registered as `Ubuntu` and
@@ -49,12 +48,12 @@ available on `main`.
 The next agent must use the actual distro name `Ubuntu` in WSL commands. The
 Linux-native repository is now available at `/home/kennarr/src/veloinference`
 on branch `codex/research-preprint`. Its HEAD matches the Windows checkout at
-the last documented commit. The Python 3.12 environment and lockfile still
-need to be created there before vLLM dependencies are installed.
+the last documented commit. The Python 3.12 environment and lockfile are now
+created there, and the WSL branch has been fast-forwarded through `7d71947`.
 
-The immediate sequence is REP-001 completion, then CORE-003
-verification. ENV-003 and all live vLLM experiments remain blocked until the
-Linux Python 3.12 environment and lockfile are ready.
+The immediate sequence is the REP-001 ledger update, then BACKEND-002 and
+ENV-003. Live vLLM experiments remain blocked until the adapter, vLLM
+dependencies, and smoke test are complete.
 
 ## Completed tasks
 
@@ -372,6 +371,61 @@ only equal `BatchKey` requests, use precise future typing, and guarantee
 idempotent shutdown with no unresolved futures. Add deterministic async tests
 where the host environment permits, plus direct coroutine checks if the
 host lacks pytest-asyncio.
+
+### CORE-003 — Make batching compatibility- and shutdown-safe
+
+Status: complete
+Date: 2026-09-11
+Commits: 36a9696, e4a4f66, 7d71947
+
+Files changed:
+
+- gateway/core/batcher.py
+- gateway/core/models.py
+- gateway/backends/base.py
+- gateway/core/policies/base.py
+- gateway/main.py
+- tests/test_batcher.py
+
+Changes made:
+
+- Replaced the legacy single pending deque with one coordinator and one
+  pending deque per `BatchKey`.
+- Ensured incompatible model or generation settings never share a backend
+  call.
+- Added injectable clock use for enqueue timestamps and precise future typing.
+- Added explicit start-before-infer and stop lifecycle errors.
+- Made start and stop idempotent, drained queued requests on stop, and added
+  `BatcherStoppedError` for requests held during in-flight shutdown.
+- Preserved backend failures and output-count validation for every request in
+  a dispatched batch.
+- Fixed the previous agent's shutdown bookkeeping so an in-flight batch remains
+  visible to `stop()` until its futures are resolved.
+
+Commands run in WSL Ubuntu 26.04 with Python 3.12.14:
+
+~~~bash
+uv run --python 3.12 ruff check .
+uv run --python 3.12 pytest -q
+~~~
+
+Observed result:
+
+- Ruff: `All checks passed!`.
+- Pytest: `24 passed`.
+- Only two upstream Starlette/httpx deprecation warnings were emitted.
+- The WSL research branch `codex/research-preprint` is clean at `7d71947`.
+
+Current status:
+
+CORE-003 is complete and verified. The batcher is still mock-backend based;
+service/factory/lifecycle extraction is reserved for CORE-004. No live model
+request has been made.
+
+Exact next action:
+
+Complete REP-001 ledger documentation, including the WSL Python 3.12.14,
+uv 0.12.13, lockfile, and clean test/lint evidence.
 
 ## ENV-001 — Install and verify WSL2
 
