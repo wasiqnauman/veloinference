@@ -60,7 +60,12 @@ class JsonEventLogger:
     @staticmethod
     def _safe_data(data: dict[str, object]) -> dict[str, object]:
         """Drop prompt and credential fields even if a caller supplies them."""
-        unsafe_fragments = ("prompt", "api_key", "authorization")
+        unsafe_fragments = (
+            "prompt",
+            "input_text",
+            "api_key",
+            "authorization",
+        )
         return {
             key: value
             for key, value in data.items()
