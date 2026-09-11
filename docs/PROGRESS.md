@@ -1,6 +1,6 @@
 # ADIP Project Progress Tracker
 
-Status: REP-001 complete; next BACKEND-002
+Status: BACKEND-002 complete; next ENV-003
 Last updated: 2026-09-11
 Current branch: main
 Current commit before this tracker: b4393f6
@@ -37,7 +37,8 @@ tracker, reproducibility scaffolding, a frozen research proposal, typed core
 contracts, and a tested shared backend HTTP client. CPU-only application
 implementation has reached a verified CORE-003 batcher and a reproducible
 Python 3.12 WSL environment. The dependency lockfile and baseline quality gate
-are complete. No live vLLM experiment or numerical paper result exists yet.
+are complete. The vLLM adapter is implemented and MockTransport-tested, but no
+live model request or numerical paper result exists yet.
 
 WSL 2 and Ubuntu are now installed on the host, and WSL-side GPU access has
 been verified. The installed distribution is registered as `Ubuntu` and
@@ -49,12 +50,12 @@ The next agent must use the actual distro name `Ubuntu` in WSL commands. The
 Linux-native repository is now available at `/home/kennarr/src/veloinference`
 on branch `codex/research-preprint`. Its HEAD matches the Windows checkout at
 the last documented commit. The Python 3.12 environment and lockfile are now
-created there, and the WSL branch has been fast-forwarded through `7d71947`.
+created there, and the WSL branch has been fast-forwarded through `43ba353`.
 The Windows ledger now records the same verified state.
 
-The immediate sequence is BACKEND-002, then ENV-003. Live vLLM experiments
-remain blocked until the adapter, vLLM
-dependencies, and smoke test are complete.
+The immediate sequence is ENV-003. Live vLLM experiments remain blocked until
+the RTX 3060-compatible vLLM dependency is installed and a direct smoke test
+is recorded.
 
 ## Completed tasks
 
@@ -644,7 +645,7 @@ Observed result:
 - Pytest: `24 passed`.
 - Two upstream Starlette/httpx deprecation warnings remain; they do not fail
   the gate and are documented here rather than hidden.
-- WSL branch `codex/research-preprint` is clean at `7d71947` before this
+- WSL branch `codex/research-preprint` is clean at `43ba353` before this
   Windows-only ledger update.
 
 Current status:
@@ -658,6 +659,64 @@ Exact next action:
 Implement BACKEND-002, the OpenAI-compatible vLLM adapter, and test its
 payload construction, response ordering, incompatibility rejection, and token
 usage parsing with MockTransport. Do not make a live request until ENV-003.
+
+### BACKEND-002 — Implement vLLM completion backend
+
+Status: complete
+Date: 2026-09-11
+Commits: d293dc3, 43ba353
+
+Files changed:
+
+- gateway/core/models.py
+- gateway/backends/base.py
+- gateway/backends/mock.py
+- gateway/backends/vllm.py
+- gateway/core/batcher.py
+- tests/test_batcher.py
+- tests/test_mock_backend.py
+- tests/test_vllm_backend.py
+
+Changes made:
+
+- Added typed `BackendOutput` values containing completion text and optional
+  completion-token counts.
+- Updated the backend interface, mock backend, and batcher response mapping to
+  preserve token usage without breaking existing mock behavior.
+- Implemented `VllmBackend` over the shared `BackendHttpClient`.
+- Added single-prompt and list-of-prompts payload construction using model,
+  max_tokens, and temperature from the request.
+- Rejected incompatible `BatchKey` batches before any HTTP call.
+- Parsed OpenAI-compatible choices, restored indexed batch responses to input
+  order, and used top-level usage only for single-request token counts.
+- Added deterministic MockTransport tests for success, ordering, token usage,
+  incompatibility, count mismatch, and repeated close.
+
+Commands run in WSL Ubuntu 26.04 with Python 3.12.14:
+
+~~~bash
+uv run --python 3.12 ruff check .
+uv run --python 3.12 pytest -q
+~~~
+
+Observed result:
+
+- Ruff: `All checks passed!`.
+- Pytest: `29 passed`.
+- Only two upstream Starlette/httpx deprecation warnings were emitted.
+- WSL branch `codex/research-preprint` is clean at `43ba353`.
+
+Current status:
+
+BACKEND-002 is complete. The adapter has not contacted a live vLLM server and
+does not authorize live experiment claims.
+
+Exact next action:
+
+Execute ENV-003 in WSL: choose and pin a vLLM version compatible with the RTX
+3060/Python 3.12 environment, install it in an isolated environment, start
+Qwen 1.5B, send one direct completion, and save the smoke-test evidence before
+using the adapter against a real server.
 
 ## Remaining task sequence
 
@@ -730,5 +789,6 @@ agent should execute.
 
 ## Next task
 
-BACKEND-002 — Implement and MockTransport-test the vLLM adapter; keep live
-requests blocked until ENV-003 installs and smoke-tests the real vLLM server.
+ENV-003 — Install a pinned RTX 3060-compatible vLLM release inside WSL,
+start Qwen 1.5B, send one direct completion, and save the complete smoke-test
+evidence before running any research workload.
