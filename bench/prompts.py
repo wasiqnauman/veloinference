@@ -10,7 +10,6 @@ from typing import Any
 
 from bench.schema import PreparedPrompt, PromptBucket
 
-
 DEFAULT_SEEDS_PATH = Path(__file__).with_name("data") / "prompt_seeds.jsonl"
 
 
