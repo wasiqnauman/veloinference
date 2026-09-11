@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: ENV-001 complete; CORE-003 pending verification
+Status: ENV-002 complete; REP-001 pending
 Last updated: 2026-09-11
 Current branch: main
-Current commit before this tracker: 36a9696
+Current commit before this tracker: 059ff31
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -47,10 +47,12 @@ The repository-only scaffolding and CPU-safe implementation commits remain
 available on `main`.
 
 The next agent must use the actual distro name `Ubuntu` in WSL commands. The
-Linux-native repository and Python 3.12 environment still need to be created
-inside WSL before vLLM dependencies are installed.
+Linux-native repository is now available at `/home/kennarr/src/veloinference`
+on branch `codex/research-preprint`. Its HEAD matches the Windows checkout at
+the last documented commit. The Python 3.12 environment and lockfile still
+need to be created there before vLLM dependencies are installed.
 
-The immediate sequence is ENV-002 and REP-001 completion, then CORE-003
+The immediate sequence is REP-001 completion, then CORE-003
 verification. ENV-003 and all live vLLM experiments remain blocked until the
 Linux Python 3.12 environment and lockfile are ready.
 
@@ -508,6 +510,49 @@ Expected state:
 
 The historical next action above is no longer pending. Continue with ENV-002.
 
+### ENV-002 — Create Linux-native working copy
+
+Status: complete
+Date: 2026-09-11
+Commit: progress-only reconciliation; the WSL clone is separate from Windows Git
+
+Actions completed:
+
+- Cloned the clean Windows repository into the WSL filesystem at
+  `/home/kennarr/src/veloinference`.
+- Moved the initial temporary clone into the exact `~/src/veloinference` path
+  required by the design before continuing.
+- Created the WSL-only branch `codex/research-preprint`.
+- Confirmed the WSL HEAD matches the Windows checkout at `059ff31`.
+
+Commands run:
+
+~~~powershell
+wsl.exe -d Ubuntu -- bash -lc 'git clone --no-hardlinks /mnt/c/Users/Wasiq/Desktop/veloinference /home/kennarr/veloinference'
+wsl.exe -d Ubuntu -- bash -lc 'mv /home/kennarr/veloinference /home/kennarr/src/veloinference'
+wsl.exe -d Ubuntu -- bash -lc 'cd /home/kennarr/src/veloinference; git switch -c codex/research-preprint'
+~~~
+
+Verification:
+
+- WSL path: `/home/kennarr/src/veloinference`.
+- Branch: `codex/research-preprint`.
+- `git status --short` is empty.
+- WSL and Windows `git rev-parse HEAD` both report `059ff317ea4cc44e3ed35e4234c831904c3fd78b`.
+
+Current status:
+
+ENV-002 is complete. The Windows checkout remains on `main`; implementation
+commits made from this point must be made in the WSL research branch first and
+then reflected in the shared Windows checkout only when intentionally synced.
+
+Exact next action:
+
+Complete REP-001 inside WSL by installing or exposing Python 3.12, installing
+uv, generating `uv.lock`, running the full test and lint suite, and recording
+the Ubuntu 26.04/Python 3.12 environment details. Do not install vLLM before
+the lockfile and baseline suite are green.
+
 ## Remaining task sequence
 
 The remaining tasks are defined in docs/RESEARCH_TO_ARXIV_DESIGN.md:
@@ -579,6 +624,6 @@ agent should execute.
 
 ## Next task
 
-ENV-002 — Create the Linux-native repository working copy inside Ubuntu on the
-C: backed WSL filesystem, verify Git history, and prepare the Python 3.12
-environment without changing the Windows working copy.
+REP-001 — Install or expose Python 3.12 and uv inside the WSL research copy,
+generate `uv.lock`, then run the full baseline test and lint suite before any
+vLLM installation.
