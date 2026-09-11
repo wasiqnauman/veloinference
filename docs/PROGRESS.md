@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: OBS-001 complete; next BENCH-001
+Status: BENCH-001 complete; next BENCH-002
 Last updated: 2026-09-11
 Current branch: main
-Current commit before this tracker: 95b5831
+Current commit before this tracker: 77a3831
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -49,14 +49,15 @@ available on `main`.
 The next agent must use the actual distro name `Ubuntu` in WSL commands. The
 Linux-native repository is available at `/home/kennarr/src/veloinference`
 on branch `codex/research-preprint`. Its Python 3.12 environment and lockfile
-are created there, and the branch is synchronized through `95b5831`. The
+are created there, and the branch is synchronized through `77a3831`. The
 Windows `main` checkout and the WSL research branch have the same source state.
 
-OBS-001 is complete. Structured JSON events, redaction, counters, and API
-error-path coverage are implemented without changing the request/response
-contract. The next agent must begin BENCH-001 by adding the benchmark runner
-and its manifest-driven configuration, then verify that a local mock benchmark
-produces a machine-readable result artifact.
+OBS-001 and BENCH-001 are complete. Structured JSON events, redaction,
+counters, API error-path coverage, immutable benchmark schemas, strict TOML
+validation, and config-relative path resolution are implemented without
+changing the gateway request/response contract. The next agent must begin
+BENCH-002 by implementing deterministic arrival generation and prompt-bucket
+preparation.
 
 ## Completed tasks
 
@@ -922,6 +923,64 @@ Execute BENCH-001. Add the benchmark runner and manifest format, run a small
 mock-backend smoke benchmark, write the result JSON under the ignored runtime
 artifact directory, and test that the artifact is deterministic in schema.
 
+### BENCH-001 — Define schemas and TOML loading
+
+Status: complete  
+Date: 2026-09-11  
+Commit: df16ca3, 95a807b, d1a1f50, 77a3831  
+
+Files changed:
+
+- `bench/schema.py` — frozen dataclasses for model, workload, arrival,
+  experiment, request, GPU, manifest, and summary records.
+- `bench/config.py` — TOML loader with strict scalar, range, enum, bucket,
+  cross-field, and relative-path validation.
+- `configs/models/mock.toml` — small local model fixture for parser tests and
+  future mock runs.
+- `configs/workloads/short_constant.toml` — deterministic low-cost workload
+  fixture.
+- `configs/experiments/mock_smoke.toml` — complete experiment fixture tying
+  the model, workload, endpoint, policy, and output path together.
+- `tests/test_bench_config.py` — valid-load, frozen-record, missing-file, and
+  invalid-boundary tests.
+
+Commands run:
+
+~~~text
+wsl.exe -d Ubuntu -- bash -lc 'cd /home/kennarr/src/veloinference; uv run --python 3.12 ruff check .; uv run --python 3.12 pytest -q'
+~~~
+
+Observed result:
+
+- Ruff: `All checks passed!`.
+- Pytest: `46 passed, 2 warnings in 0.58s`.
+- The warnings are upstream FastAPI/Starlette/httpx deprecations and do not
+  represent project failures.
+- The WSL branch `codex/research-preprint` is clean and synchronized through
+  `77a3831`.
+- The smoke experiment resolves model, workload, and output paths from the
+  experiment file location rather than the caller's working directory.
+
+Verification:
+
+- Valid mock experiment load: pass.
+- Frozen dataclass mutation rejection: pass.
+- Missing referenced file error: pass.
+- Invalid numeric, range, and prompt-bucket boundary errors: pass.
+- Full WSL Ruff gate: pass.
+- Full WSL pytest gate: pass.
+
+Current status:
+
+BENCH-001 is complete. Later benchmark tasks can consume a typed,
+fully-resolved `ExperimentConfig`; no arrivals, tokenizer-backed prompt set,
+HTTP client, or open-loop execution has been implemented yet.
+
+Exact next action:
+
+Execute BENCH-002: add deterministic constant, Poisson, and bursty arrival
+generators plus license-safe prompt seed and token-bucket preparation tests.
+
 ## Remaining task sequence
 
 The remaining tasks are defined in docs/RESEARCH_TO_ARXIV_DESIGN.md:
@@ -993,5 +1052,5 @@ agent should execute.
 
 ## Next task
 
-BENCH-001 — Implement the manifest-driven benchmark runner and produce a
-machine-readable local mock-backend result artifact.
+BENCH-002 — Implement deterministic arrival generation and license-safe,
+token-bucket prompt preparation.
