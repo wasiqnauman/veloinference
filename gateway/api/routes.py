@@ -36,7 +36,7 @@ async def infer(request: Request, payload: InferenceRequest) -> InferenceRespons
             status_code=status.HTTP_504_GATEWAY_TIMEOUT,
             detail="Backend request timed out",
         ) from exc
-    except Exception as exc:  # noqa: BLE001 - hide backend implementation details
+    except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail="Backend inference failed",
