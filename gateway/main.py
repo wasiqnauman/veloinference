@@ -1,7 +1,7 @@
 """Application entrypoint."""
 
-from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI
