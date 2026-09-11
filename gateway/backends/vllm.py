@@ -73,7 +73,7 @@ class VllmBackend(InferenceBackend):
     ) -> list[BackendOutput]:
         choices = response.get("choices")
         if not isinstance(choices, list):
-            raise ValueError("vLLM response choices must be a list")
+            raise TypeError("vLLM response choices must be a list")
         if len(choices) != expected_count:
             raise ValueError(
                 "vLLM response choice count does not match request count"
@@ -84,10 +84,10 @@ class VllmBackend(InferenceBackend):
         outputs: list[BackendOutput] = []
         for position, choice in enumerate(indexed_choices):
             if not isinstance(choice, dict):
-                raise ValueError("vLLM completion choice must be an object")
+                raise TypeError("vLLM completion choice must be an object")
             text = choice.get("text")
             if not isinstance(text, str):
-                raise ValueError("vLLM completion choice text must be a string")
+                raise TypeError("vLLM completion choice text must be a string")
             output_tokens = cls._completion_tokens(choice.get("usage"))
             if expected_count == 1 and output_tokens is None:
                 output_tokens = top_level_tokens
