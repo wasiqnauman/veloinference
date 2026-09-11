@@ -77,7 +77,7 @@ class InferenceService:
         backend_started = self._clock.monotonic()
         try:
             output = await self._backend.infer_one(pending)
-        except Exception as exc:  # noqa: BLE001 - record and re-raise backend error
+        except Exception as exc:
             self._metrics.record_failed()
             self._event_logger.emit(
                 "request_failed",

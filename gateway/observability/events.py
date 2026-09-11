@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Literal
 
 EventName = Literal[
@@ -19,7 +19,7 @@ EventName = Literal[
 
 def utc_timestamp() -> str:
     """Return a compact, timezone-aware event timestamp."""
-    return datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+    return datetime.now(UTC).isoformat(timespec="milliseconds")
 
 
 @dataclass(frozen=True, slots=True)
