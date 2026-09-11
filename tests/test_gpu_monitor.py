@@ -12,7 +12,6 @@ from bench.gpu_monitor import (
     telemetry_available,
 )
 
-
 FIXTURE = Path(__file__).parent / "fixtures" / "nvidia_smi_sample.csv"
 
 

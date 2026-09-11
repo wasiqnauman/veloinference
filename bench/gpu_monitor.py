@@ -11,7 +11,6 @@ from time import monotonic
 
 from bench.schema import GpuSample
 
-
 QUERY_FIELDS = (
     "timestamp",
     "index",
