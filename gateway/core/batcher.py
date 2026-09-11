@@ -4,13 +4,12 @@ from __future__ import annotations
 
 import asyncio
 from collections import deque
-from typing import Final
 
 from gateway.backends.base import InferenceBackend
 from gateway.core.clock import Clock, SystemClock
 from gateway.core.models import (
-    BatchMetadata,
     BatchKey,
+    BatchMetadata,
     InferenceRequest,
     InferenceResponse,
     PendingRequest,
@@ -69,7 +68,7 @@ class DynamicBatcher:
             finally:
                 self._worker_task = None
 
-        stopped_error: Final = BatcherStoppedError("Batcher stopped")
+        stopped_error = BatcherStoppedError("Batcher stopped")
         for request in self._inflight:
             self._set_exception(request, stopped_error)
         self._inflight.clear()
@@ -124,7 +123,7 @@ class DynamicBatcher:
                 del self._queues[key]
                 return []
 
-            decision = self._policy.decide(self._snapshot(key, pending_queue))
+            decision = self._policy.decide(self._snapshot(pending_queue))
             if decision.dispatch_now:
                 return self._pop_batch(key)
 
@@ -132,7 +131,7 @@ class DynamicBatcher:
                 request = await asyncio.wait_for(
                     self._queue.get(), timeout=decision.wait_s
                 )
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 return self._pop_batch(key)
 
             self._enqueue_pending(request)
@@ -146,12 +145,13 @@ class DynamicBatcher:
             outputs = await self._backend.infer_batch(batch)
             if len(outputs) != len(batch):
                 raise RuntimeError("Backend returned an unexpected number of responses")
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - propagate any backend failure
             for request in batch:
                 self._set_exception(request, exc)
             return
         finally:
-            self._inflight = []
+            if not self._stopped:
+                self._inflight = []
 
         for request, output in zip(batch, outputs, strict=True):
             if request.future is None or request.future.done():
@@ -199,11 +199,7 @@ class DynamicBatcher:
         pending_queue.clear()
         pending_queue.extend(active)
 
-    def _snapshot(
-        self,
-        key: BatchKey,
-        pending_queue: deque[PendingRequest],
-    ) -> QueueSnapshot:
+    def _snapshot(self, pending_queue: deque[PendingRequest]) -> QueueSnapshot:
         deadlines = [
             request.metadata.enqueued_at + request.metadata.deadline_ms / 1000
             for request in pending_queue
@@ -221,6 +217,6 @@ class DynamicBatcher:
         )
 
     @staticmethod
-    def _set_exception(request: PendingRequest, error: BaseException) -> None:
+    def _set_exception(request: PendingRequest, error: Exception) -> None:
         if request.future is not None and not request.future.done():
             request.future.set_exception(error)

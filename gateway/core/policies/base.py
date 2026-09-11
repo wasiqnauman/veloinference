@@ -5,7 +5,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal, Protocol
 
-
 DispatchReason = Literal[
     "batch_full",
     "wait_window_elapsed",

@@ -22,4 +22,4 @@ class InferenceBackend(ABC):
 
     async def aclose(self) -> None:
         """Release backend resources when the application stops."""
-        return None
+        return
