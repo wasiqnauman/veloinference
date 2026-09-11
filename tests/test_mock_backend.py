@@ -27,4 +27,7 @@ async def test_mock_backend_preserves_order() -> None:
 
     outputs = await backend.infer_batch(requests)
 
-    assert outputs == ["mock:one|batch=2", "mock:two|batch=2"]
+    assert [output.output_text for output in outputs] == [
+        "mock:one|batch=2",
+        "mock:two|batch=2",
+    ]

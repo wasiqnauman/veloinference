@@ -6,7 +6,7 @@ import asyncio
 from collections.abc import Sequence
 
 from gateway.backends.base import InferenceBackend
-from gateway.core.models import PendingRequest
+from gateway.core.models import BackendOutput, PendingRequest
 
 
 class MockBackend(InferenceBackend):
@@ -14,12 +14,17 @@ class MockBackend(InferenceBackend):
         self._base_latency_ms = base_latency_ms
         self._per_item_latency_ms = per_item_latency_ms
 
-    async def infer_batch(self, requests: Sequence[PendingRequest]) -> list[str]:
+    async def infer_batch(
+        self,
+        requests: Sequence[PendingRequest],
+    ) -> list[BackendOutput]:
         batch_size = len(requests)
         delay_ms = self._base_latency_ms + self._per_item_latency_ms * batch_size
         await asyncio.sleep(delay_ms / 1000)
 
         return [
-            f"mock:{request.payload.input_text.strip()}|batch={batch_size}"
+            BackendOutput(
+                output_text=f"mock:{request.payload.input_text.strip()}|batch={batch_size}"
+            )
             for request in requests
         ]

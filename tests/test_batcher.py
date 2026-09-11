@@ -8,7 +8,7 @@ import pytest
 from gateway.backends.base import InferenceBackend
 from gateway.backends.mock import MockBackend
 from gateway.core.batcher import BatcherStoppedError, DynamicBatcher
-from gateway.core.models import InferenceRequest, PendingRequest
+from gateway.core.models import BackendOutput, InferenceRequest, PendingRequest
 
 
 class RecordingBackend(InferenceBackend):
@@ -20,7 +20,7 @@ class RecordingBackend(InferenceBackend):
         requests: Sequence[PendingRequest],
     ) -> list[str]:
         self.batch_keys.append([request.metadata.batch_key for request in requests])
-        return [request.payload.input_text for request in requests]
+        return [BackendOutput(output_text=request.payload.input_text) for request in requests]
 
 
 class BlockingBackend(InferenceBackend):
@@ -33,7 +33,7 @@ class BlockingBackend(InferenceBackend):
     ) -> list[str]:
         self.started.set()
         await asyncio.Future()
-        return [request.payload.input_text for request in requests]
+        return [BackendOutput(output_text=request.payload.input_text) for request in requests]
 
 
 @pytest.mark.asyncio

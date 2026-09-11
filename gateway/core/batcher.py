@@ -161,8 +161,9 @@ class DynamicBatcher:
                 InferenceResponse(
                     request_id=request.metadata.request_id,
                     model=request.metadata.model,
-                    output_text=output,
+                    output_text=output.output_text,
                     batch_size=len(batch),
+                    output_tokens=output.output_tokens,
                 )
             )
 

@@ -32,6 +32,14 @@ class InferenceResponse(BaseModel):
     deadline_met: bool | None = None
 
 
+@dataclass(frozen=True, slots=True)
+class BackendOutput:
+    """Normalized output returned by a backend implementation."""
+
+    output_text: str
+    output_tokens: int | None = None
+
+
 class HealthResponse(BaseModel):
     status: str
 
