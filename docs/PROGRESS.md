@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: CORE-003 complete; REP-001 pending ledger update
+Status: REP-001 complete; next BACKEND-002
 Last updated: 2026-09-11
 Current branch: main
-Current commit before this tracker: 7d71947
+Current commit before this tracker: b4393f6
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -36,8 +36,8 @@ The repository contains the complete research execution design, the progress
 tracker, reproducibility scaffolding, a frozen research proposal, typed core
 contracts, and a tested shared backend HTTP client. CPU-only application
 implementation has reached a verified CORE-003 batcher and a reproducible
-Python 3.12 WSL environment. No live vLLM experiment or numerical paper result
-exists yet.
+Python 3.12 WSL environment. The dependency lockfile and baseline quality gate
+are complete. No live vLLM experiment or numerical paper result exists yet.
 
 WSL 2 and Ubuntu are now installed on the host, and WSL-side GPU access has
 been verified. The installed distribution is registered as `Ubuntu` and
@@ -50,9 +50,10 @@ Linux-native repository is now available at `/home/kennarr/src/veloinference`
 on branch `codex/research-preprint`. Its HEAD matches the Windows checkout at
 the last documented commit. The Python 3.12 environment and lockfile are now
 created there, and the WSL branch has been fast-forwarded through `7d71947`.
+The Windows ledger now records the same verified state.
 
-The immediate sequence is the REP-001 ledger update, then BACKEND-002 and
-ENV-003. Live vLLM experiments remain blocked until the adapter, vLLM
+The immediate sequence is BACKEND-002, then ENV-003. Live vLLM experiments
+remain blocked until the adapter, vLLM
 dependencies, and smoke test are complete.
 
 ## Completed tasks
@@ -607,6 +608,57 @@ uv, generating `uv.lock`, running the full test and lint suite, and recording
 the Ubuntu 26.04/Python 3.12 environment details. Do not install vLLM before
 the lockfile and baseline suite are green.
 
+### REP-001 — Establish reproducible Python environment and baseline gate
+
+Status: complete
+Date: 2026-09-11
+Commits: 57e0895, 7d71947
+
+Files changed:
+
+- uv.lock
+- gateway/main.py (import-order correction required by the clean lint gate)
+
+Environment actions:
+
+- Installed uv `0.12.13` under `/home/kennarr/.local/bin` inside WSL.
+- Installed managed CPython `3.12.14` with uv inside the WSL filesystem.
+- Created `.venv` and synchronized runtime, dev, and research dependency
+  groups with `uv sync --all-groups --python 3.12`.
+- Kept vLLM out of the baseline environment; it belongs to BACKEND-002 and
+  ENV-003 after the adapter contract is tested.
+
+Commands run in WSL Ubuntu 26.04:
+
+~~~bash
+uv lock
+uv sync --all-groups --python 3.12
+uv run --python 3.12 ruff check .
+uv run --python 3.12 pytest -q
+~~~
+
+Observed result:
+
+- `uv.lock` contains the resolved reproducibility set and is committed.
+- Ruff: `All checks passed!`.
+- Pytest: `24 passed`.
+- Two upstream Starlette/httpx deprecation warnings remain; they do not fail
+  the gate and are documented here rather than hidden.
+- WSL branch `codex/research-preprint` is clean at `7d71947` before this
+  Windows-only ledger update.
+
+Current status:
+
+REP-001 is complete. The project now has a Python 3.12 lockfile and a green
+baseline quality gate on the RTX 3060 host. No vLLM package or model has been
+installed yet.
+
+Exact next action:
+
+Implement BACKEND-002, the OpenAI-compatible vLLM adapter, and test its
+payload construction, response ordering, incompatibility rejection, and token
+usage parsing with MockTransport. Do not make a live request until ENV-003.
+
 ## Remaining task sequence
 
 The remaining tasks are defined in docs/RESEARCH_TO_ARXIV_DESIGN.md:
@@ -678,6 +730,5 @@ agent should execute.
 
 ## Next task
 
-REP-001 — Install or expose Python 3.12 and uv inside the WSL research copy,
-generate `uv.lock`, then run the full baseline test and lint suite before any
-vLLM installation.
+BACKEND-002 — Implement and MockTransport-test the vLLM adapter; keep live
+requests blocked until ENV-003 installs and smoke-tests the real vLLM server.
