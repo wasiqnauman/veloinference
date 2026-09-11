@@ -1,0 +1,13 @@
+# Purpose: deterministic, low-cost workload for local benchmark smoke tests.
+name = "short-constant"
+arrival_kind = "constant"
+duration_s = 1.0
+warmup_requests = 0
+seed = 1729
+rate_fraction_of_capacity = 0.25
+
+[[prompt_buckets]]
+name = "short"
+minimum_tokens = 1
+maximum_tokens = 32
+weight = 1.0

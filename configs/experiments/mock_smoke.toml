@@ -1,0 +1,14 @@
+# Purpose: fully resolved parser fixture for a local mock gateway experiment.
+name = "mock-smoke"
+model_config = "../models/mock.toml"
+workload_config = "../workloads/short_constant.toml"
+target_endpoint = "adip"
+adip_gateway_mode = "batched"
+policy = "fixed"
+max_batch_size = 4
+max_wait_ms = 5
+repetition_seeds = [1729]
+cooldown_s = 0.0
+output_dir = "../../results/raw"
+slo_derivation_rule = "not_applicable_for_parser_smoke"
+health_url = "http://127.0.0.1:8000/health"
