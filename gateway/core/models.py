@@ -42,6 +42,9 @@ class BackendOutput:
 
 class HealthResponse(BaseModel):
     status: str
+    backend: str = "mock"
+    mode: str = "batched"
+    policy: str = "fixed"
 
 
 @dataclass(frozen=True, slots=True)

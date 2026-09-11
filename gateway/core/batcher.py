@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from collections import deque
+from uuid import uuid4
 
 from gateway.backends.base import InferenceBackend
 from gateway.core.clock import Clock, SystemClock
@@ -140,11 +141,15 @@ class DynamicBatcher:
         if not batch:
             return
 
+        batch_id = str(uuid4())
+        dispatch_at = self._clock.monotonic()
         self._inflight = batch
         try:
+            backend_started = self._clock.monotonic()
             outputs = await self._backend.infer_batch(batch)
             if len(outputs) != len(batch):
                 raise RuntimeError("Backend returned an unexpected number of responses")
+            completed_at = self._clock.monotonic()
         except Exception as exc:  # noqa: BLE001 - propagate any backend failure
             for request in batch:
                 self._set_exception(request, exc)
@@ -157,6 +162,9 @@ class DynamicBatcher:
             if request.future is None or request.future.done():
                 continue
 
+            queue_ms = max(0.0, (dispatch_at - request.metadata.enqueued_at) * 1000)
+            backend_ms = max(0.0, (completed_at - backend_started) * 1000)
+            total_ms = max(0.0, (completed_at - request.metadata.enqueued_at) * 1000)
             request.future.set_result(
                 InferenceResponse(
                     request_id=request.metadata.request_id,
@@ -164,8 +172,20 @@ class DynamicBatcher:
                     output_text=output.output_text,
                     batch_size=len(batch),
                     output_tokens=output.output_tokens,
+                    batch_id=batch_id,
+                    queue_ms=queue_ms,
+                    backend_ms=backend_ms,
+                    total_ms=total_ms,
+                    deadline_met=self._deadline_met(request.metadata, completed_at),
                 )
             )
+
+    @staticmethod
+    def _deadline_met(metadata: BatchMetadata, completed_at: float) -> bool | None:
+        if metadata.deadline_ms is None:
+            return None
+        deadline_at = metadata.enqueued_at + metadata.deadline_ms / 1000
+        return completed_at <= deadline_at
 
     def _enqueue_pending(self, request: PendingRequest) -> None:
         if request.future is None or request.future.done():
