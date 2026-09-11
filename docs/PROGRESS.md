@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: BACKEND-002 complete; next ENV-003
+Status: ENV-003 complete; next CORE-004
 Last updated: 2026-09-11
 Current branch: main
-Current commit before this tracker: b4393f6
+Current commit before this tracker: 363d771
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -34,11 +34,11 @@ evidence.
 
 The repository contains the complete research execution design, the progress
 tracker, reproducibility scaffolding, a frozen research proposal, typed core
-contracts, and a tested shared backend HTTP client. CPU-only application
-implementation has reached a verified CORE-003 batcher and a reproducible
-Python 3.12 WSL environment. The dependency lockfile and baseline quality gate
-are complete. The vLLM adapter is implemented and MockTransport-tested, but no
-live model request or numerical paper result exists yet.
+contracts, a tested shared backend HTTP client, a verified CORE-003 batcher,
+and the implemented vLLM adapter. The CPU-safe dependency lockfile and
+baseline quality gate are complete. ENV-003 has now validated a real vLLM
+server and one direct completion on the local RTX 3060; no numerical paper
+result exists yet.
 
 WSL 2 and Ubuntu are now installed on the host, and WSL-side GPU access has
 been verified. The installed distribution is registered as `Ubuntu` and
@@ -47,15 +47,16 @@ The repository-only scaffolding and CPU-safe implementation commits remain
 available on `main`.
 
 The next agent must use the actual distro name `Ubuntu` in WSL commands. The
-Linux-native repository is now available at `/home/kennarr/src/veloinference`
-on branch `codex/research-preprint`. Its HEAD matches the Windows checkout at
-the last documented commit. The Python 3.12 environment and lockfile are now
-created there, and the WSL branch has been fast-forwarded through `43ba353`.
-The Windows ledger now records the same verified state.
+Linux-native repository is available at `/home/kennarr/src/veloinference`
+on branch `codex/research-preprint`. Its Python 3.12 environment and lockfile
+are created there, but the branch currently stops at `43ba353`; the Windows
+`main` checkout contains later ledger and ENV-003 documentation commits. The
+next agent must fast-forward the WSL branch through `363d771` before CORE-004.
 
-The immediate sequence is ENV-003. Live vLLM experiments remain blocked until
-the RTX 3060-compatible vLLM dependency is installed and a direct smoke test
-is recorded.
+The immediate sequence is CORE-004. The next agent must first fast-forward the
+Linux-native research branch through the current Windows commit, then extract
+the service, backend factory, routes, and lifecycle wiring before any benchmark
+work begins.
 
 ## Completed tasks
 
@@ -713,10 +714,82 @@ does not authorize live experiment claims.
 
 Exact next action:
 
-Execute ENV-003 in WSL: choose and pin a vLLM version compatible with the RTX
-3060/Python 3.12 environment, install it in an isolated environment, start
-Qwen 1.5B, send one direct completion, and save the smoke-test evidence before
-using the adapter against a real server.
+ENV-003 is recorded below as complete. Continue with CORE-004 after syncing
+the WSL research branch through the ENV-003 documentation commit.
+
+### ENV-003 — Install and smoke-test vLLM
+
+Status: complete  
+Date: 2026-09-11  
+Commit: 363d771 (runtime documentation and pinned requirements; this ledger
+update is committed separately)
+
+Files changed:
+
+- requirements/vllm.txt
+- docs/ENV-003_SMOKE.md
+
+Environment changes outside Git:
+
+- Created the isolated WSL environment at
+  `/home/kennarr/src/veloinference/.venv-vllm` with Python 3.12.14.
+- Installed vLLM 0.29.0, ninja 1.13.2, and FlashInfer 0.6.18.
+- Aligned the CUDA compiler/runtime packages to `nvidia-cuda-nvcc==13.4.59`
+  and `nvidia-cuda-runtime==13.4.49` after the initial mixed CUDA package set
+  caused JIT compiler and PTX assembler mismatches.
+- Added only the required `lib64`, `stubs/libcuda.so`, and unversioned
+  `libcudart.so` symlinks inside the isolated Python CUDA toolkit directory.
+- Kept model and FlashInfer caches in the WSL filesystem on C: storage.
+
+Commands run:
+
+~~~bash
+uv pip install --python .venv-vllm/bin/python -r requirements/vllm.txt
+.venv-vllm/bin/python -c "import torch; print(torch.__version__); print(torch.version.cuda); print(torch.cuda.is_available()); print(torch.cuda.get_device_name(0))"
+export VLLM_WSL2_ENABLE_PIN_MEMORY=1
+.venv-vllm/bin/vllm serve Qwen/Qwen2.5-1.5B-Instruct --host 127.0.0.1 --port 8001 --dtype half --max-model-len 2048 --gpu-memory-utilization 0.85 --max-num-seqs 8 --enforce-eager --served-model-name Qwen/Qwen2.5-1.5B-Instruct
+.venv-vllm/bin/python -c "import json, urllib.request; payload={'model':'Qwen/Qwen2.5-1.5B-Instruct','prompt':'In one short sentence, explain why batching can improve GPU throughput.','max_tokens':32,'temperature':0.0}; request=urllib.request.Request('http://127.0.0.1:8001/v1/completions', data=json.dumps(payload).encode(), headers={'Content-Type':'application/json'}); print(urllib.request.urlopen(request, timeout=60).read().decode())"
+~~~
+
+Observed result:
+
+- The first launch failed with `RuntimeError: UVA is not available`; setting
+  `VLLM_WSL2_ENABLE_PIN_MEMORY=1` cleared that WSL2-specific failure.
+- The next attempts identified and fixed missing `gcc`, missing `nvcc`, missing
+  `ninja`, mismatched CUDA 13.4/13.2 compiler packages, and the Python-wheel
+  `lib` versus `lib64` linker layout.
+- The successful launch loaded the Qwen checkpoint using 2.98 GiB of GPU
+  memory, reported 6.98 GiB of available KV-cache memory, completed kernel
+  warmup, and printed `Application startup complete.`
+- The direct completion returned HTTP 200 with model
+  `Qwen/Qwen2.5-1.5B-Instruct`, non-empty text, and usage
+  `prompt_tokens=13`, `completion_tokens=32`, `total_tokens=45`.
+- Ctrl+C stopped the supervised server and port 8001 was no longer listening.
+
+Verification:
+
+- command: `uv pip install --dry-run ... -r requirements/vllm.txt` — pass;
+  `Checked 5 packages` and `Would make no changes`.
+- command: PyTorch CUDA probe — pass; `2.13.0+cu132`, `13.2`, `True`, and
+  `NVIDIA GeForce RTX 3060`.
+- command: live vLLM startup — pass; server reached application startup.
+- command: one direct completion — pass; HTTP 200 and valid usage fields.
+- command: process/listener cleanup — pass; no vLLM process and no listener on
+  port 8001 after shutdown.
+
+Current status:
+
+ENV-003 is complete. The local machine can run the pinned Qwen smoke workload.
+This is environment evidence only; it is not a benchmark result and does not
+authorize claims about batching performance.
+
+Exact next action:
+
+Fast-forward the WSL branch through commit `363d771`, then execute CORE-004:
+extract the service, backend factory, FastAPI routes, and startup/shutdown
+lifecycle around the tested batcher and vLLM backend. Keep the first CORE-004
+change CPU-safe and verify it with the existing full test suite before sending
+gateway traffic to the live model.
 
 ## Remaining task sequence
 
