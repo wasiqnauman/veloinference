@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: ENV-003 complete; next CORE-004
+Status: CORE-004 complete; next OBS-001
 Last updated: 2026-09-11
 Current branch: main
-Current commit before this tracker: 363d771
+Current commit before this tracker: 1e9c3d0
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -49,14 +49,12 @@ available on `main`.
 The next agent must use the actual distro name `Ubuntu` in WSL commands. The
 Linux-native repository is available at `/home/kennarr/src/veloinference`
 on branch `codex/research-preprint`. Its Python 3.12 environment and lockfile
-are created there, but the branch currently stops at `43ba353`; the Windows
-`main` checkout contains later ledger and ENV-003 documentation commits. The
-next agent must fast-forward the WSL branch through `363d771` before CORE-004.
+are created there, and the branch is synchronized through `1e9c3d0`. The
+Windows `main` checkout and the WSL research branch have the same source state.
 
-The immediate sequence is CORE-004. The next agent must first fast-forward the
-Linux-native research branch through the current Windows commit, then extract
-the service, backend factory, routes, and lifecycle wiring before any benchmark
-work begins.
+The immediate sequence is OBS-001. The next agent must add structured event
+schemas and counters without changing the request/response contract, then
+verify that logs contain no prompt text or credentials.
 
 ## Completed tasks
 
@@ -719,8 +717,8 @@ the WSL research branch through the ENV-003 documentation commit.
 
 ### ENV-003 — Install and smoke-test vLLM
 
-Status: complete  
-Date: 2026-09-11  
+Status: complete
+Date: 2026-09-11
 Commit: 363d771 (runtime documentation and pinned requirements; this ledger
 update is committed separately)
 
@@ -790,6 +788,76 @@ extract the service, backend factory, FastAPI routes, and startup/shutdown
 lifecycle around the tested batcher and vLLM backend. Keep the first CORE-004
 change CPU-safe and verify it with the existing full test suite before sending
 gateway traffic to the live model.
+
+### CORE-004 — Implement service, factory, routes, and lifecycle
+
+Status: complete  
+Date: 2026-09-11  
+Commits: 5991f62, 1e9c3d0
+
+Files changed:
+
+- gateway/config.py
+- gateway/backends/__init__.py
+- gateway/backends/factory.py
+- gateway/core/models.py
+- gateway/core/batcher.py
+- gateway/core/service.py
+- gateway/api/routes.py
+- gateway/main.py
+- tests/test_api.py
+- tests/test_backend_factory.py
+- tests/test_service.py
+
+Changes made:
+
+- Added validated settings for backend kind, gateway mode, policy, vLLM
+  endpoint/timeout, adaptive-policy placeholders, telemetry, and log level.
+- Added `build_backend()` with explicit mock and vLLM branches.
+- Added `InferenceService` so pass-through and batched execution are selected
+  outside the HTTP route.
+- Added batch IDs, queue/backend/total timing fields, and soft deadline status
+  to batched responses; pass-through responses now expose the same normalized
+  shape.
+- Updated routes to read `app.state.inference_service`, expose backend/mode/
+  policy health metadata, and map queue overload, shutdown, timeout, and
+  unexpected backend failures to 503, 503, 504, and 502 respectively.
+- Rebuilt application composition so backend cleanup runs even when batcher
+  shutdown raises. Adaptive policy selection is explicitly rejected until
+  CORE-005 implements it.
+- Added API, factory, pass-through service, and error-mapping tests.
+
+Commands run in WSL Ubuntu with Python 3.12.14:
+
+~~~bash
+git fetch /mnt/c/Users/Wasiq/Desktop/veloinference main
+git merge --ff-only FETCH_HEAD
+uv run --python 3.12 ruff check .
+uv run --python 3.12 pytest -q
+~~~
+
+Observed result:
+
+- Ruff: `All checks passed!`.
+- Pytest: `35 passed`.
+- The two existing upstream Starlette/httpx deprecation warnings remain.
+- The WSL research branch is clean and synchronized at `1e9c3d0`.
+- The Windows host-only pytest run was not used as the quality gate because
+  that environment lacks `pytest-asyncio`; it reported the known async-plugin
+  failures. The WSL Python 3.12 run is the authoritative result.
+
+Current status:
+
+CORE-004 is complete. The application can now be exercised in either mock
+pass-through or mock batched mode, and can construct the vLLM backend without
+making a request during startup. No gateway-to-vLLM experiment has been run
+yet, and no structured telemetry or benchmark artifact exists.
+
+Exact next action:
+
+Execute OBS-001: add stable structured event schemas and counters, emit JSON
+events without prompt text or secrets, and add parser/schema tests before
+building benchmark tooling.
 
 ## Remaining task sequence
 
@@ -862,6 +930,5 @@ agent should execute.
 
 ## Next task
 
-ENV-003 — Install a pinned RTX 3060-compatible vLLM release inside WSL,
-start Qwen 1.5B, send one direct completion, and save the complete smoke-test
-evidence before running any research workload.
+OBS-001 — Add structured telemetry events and counters, verify JSON-line output,
+and ensure logs contain no prompt text or API keys.
