@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: BENCH-002 complete; next BENCH-003
+Status: BENCH-003 complete; next BENCH-004
 Last updated: 2026-09-11
 Current branch: main
-Current commit before this tracker: dbf2d97
+Current commit before this tracker: 1e2fe22
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -49,15 +49,15 @@ available on `main`.
 The next agent must use the actual distro name `Ubuntu` in WSL commands. The
 Linux-native repository is available at `/home/kennarr/src/veloinference`
 on branch `codex/research-preprint`. Its Python 3.12 environment and lockfile
-are created there, and the branch is synchronized through `dbf2d97`. The
+are created there, and the branch is synchronized through `1e2fe22`. The
 Windows `main` checkout and the WSL research branch have the same source state.
 
-OBS-001 through BENCH-002 are complete. Structured JSON events, redaction,
+OBS-001 through BENCH-003 are complete. Structured JSON events, redaction,
 counters, API error-path coverage, immutable benchmark schemas, strict TOML
 validation, config-relative path resolution, deterministic arrivals, and
 token-bucket prompt preparation are implemented without changing the gateway
-request/response contract. The next agent must begin BENCH-003 by adding the
-direct-vLLM and ADIP clients with one normalized response shape.
+request/response contract. The next agent must begin BENCH-004 by adding
+absolute-time open-loop execution and append-safe result storage.
 
 ## Completed tasks
 
@@ -1037,6 +1037,59 @@ Exact next action:
 Execute BENCH-003: implement DirectVllmClient and AdipClient, normalize their
 responses into one client result shape, and test both with httpx MockTransport.
 
+### BENCH-003 — Implement direct and ADIP clients
+
+Status: complete  
+Date: 2026-09-11  
+Commit: 1e2fe22  
+
+Files changed:
+
+- `bench/client.py` — `InferenceClient` protocol, `ClientResult`, direct
+  vLLM completions client, ADIP inference client, response validation, and
+  idempotent transport close.
+- `tests/test_bench_client.py` — MockTransport request-shape, header,
+  normalization, malformed-response, and lifecycle tests.
+
+Commands run:
+
+~~~text
+wsl.exe -d Ubuntu -- bash -lc 'cd /home/kennarr/src/veloinference; uv run --python 3.12 ruff check .; uv run --python 3.12 pytest -q'
+~~~
+
+Observed result:
+
+- Ruff: `All checks passed!`.
+- Pytest: `57 passed, 2 warnings in 0.57s`.
+- The warnings are upstream FastAPI/Starlette/httpx deprecations and do not
+  represent project failures.
+- The WSL branch `codex/research-preprint` is clean and synchronized through
+  `1e2fe22`.
+- Direct vLLM uses `/v1/completions`; ADIP uses `/v1/infer` and receives the
+  `X-ADIP-Experiment-ID` header.
+
+Verification:
+
+- Shared model, prompt, max-token, and temperature payload fields: pass.
+- Direct vLLM completion and usage normalization: pass.
+- ADIP output, batch, queue, and backend normalization: pass.
+- Malformed response rejection: pass.
+- Idempotent close and closed-client rejection: pass.
+- Full WSL Ruff gate: pass.
+- Full WSL pytest gate: pass.
+
+Current status:
+
+BENCH-003 is complete. The benchmark layer can now target either local vLLM
+or ADIP through one response contract. It still cannot schedule requests on
+an open-loop timeline or persist request/manifest evidence.
+
+Exact next action:
+
+Execute BENCH-004: implement absolute-target-time request execution and
+append-safe JSONL plus atomic manifest storage, then test slow-response
+non-blocking behavior with an injected fake client.
+
 ## Remaining task sequence
 
 The remaining tasks are defined in docs/RESEARCH_TO_ARXIV_DESIGN.md:
@@ -1108,5 +1161,5 @@ agent should execute.
 
 ## Next task
 
-BENCH-003 — Implement direct-vLLM and ADIP HTTP clients with normalized
-responses and MockTransport coverage.
+BENCH-004 — Implement open-loop scheduling and append-safe result/manifest
+storage with interruption-safe tests.
