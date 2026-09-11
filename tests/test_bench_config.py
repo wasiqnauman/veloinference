@@ -10,7 +10,6 @@ import pytest
 from bench.config import ConfigError, load_experiment_config
 from bench.schema import ExperimentConfig, ModelConfig, RequestResult
 
-
 ROOT = Path(__file__).resolve().parents[1]
 SMOKE_CONFIG = ROOT / "configs" / "experiments" / "mock_smoke.toml"
 
