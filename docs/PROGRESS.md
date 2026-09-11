@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: BENCH-001 complete; next BENCH-002
+Status: BENCH-002 complete; next BENCH-003
 Last updated: 2026-09-11
 Current branch: main
-Current commit before this tracker: 77a3831
+Current commit before this tracker: dbf2d97
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -49,15 +49,15 @@ available on `main`.
 The next agent must use the actual distro name `Ubuntu` in WSL commands. The
 Linux-native repository is available at `/home/kennarr/src/veloinference`
 on branch `codex/research-preprint`. Its Python 3.12 environment and lockfile
-are created there, and the branch is synchronized through `77a3831`. The
+are created there, and the branch is synchronized through `dbf2d97`. The
 Windows `main` checkout and the WSL research branch have the same source state.
 
-OBS-001 and BENCH-001 are complete. Structured JSON events, redaction,
+OBS-001 through BENCH-002 are complete. Structured JSON events, redaction,
 counters, API error-path coverage, immutable benchmark schemas, strict TOML
-validation, and config-relative path resolution are implemented without
-changing the gateway request/response contract. The next agent must begin
-BENCH-002 by implementing deterministic arrival generation and prompt-bucket
-preparation.
+validation, config-relative path resolution, deterministic arrivals, and
+token-bucket prompt preparation are implemented without changing the gateway
+request/response contract. The next agent must begin BENCH-003 by adding the
+direct-vLLM and ADIP clients with one normalized response shape.
 
 ## Completed tasks
 
@@ -981,6 +981,62 @@ Exact next action:
 Execute BENCH-002: add deterministic constant, Poisson, and bursty arrival
 generators plus license-safe prompt seed and token-bucket preparation tests.
 
+### BENCH-002 — Implement arrivals and prompts
+
+Status: complete  
+Date: 2026-09-11  
+Commit: 6fa5eec, ae486af, dbf2d97  
+
+Files changed:
+
+- `bench/arrivals.py` — deterministic constant, Poisson, and interval-bursty
+  arrival offsets with finite/range validation.
+- `bench/prompts.py` — JSONL seed loading, tokenizer adapter protocol,
+  deterministic bucket fitting, and bucket validation.
+- `bench/schema.py` — immutable `PreparedPrompt` record.
+- `bench/data/prompt_seeds.jsonl` — four project-authored seed passages.
+- `tests/test_bench_arrivals.py` — schedule determinism, bounds, invalid-input,
+  prompt determinism, bucket, and no-fit tests.
+
+Commands run:
+
+~~~text
+wsl.exe -d Ubuntu -- bash -lc 'cd /home/kennarr/src/veloinference; uv run --python 3.12 ruff check .; uv run --python 3.12 pytest -q'
+~~~
+
+Observed result:
+
+- Ruff: `All checks passed!`.
+- Pytest: `53 passed, 2 warnings in 0.59s`.
+- The warnings are upstream FastAPI/Starlette/httpx deprecations and do not
+  represent project failures.
+- The WSL branch `codex/research-preprint` is clean and synchronized through
+  `dbf2d97`.
+- Identical seeds produce identical schedules and prompt records.
+- Every generated prompt is checked against its declared token bucket.
+
+Verification:
+
+- Constant schedule starts at zero and stays below duration: pass.
+- Poisson and bursty schedules are seed-deterministic and sorted: pass.
+- Invalid rates, probabilities, and durations fail clearly: pass.
+- Prompt seed JSONL loads and deterministic smoke prompts fit buckets: pass.
+- Unfillable prompt bucket raises instead of silently reassigning: pass.
+- Full WSL Ruff gate: pass.
+- Full WSL pytest gate: pass.
+
+Current status:
+
+BENCH-002 is complete. The default whitespace tokenizer is intentionally only
+for parser/smoke tests; final experiments must inject the exact target-model
+tokenizer and record its revision. No direct/ADIP HTTP client or open-loop
+runner exists yet.
+
+Exact next action:
+
+Execute BENCH-003: implement DirectVllmClient and AdipClient, normalize their
+responses into one client result shape, and test both with httpx MockTransport.
+
 ## Remaining task sequence
 
 The remaining tasks are defined in docs/RESEARCH_TO_ARXIV_DESIGN.md:
@@ -1052,5 +1108,5 @@ agent should execute.
 
 ## Next task
 
-BENCH-002 — Implement deterministic arrival generation and license-safe,
-token-bucket prompt preparation.
+BENCH-003 — Implement direct-vLLM and ADIP HTTP clients with normalized
+responses and MockTransport coverage.
