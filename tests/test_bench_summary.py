@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from bench.plot import plot_summary
 from bench.summarize import summarize_records
 
@@ -41,7 +43,7 @@ def test_summary_excludes_warmup_and_keeps_failures() -> None:
     assert summary.mean_gpu_utilization_percent == 30.0
     assert summary.max_vram_used_mb == 800.0
     assert summary.mean_power_draw_w == 55.0
-    assert summary.p95_arrival_drift_ms == 1.9
+    assert summary.p95_arrival_drift_ms == pytest.approx(1.9)
 
 
 def test_plot_summary_writes_both_publication_formats(tmp_path: Path) -> None:
