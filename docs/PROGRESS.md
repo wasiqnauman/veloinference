@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: CORE-004 complete; next OBS-001
+Status: OBS-001 complete; next BENCH-001
 Last updated: 2026-09-11
 Current branch: main
-Current commit before this tracker: 1e9c3d0
+Current commit before this tracker: 95b5831
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -49,12 +49,14 @@ available on `main`.
 The next agent must use the actual distro name `Ubuntu` in WSL commands. The
 Linux-native repository is available at `/home/kennarr/src/veloinference`
 on branch `codex/research-preprint`. Its Python 3.12 environment and lockfile
-are created there, and the branch is synchronized through `1e9c3d0`. The
+are created there, and the branch is synchronized through `95b5831`. The
 Windows `main` checkout and the WSL research branch have the same source state.
 
-The immediate sequence is OBS-001. The next agent must add structured event
-schemas and counters without changing the request/response contract, then
-verify that logs contain no prompt text or credentials.
+OBS-001 is complete. Structured JSON events, redaction, counters, and API
+error-path coverage are implemented without changing the request/response
+contract. The next agent must begin BENCH-001 by adding the benchmark runner
+and its manifest-driven configuration, then verify that a local mock benchmark
+produces a machine-readable result artifact.
 
 ## Completed tasks
 
@@ -855,9 +857,70 @@ yet, and no structured telemetry or benchmark artifact exists.
 
 Exact next action:
 
-Execute OBS-001: add stable structured event schemas and counters, emit JSON
-events without prompt text or secrets, and add parser/schema tests before
-building benchmark tooling.
+Execute BENCH-001: implement the manifest-driven benchmark runner and its
+machine-readable result artifact using the existing local mock backend first.
+
+### OBS-001 — Add structured events and counters
+
+Status: complete  
+Date: 2026-09-11  
+Commit: b1eef15, 41eb54d, dd7436d, 95b5831  
+
+Files changed:
+
+- `gateway/observability/events.py` — stable event names and JSON-serializable
+  event schema.
+- `gateway/observability/logging.py` — JSON-line event logger, null logger,
+  credential/prompt-field redaction, and safe exception messages.
+- `gateway/observability/metrics.py` — request, batch, failure, latency, and
+  EWMA counters used by the research policy layer.
+- `gateway/core/models.py` — optional experiment identifier in batch metadata.
+- `gateway/core/batcher.py` — event and metric emission at enqueue, policy,
+  dispatch, completion, and failure boundaries.
+- `gateway/core/service.py` — telemetry integration for batched and
+  pass-through service modes.
+- `gateway/main.py` — one application-wide logger and metrics registry.
+- `gateway/api/routes.py` — forwards `X-ADIP-Experiment-ID` and preserves
+  explicit error mappings.
+- `tests/test_observability.py` — event schema, redaction, metric, and
+  exception-safety tests.
+- `tests/test_api.py` — route tests for timeout and queue-overload mappings.
+
+Commands run:
+
+~~~text
+wsl.exe -d Ubuntu -- bash -lc 'cd /home/kennarr/src/veloinference; uv run --python 3.12 ruff check .; uv run --python 3.12 pytest -q'
+~~~
+
+Observed result:
+
+- Ruff: `All checks passed!`.
+- Pytest: `39 passed, 2 warnings in 0.55s`.
+- The warnings are upstream FastAPI/Starlette/httpx deprecations and do not
+  represent project failures.
+- The WSL branch `codex/research-preprint` is clean and synchronized through
+  `95b5831`.
+- Redaction tests confirm prompt-like fields and bearer/API-key values do not
+  appear in emitted event JSON.
+
+Verification:
+
+- Structured-event and metric tests: pass.
+- API timeout and queue-overload mapping tests: pass.
+- Full WSL Ruff gate: pass.
+- Full WSL pytest gate: pass.
+
+Current status:
+
+OBS-001 is complete. The gateway now exposes stable research telemetry for
+later benchmark and analysis tooling. No benchmark result artifact exists yet,
+and no numerical gateway-to-vLLM comparison has been run.
+
+Exact next action:
+
+Execute BENCH-001. Add the benchmark runner and manifest format, run a small
+mock-backend smoke benchmark, write the result JSON under the ignored runtime
+artifact directory, and test that the artifact is deterministic in schema.
 
 ## Remaining task sequence
 
@@ -930,5 +993,5 @@ agent should execute.
 
 ## Next task
 
-OBS-001 — Add structured telemetry events and counters, verify JSON-line output,
-and ensure logs contain no prompt text or API keys.
+BENCH-001 — Implement the manifest-driven benchmark runner and produce a
+machine-readable local mock-backend result artifact.
