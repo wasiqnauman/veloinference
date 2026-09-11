@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: BENCH-005 complete; next BENCH-006
+Status: BENCH-006 complete; next EXP-001
 Last updated: 2026-09-11
 Current branch: main
-Current commit before this tracker: a914eba
+Current commit before this tracker: 65e4dce
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -49,16 +49,17 @@ available on `main`.
 The next agent must use the actual distro name `Ubuntu` in WSL commands. The
 Linux-native repository is available at `/home/kennarr/src/veloinference`
 on branch `codex/research-preprint`. Its Python 3.12 environment and lockfile
-are created there, and the branch is synchronized through `a914eba`. The
+are created there, and the branch is synchronized through `65e4dce`. The
 Windows `main` checkout and the WSL research branch have the same source state.
 
-OBS-001 through BENCH-005 are complete. Structured JSON events, redaction,
+OBS-001 through BENCH-006 are complete. Structured JSON events, redaction,
 counters, API error-path coverage, immutable benchmark schemas, strict TOML
 validation, config-relative path resolution, deterministic arrivals, and
 token-bucket prompt preparation are implemented without changing the gateway
-request/response contract. The next agent must begin BENCH-006 by converting
-raw request/GPU records into exact summaries and deterministic publication
-figures.
+request/response contract. Raw request/GPU records can now be converted into
+exact summaries and deterministic PDF/PNG figures. The next agent must begin
+EXP-001 by preparing the calibration run against the pinned local vLLM server;
+no capacity value may be guessed from the smoke test.
 
 ## Completed tasks
 
@@ -1208,6 +1209,68 @@ Execute BENCH-006: implement warm-up exclusion, failure-safe aggregate
 metrics, NumPy quantiles, and deterministic PDF/PNG plots using a checked-in
 synthetic fixture.
 
+### BENCH-006 — Implement summaries and figures
+
+Status: complete  
+Date: 2026-09-11  
+Commit: 4e6cc56, 20c9b48, 65e4dce  
+
+Files changed:
+
+- `bench/summarize.py` — warm-up exclusion, success/failure accounting,
+  NumPy quantiles, queue/backend/batch metrics, SLO attainment, GPU metrics,
+  and arrival-drift summaries.
+- `bench/plot.py` — noninteractive colorblind-safe throughput/p95-latency
+  figure writer with PDF and PNG outputs.
+- `tests/fixtures/request_records.jsonl` — synthetic raw request evidence.
+- `tests/fixtures/gpu_records.jsonl` — synthetic successful and unavailable
+  GPU samples.
+- `tests/test_bench_summary.py` — exact aggregate assertions and output-file
+  checks.
+
+Commands run:
+
+~~~text
+wsl.exe -d Ubuntu -- bash -lc 'cd /home/kennarr/src/veloinference; uv run --python 3.12 ruff check .; uv run --python 3.12 pytest -q'
+~~~
+
+Observed result:
+
+- Ruff: `All checks passed!`.
+- Pytest: `66 passed, 2 warnings in 1.24s`.
+- The warnings are upstream FastAPI/Starlette/httpx deprecations and do not
+  represent project failures.
+- The WSL branch `codex/research-preprint` is clean and synchronized through
+  `65e4dce`.
+- The synthetic fixture produces 0.50 successful requests/s, 3.0 output
+  tokens/s, p95 latency 29.0 ms, 50% SLO attainment, and 1.9 ms p95 drift
+  after excluding one warm-up request; failures remain counted.
+- The plot test produced nonempty PDF and PNG files in the temporary output
+  directory.
+
+Verification:
+
+- Warm-up exclusion: pass.
+- Failed-request counting without fake zero latency: pass.
+- NumPy p50/p95/p99 and queue/backend aggregates: pass.
+- GPU mean/max/power and arrival-drift aggregates: pass.
+- Deterministic noninteractive PDF/PNG output creation: pass.
+- Full WSL Ruff gate: pass.
+- Full WSL pytest gate: pass.
+
+Current status:
+
+BENCH-006 is complete. The benchmark primitives are implemented and tested,
+but no real vLLM calibration result has been generated. The existing legacy
+`bench/load_test.py` remains a closed-loop convenience tool and must not be
+used as final evidence; EXP-001 must use the open-loop runner.
+
+Exact next action:
+
+Execute EXP-001: prepare the primary-model calibration configuration and
+driver, start the pinned vLLM server in WSL, and measure 0.5/1/2/4/8/16
+requests per second with raw request and GPU records.
+
 ## Remaining task sequence
 
 The remaining tasks are defined in docs/RESEARCH_TO_ARXIV_DESIGN.md:
@@ -1279,5 +1342,5 @@ agent should execute.
 
 ## Next task
 
-BENCH-006 — Implement raw-record summarization and deterministic PDF/PNG plots
-with exact synthetic-fixture tests.
+EXP-001 — Prepare and run primary-model calibration on the local RTX 3060;
+record measured capacity from open-loop raw evidence.
