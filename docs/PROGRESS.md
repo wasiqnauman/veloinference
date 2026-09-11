@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: BENCH-003 complete; next BENCH-004
+Status: BENCH-004 complete; next BENCH-005
 Last updated: 2026-09-11
 Current branch: main
-Current commit before this tracker: 1e2fe22
+Current commit before this tracker: af464b7
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -49,15 +49,16 @@ available on `main`.
 The next agent must use the actual distro name `Ubuntu` in WSL commands. The
 Linux-native repository is available at `/home/kennarr/src/veloinference`
 on branch `codex/research-preprint`. Its Python 3.12 environment and lockfile
-are created there, and the branch is synchronized through `1e2fe22`. The
+are created there, and the branch is synchronized through `af464b7`. The
 Windows `main` checkout and the WSL research branch have the same source state.
 
-OBS-001 through BENCH-003 are complete. Structured JSON events, redaction,
+OBS-001 through BENCH-004 are complete. Structured JSON events, redaction,
 counters, API error-path coverage, immutable benchmark schemas, strict TOML
 validation, config-relative path resolution, deterministic arrivals, and
 token-bucket prompt preparation are implemented without changing the gateway
-request/response contract. The next agent must begin BENCH-004 by adding
-absolute-time open-loop execution and append-safe result storage.
+request/response contract. The next agent must begin BENCH-005 by adding
+independent `nvidia-smi` sampling and parser tests that preserve unavailable
+telemetry as an explicit state.
 
 ## Completed tasks
 
@@ -1090,6 +1091,64 @@ Execute BENCH-004: implement absolute-target-time request execution and
 append-safe JSONL plus atomic manifest storage, then test slow-response
 non-blocking behavior with an injected fake client.
 
+### BENCH-004 — Implement open-loop runner and storage
+
+Status: complete  
+Date: 2026-09-11  
+Commit: 287fcd1, af464b7  
+
+Files changed:
+
+- `bench/runner.py` — absolute-target-time request execution, client failure
+  normalization, scheduling-drift accounting, immediate completion writes,
+  and harness-overload threshold.
+- `bench/storage.py` — compact append-safe JSONL and atomic sibling-file JSON
+  replacement with parent-directory creation.
+- `tests/test_bench_runner.py` — non-blocking slow-response scheduling,
+  persisted-result, JSONL, and atomic replacement tests.
+
+Commands run:
+
+~~~text
+wsl.exe -d Ubuntu -- bash -lc 'cd /home/kennarr/src/veloinference; uv run --python 3.12 ruff check .; uv run --python 3.12 pytest -q'
+~~~
+
+Observed result:
+
+- Ruff: `All checks passed!`.
+- Pytest: `60 passed, 2 warnings in 0.72s`.
+- The warnings are upstream FastAPI/Starlette/httpx deprecations and do not
+  represent project failures.
+- The WSL branch `codex/research-preprint` is clean and synchronized through
+  `af464b7`.
+- A slow request zero does not postpone the target arrival of request one.
+- Each completed result is written as one valid JSONL object; manifests use
+  atomic replacement with no temporary file left behind.
+
+Verification:
+
+- Absolute target scheduling: pass.
+- Slow-prior-response non-blocking behavior: pass.
+- Client failure normalization into `RequestResult`: implemented by the
+  runner failure path.
+- Harness scheduling drift threshold validation: pass.
+- Append-safe JSONL writes: pass.
+- Atomic manifest replacement: pass.
+- Full WSL Ruff gate: pass.
+- Full WSL pytest gate: pass.
+
+Current status:
+
+BENCH-004 is complete. The benchmark can now issue independent planned
+requests and persist raw request evidence. GPU telemetry and run manifests are
+not yet produced by a CLI.
+
+Exact next action:
+
+Execute BENCH-005: implement `nvidia-smi` sampling with explicit query fields,
+record per-sample errors without fabricating zeros, and verify parsing with a
+stored sample fixture plus one local machine sample.
+
 ## Remaining task sequence
 
 The remaining tasks are defined in docs/RESEARCH_TO_ARXIV_DESIGN.md:
@@ -1161,5 +1220,5 @@ agent should execute.
 
 ## Next task
 
-BENCH-004 — Implement open-loop scheduling and append-safe result/manifest
-storage with interruption-safe tests.
+BENCH-005 — Implement independent `nvidia-smi` GPU sampling and unavailable-
+telemetry handling with parser tests.
