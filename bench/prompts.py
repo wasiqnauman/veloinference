@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import json
 import random
-from collections.abc import Iterable, Protocol
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 from bench.schema import PreparedPrompt, PromptBucket
 
