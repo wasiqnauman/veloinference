@@ -1,0 +1,4 @@
+{"seed_id":"gateway-batching","text":"A gateway groups independent inference requests before forwarding them to a model server."}
+{"seed_id":"latency-throughput","text":"Shorter waiting windows usually reduce queue delay while longer windows may create larger batches."}
+{"seed_id":"measurement","text":"A reproducible experiment records its configuration, request timings, and failures as raw evidence."}
+{"seed_id":"single-gpu","text":"A single GPU study should report hardware limits and avoid claiming behavior for every serving system."}

@@ -34,6 +34,17 @@ class PromptBucket:
 
 
 @dataclass(frozen=True, slots=True)
+class PreparedPrompt:
+    """One deterministic prompt and the tokenizer evidence used to make it."""
+
+    text: str
+    input_tokens: int
+    seed_id: str
+    tokenizer_revision: str
+    bucket_name: str
+
+
+@dataclass(frozen=True, slots=True)
 class ArrivalConfig:
     """Arrival-process settings resolved from a workload TOML file."""
 
