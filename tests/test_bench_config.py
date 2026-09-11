@@ -58,7 +58,7 @@ def test_invalid_boundary_has_actionable_error(
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
 
-    target = config_root / Path(relative_path)
+    target = tmp_path / Path(relative_path)
     target.write_text(
         target.read_text(encoding="utf-8").replace(
             {

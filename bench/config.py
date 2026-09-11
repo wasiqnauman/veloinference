@@ -152,13 +152,17 @@ def _load_workload_config(path: Path) -> WorkloadConfig:
         high_rate_fraction_of_capacity=_optional_fraction(
             values, "high_rate_fraction_of_capacity", "workload"
         ),
-        burst_probability=_float_between(
-            values,
-            "burst_probability",
-            0.0,
-            1.0,
-            "workload",
-            include_lower=True,
+        burst_probability=(
+            _float_between(
+                values,
+                "burst_probability",
+                0.0,
+                1.0,
+                "workload",
+                include_lower=True,
+            )
+            if "burst_probability" in values
+            else 0.5
         ),
         interval_s=_positive_float_or_default(values, "interval_s", "workload", 1.0),
     )
