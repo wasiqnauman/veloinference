@@ -51,20 +51,12 @@ def test_infer_pass_through_mode() -> None:
 
 
 class _FailingService:
-    async def infer(
-        self,
-        _payload: object,
-        _experiment_id: str | None = None,
-    ) -> object:
+    async def infer(self, _payload: object, **_kwargs: object) -> object:
         raise httpx.ReadTimeout("backend timed out")
 
 
 class _OverloadedService:
-    async def infer(
-        self,
-        _payload: object,
-        _experiment_id: str | None = None,
-    ) -> object:
+    async def infer(self, _payload: object, **_kwargs: object) -> object:
         raise QueueOverloadedError("full")
 
 
