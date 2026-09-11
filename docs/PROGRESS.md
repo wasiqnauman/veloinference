@@ -791,8 +791,8 @@ gateway traffic to the live model.
 
 ### CORE-004 — Implement service, factory, routes, and lifecycle
 
-Status: complete  
-Date: 2026-09-11  
+Status: complete
+Date: 2026-09-11
 Commits: 5991f62, 1e9c3d0
 
 Files changed:
