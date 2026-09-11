@@ -13,6 +13,12 @@ from gateway.core.models import (
     InferenceResponse,
     PendingRequest,
 )
+from gateway.observability.logging import (
+    EventLogger,
+    JsonEventLogger,
+    safe_exception_message,
+)
+from gateway.observability.metrics import MetricsRegistry
 
 GatewayMode = Literal["pass_through", "batched"]
 
@@ -26,6 +32,8 @@ class InferenceService:
         batcher: DynamicBatcher,
         mode: GatewayMode,
         clock: Clock,
+        event_logger: EventLogger | None = None,
+        metrics: MetricsRegistry | None = None,
     ) -> None:
         if mode not in ("pass_through", "batched"):
             raise ValueError(f"Unsupported gateway mode: {mode}")
@@ -33,20 +41,68 @@ class InferenceService:
         self._batcher = batcher
         self._mode = mode
         self._clock = clock
+        self._event_logger = event_logger or JsonEventLogger()
+        self._metrics = metrics or MetricsRegistry()
 
-    async def infer(self, request: InferenceRequest) -> InferenceResponse:
+    async def infer(
+        self,
+        request: InferenceRequest,
+        experiment_id: str | None = None,
+    ) -> InferenceResponse:
         """Execute one validated request and return normalized response data."""
+        received_at = self._clock.monotonic()
+        metadata = BatchMetadata.create(
+            request,
+            clock=self._clock,
+            experiment_id=experiment_id,
+        )
+        self._metrics.record_received(metadata.batch_key, received_at)
+        self._event_logger.emit(
+            "request_received",
+            request_id=metadata.request_id,
+            experiment_id=experiment_id,
+            model=request.model,
+        )
         if self._mode == "batched":
-            return await self._batcher.infer(request)
+            return await self._batcher.infer(request, experiment_id=experiment_id)
 
-        metadata = BatchMetadata.create(request, clock=self._clock)
         pending = PendingRequest(metadata=metadata, payload=request, future=None)
+        self._event_logger.emit(
+            "request_enqueued",
+            request_id=metadata.request_id,
+            experiment_id=experiment_id,
+            model=request.model,
+            mode="pass_through",
+        )
         backend_started = self._clock.monotonic()
-        output = await self._backend.infer_one(pending)
+        try:
+            output = await self._backend.infer_one(pending)
+        except Exception as exc:  # noqa: BLE001 - record and re-raise backend error
+            self._metrics.record_failed()
+            self._event_logger.emit(
+                "request_failed",
+                request_id=metadata.request_id,
+                experiment_id=experiment_id,
+                error_type=type(exc).__name__,
+                safe_message=safe_exception_message(exc),
+            )
+            raise
         completed_at = self._clock.monotonic()
         deadline_met = self._deadline_met(metadata, completed_at)
         backend_ms = max(0.0, (completed_at - backend_started) * 1000)
         total_ms = max(0.0, (completed_at - metadata.enqueued_at) * 1000)
+        self._metrics.record_backend_latency(completed_at - backend_started)
+        self._metrics.record_completed()
+        self._event_logger.emit(
+            "request_completed",
+            request_id=metadata.request_id,
+            experiment_id=experiment_id,
+            batch_size=1,
+            queue_ms=0.0,
+            backend_ms=backend_ms,
+            total_ms=total_ms,
+            deadline_met=deadline_met,
+        )
 
         return InferenceResponse(
             request_id=metadata.request_id,

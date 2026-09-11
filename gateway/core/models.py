@@ -70,11 +70,17 @@ class BatchMetadata(BaseModel):
     model: str
     enqueued_at: float
     deadline_ms: int | None
+    experiment_id: str | None = None
     max_tokens: int = Field(default=64, ge=1, le=256)
     temperature: float = Field(default=0.0, ge=0.0, le=2.0)
 
     @classmethod
-    def create(cls, request: InferenceRequest, clock: Clock | None = None) -> Self:
+    def create(
+        cls,
+        request: InferenceRequest,
+        clock: Clock | None = None,
+        experiment_id: str | None = None,
+    ) -> Self:
         return cls(
             request_id=str(uuid4()),
             model=request.model,
@@ -82,6 +88,7 @@ class BatchMetadata(BaseModel):
             temperature=request.temperature,
             enqueued_at=clock.monotonic() if clock is not None else monotonic(),
             deadline_ms=request.deadline_ms,
+            experiment_id=experiment_id,
         )
 
     @property

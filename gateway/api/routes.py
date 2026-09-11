@@ -19,8 +19,9 @@ async def healthcheck(request: Request) -> HealthResponse:
 @router.post("/v1/infer", response_model=InferenceResponse)
 async def infer(request: Request, payload: InferenceRequest) -> InferenceResponse:
     service = request.app.state.inference_service
+    experiment_id = request.headers.get("X-ADIP-Experiment-ID")
     try:
-        return await service.infer(payload)
+        return await service.infer(payload, experiment_id=experiment_id)
     except QueueOverloadedError as exc:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,

@@ -18,6 +18,8 @@ from gateway.core.clock import SystemClock
 from gateway.core.policies.base import BatchPolicy
 from gateway.core.policies.fixed import FixedWindowPolicy
 from gateway.core.service import InferenceService
+from gateway.observability.logging import JsonEventLogger, NullEventLogger
+from gateway.observability.metrics import MetricsRegistry
 
 
 def _build_policy(configured: Settings) -> BatchPolicy:
@@ -37,13 +39,22 @@ def _build_lifespan(configured: Settings):
         )
         backend: InferenceBackend = build_backend(configured)
         policy = _build_policy(configured)
+        clock = SystemClock()
+        event_logger = (
+            JsonEventLogger()
+            if configured.research_telemetry
+            else NullEventLogger()
+        )
+        metrics = MetricsRegistry(configured.adaptive_ewma_alpha)
         batcher = DynamicBatcher(
             backend=backend,
             max_batch_size=configured.batch_max_size,
             max_wait_ms=configured.batch_max_wait_ms,
             queue_max_size=configured.queue_max_size,
             policy=policy,
-            clock=SystemClock(),
+            clock=clock,
+            event_logger=event_logger,
+            metrics=metrics,
         )
 
         try:
@@ -54,8 +65,11 @@ def _build_lifespan(configured: Settings):
                 backend=backend,
                 batcher=batcher,
                 mode=configured.gateway_mode,
-                clock=SystemClock(),
+                clock=clock,
+                event_logger=event_logger,
+                metrics=metrics,
             )
+            app.state.metrics = metrics
             app.state.health = {
                 "status": "ok",
                 "backend": configured.backend_kind,

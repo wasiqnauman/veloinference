@@ -17,6 +17,12 @@ from gateway.core.models import (
 )
 from gateway.core.policies.base import BatchPolicy, QueueSnapshot
 from gateway.core.policies.fixed import FixedWindowPolicy
+from gateway.observability.logging import (
+    EventLogger,
+    JsonEventLogger,
+    safe_exception_message,
+)
+from gateway.observability.metrics import MetricsRegistry
 
 
 class QueueOverloadedError(RuntimeError):
@@ -36,12 +42,16 @@ class DynamicBatcher:
         queue_max_size: int,
         policy: BatchPolicy | None = None,
         clock: Clock | None = None,
+        event_logger: EventLogger | None = None,
+        metrics: MetricsRegistry | None = None,
     ) -> None:
         self._backend = backend
         self._max_batch_size = max_batch_size
         self._max_wait_ms = max_wait_ms
         self._policy = policy or FixedWindowPolicy()
         self._clock = clock or SystemClock()
+        self._event_logger = event_logger or JsonEventLogger()
+        self._metrics = metrics or MetricsRegistry()
         self._queue: asyncio.Queue[PendingRequest] = asyncio.Queue(maxsize=queue_max_size)
         self._queues: dict[BatchKey, deque[PendingRequest]] = {}
         self._worker_task: asyncio.Task[None] | None = None
@@ -83,7 +93,11 @@ class DynamicBatcher:
                 self._set_exception(pending_queue.popleft(), stopped_error)
         self._queues.clear()
 
-    async def infer(self, request: InferenceRequest) -> InferenceResponse:
+    async def infer(
+        self,
+        request: InferenceRequest,
+        experiment_id: str | None = None,
+    ) -> InferenceResponse:
         if not self._started:
             raise RuntimeError("Batcher has not started")
         if self._stopped:
@@ -91,7 +105,11 @@ class DynamicBatcher:
 
         future: asyncio.Future[InferenceResponse] = asyncio.get_running_loop().create_future()
         pending = PendingRequest(
-            metadata=BatchMetadata.create(request, clock=self._clock),
+            metadata=BatchMetadata.create(
+                request,
+                clock=self._clock,
+                experiment_id=experiment_id,
+            ),
             payload=request,
             future=future,
         )
@@ -99,7 +117,23 @@ class DynamicBatcher:
         try:
             self._queue.put_nowait(pending)
         except asyncio.QueueFull as exc:
+            self._metrics.record_rejected()
+            self._event_logger.emit(
+                "request_failed",
+                request_id=pending.metadata.request_id,
+                experiment_id=experiment_id,
+                error_type=type(exc).__name__,
+                safe_message="Gateway queue is full",
+            )
             raise QueueOverloadedError("Gateway queue is full") from exc
+
+        self._event_logger.emit(
+            "request_enqueued",
+            request_id=pending.metadata.request_id,
+            experiment_id=experiment_id,
+            model=request.model,
+            queue_size=self._queue.qsize(),
+        )
 
         return await future
 
@@ -125,6 +159,16 @@ class DynamicBatcher:
                 return []
 
             decision = self._policy.decide(self._snapshot(pending_queue))
+            oldest = pending_queue[0]
+            self._event_logger.emit(
+                "policy_decision",
+                request_id=oldest.metadata.request_id,
+                experiment_id=oldest.metadata.experiment_id,
+                reason=decision.reason,
+                wait_s=decision.wait_s,
+                dispatch_now=decision.dispatch_now,
+                compatible_queue_size=len(pending_queue),
+            )
             if decision.dispatch_now:
                 return self._pop_batch(key)
 
@@ -143,6 +187,15 @@ class DynamicBatcher:
 
         batch_id = str(uuid4())
         dispatch_at = self._clock.monotonic()
+        experiment_id = batch[0].metadata.experiment_id
+        self._metrics.record_batch(len(batch))
+        self._event_logger.emit(
+            "batch_dispatched",
+            batch_id=batch_id,
+            experiment_id=experiment_id,
+            model=batch[0].metadata.model,
+            batch_size=len(batch),
+        )
         self._inflight = batch
         try:
             backend_started = self._clock.monotonic()
@@ -151,13 +204,40 @@ class DynamicBatcher:
                 raise RuntimeError("Backend returned an unexpected number of responses")
             completed_at = self._clock.monotonic()
         except Exception as exc:  # noqa: BLE001 - propagate any backend failure
+            failed_at = self._clock.monotonic()
             for request in batch:
+                self._metrics.record_failed()
+                self._event_logger.emit(
+                    "request_failed",
+                    request_id=request.metadata.request_id,
+                    batch_id=batch_id,
+                    experiment_id=request.metadata.experiment_id,
+                    error_type=type(exc).__name__,
+                    safe_message=safe_exception_message(exc),
+                )
                 self._set_exception(request, exc)
+            self._event_logger.emit(
+                "batch_completed",
+                batch_id=batch_id,
+                experiment_id=experiment_id,
+                batch_size=len(batch),
+                status="failed",
+                backend_ms=max(0.0, (failed_at - backend_started) * 1000),
+            )
             return
         finally:
             if not self._stopped:
                 self._inflight = []
 
+        self._metrics.record_backend_latency(completed_at - backend_started)
+        self._event_logger.emit(
+            "batch_completed",
+            batch_id=batch_id,
+            experiment_id=experiment_id,
+            batch_size=len(batch),
+            status="completed",
+            backend_ms=max(0.0, (completed_at - backend_started) * 1000),
+        )
         for request, output in zip(batch, outputs, strict=True):
             if request.future is None or request.future.done():
                 continue
@@ -178,6 +258,18 @@ class DynamicBatcher:
                     total_ms=total_ms,
                     deadline_met=self._deadline_met(request.metadata, completed_at),
                 )
+            )
+            self._metrics.record_completed()
+            self._event_logger.emit(
+                "request_completed",
+                request_id=request.metadata.request_id,
+                batch_id=batch_id,
+                experiment_id=request.metadata.experiment_id,
+                batch_size=len(batch),
+                queue_ms=queue_ms,
+                backend_ms=backend_ms,
+                total_ms=total_ms,
+                deadline_met=self._deadline_met(request.metadata, completed_at),
             )
 
     @staticmethod
@@ -232,8 +324,10 @@ class DynamicBatcher:
             compatible_queue_size=len(pending_queue),
             max_batch_size=self._max_batch_size,
             max_wait_s=self._max_wait_ms / 1000,
-            arrival_rate_per_s=0.0,
-            estimated_backend_s=0.0,
+            arrival_rate_per_s=self._metrics.arrival_rate_per_s(
+                pending_queue[0].metadata.batch_key
+            ),
+            estimated_backend_s=self._metrics.backend_latency_s(),
             earliest_deadline_at=min(deadlines) if deadlines else None,
         )
 
