@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: ENV-001 blocked; CORE-002 complete
-Last updated: 2026-09-09
+Status: ENV-001 complete; CORE-003 pending verification
+Last updated: 2026-09-11
 Current branch: main
-Current commit before this tracker: fa74453
+Current commit before this tracker: 36a9696
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -36,20 +36,23 @@ The repository contains the complete research execution design, the progress
 tracker, reproducibility scaffolding, a frozen research proposal, typed core
 contracts, and a tested shared backend HTTP client. CPU-only application
 implementation has started, including the fixed-window policy, but no live
-vLLM experiment or numerical paper result exists yet.
+vLLM experiment or numerical paper result exists yet. The last agent added
+CORE-003 code in commit `36a9696`, but that commit has not yet been tested or
+documented.
 
-WSL is not installed on the host, so the next agent must not attempt vLLM or
-Linux repository setup yet. The repository-only scaffolding in REP-001A and
-the CPU-safe CORE-001 contracts are already committed. Work that does not
-require Linux or a live model may continue while ENV-001 is blocked.
+WSL 2 and Ubuntu are now installed on the host, and WSL-side GPU access has
+been verified. The installed distribution is registered as `Ubuntu` and
+reports Ubuntu 26.04 LTS, not the 24.04 version named in the original design.
+The repository-only scaffolding and CPU-safe implementation commits remain
+available on `main`.
 
-The user must run the Windows feature-enablement commands from an
-Administrator PowerShell. The current Codex shell cannot elevate to Windows
-Administrator privileges.
+The next agent must use the actual distro name `Ubuntu` in WSL commands. The
+Linux-native repository and Python 3.12 environment still need to be created
+inside WSL before vLLM dependencies are installed.
 
-The immediate implementation sequence is CORE-003 and other
-CPU-safe work where possible. ENV-001 remains a hard dependency for BACKEND-002,
-ENV-002, ENV-003, and all live vLLM experiments.
+The immediate sequence is ENV-002 and REP-001 completion, then CORE-003
+verification. ENV-003 and all live vLLM experiments remain blocked until the
+Linux Python 3.12 environment and lockfile are ready.
 
 ## Completed tasks
 
@@ -370,8 +373,12 @@ host lacks pytest-asyncio.
 
 ## ENV-001 — Install and verify WSL2
 
-Status: blocked  
-Commit: none yet; no repository changes from the blocked attempt.
+Status: complete
+Date: 2026-09-11
+Commit: progress-only reconciliation; platform setup is outside Git
+
+The earlier administrator-permission block is resolved after the user enabled
+the Windows features and restarted the machine.
 
 ### What was attempted
 
@@ -406,7 +413,8 @@ wsl.exe --status
 wsl.exe -l -v
 ~~~
 
-Therefore ENV-001 is not complete.
+Those earlier attempts are historical only. ENV-001 is now complete based on
+the verification below.
 
 ### Host evidence
 
@@ -417,9 +425,37 @@ Host GPU is available to Windows:
 - Driver: 596.49.
 - Driver-reported CUDA: 13.2.
 
-WSL GPU visibility has not yet been tested because WSL does not exist.
+WSL GPU visibility is verified below.
 
-### Exact next action
+### Final verification
+
+Commands run:
+
+~~~powershell
+wsl.exe --status
+wsl.exe -l -v
+wsl.exe -d Ubuntu -- nvidia-smi
+wsl.exe -d Ubuntu -- bash -lc 'whoami; echo HOME=$HOME; pwd; df -h / /mnt/c; git --version; python3 --version'
+~~~
+
+Observed result:
+
+- Default WSL version is 2.
+- Registered distribution is `Ubuntu`, state `Stopped` before launch, version
+  `2`.
+- The distribution reports Ubuntu 26.04 LTS.
+- WSL-side `nvidia-smi` reports an NVIDIA GeForce RTX 3060 with 12,288 MiB
+  total VRAM, driver 596.49, and CUDA 13.2.
+- The WSL root filesystem is on `/dev/sdd`; `/mnt/c` reports about 141 GiB
+  available.
+- WSL user is `kennarr`, Git is available, and the default Python is 3.14.4.
+
+Deviation to preserve explicitly:
+
+- The original design names Ubuntu 24.04, but the installed distro is Ubuntu
+  26.04. Do not silently call it 24.04 in the paper or reproduction notes.
+
+### Historical blocked-attempt next action
 
 The user must open PowerShell with Run as administrator and run:
 
@@ -470,8 +506,7 @@ Expected state:
 - The RTX 3060 appears inside WSL.
 - Approximately 12 GB VRAM is reported.
 
-Do not continue to ENV-002 until both WSL version 2 and WSL-side nvidia-smi
-have succeeded.
+The historical next action above is no longer pending. Continue with ENV-002.
 
 ## Remaining task sequence
 
@@ -544,6 +579,6 @@ agent should execute.
 
 ## Next task
 
-CORE-003 — Refactor DynamicBatcher to consume BatchPolicy, enforce BatchKey
-compatibility, and make cancellation and shutdown safe; leave ENV-001 blocked
-until Administrator PowerShell enables WSL2 and the host is rebooted.
+ENV-002 — Create the Linux-native repository working copy inside Ubuntu on the
+C: backed WSL filesystem, verify Git history, and prepare the Python 3.12
+environment without changing the Windows working copy.
