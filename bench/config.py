@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 import tomllib
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any
 
 from bench.schema import (
     ArrivalConfig,
@@ -18,9 +18,6 @@ from bench.schema import (
 
 class ConfigError(ValueError):
     """Raised when a benchmark TOML file violates the experiment contract."""
-
-
-T = TypeVar("T")
 
 
 def load_experiment_config(path: Path) -> ExperimentConfig:
@@ -241,7 +238,7 @@ def _required_string(values: dict[str, Any], key: str, section: str) -> str:
     return value.strip()
 
 
-def _literal(
+def _literal[T](
     values: dict[str, Any], key: str, choices: tuple[T, ...], section: str
 ) -> T:
     value = values.get(key)
