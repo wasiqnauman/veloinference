@@ -8,7 +8,6 @@ from pathlib import Path
 from bench.plot import plot_summary
 from bench.summarize import summarize_records
 
-
 FIXTURES = Path(__file__).parent / "fixtures"
 
 
