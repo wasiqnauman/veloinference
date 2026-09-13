@@ -189,7 +189,28 @@ The final primary-model comparison must include:
 The fixed-window pilot must evaluate 1, 5, 10, and 20 milliseconds before the
 best fixed policy is selected.
 
-## 13. Experimental matrix
+## 13. Frozen adaptive-policy parameters
+
+Before the final experiments, the adaptive implementation is frozen with the
+following settings. These values use only EXP-001 calibration and EXP-002
+pilot evidence; EXP-003 and later results must not change them:
+
+- EWMA alpha: `0.2` for arrival-rate and backend-latency estimates.
+- Low-load expected-companion threshold: `1.0` request.
+- Maximum adaptive wait window: `20` milliseconds, the largest wait evaluated
+  in the fixed pilot.
+- Maximum batch size: `8`, matching the primary model configuration and fixed
+  pilot.
+- The adaptive policy dispatches immediately for a full queue, an elapsed
+  maximum window, exhausted deadline slack, or low load. Otherwise it waits
+  for the minimum of the remaining window, estimated batch-fill time, and
+  positive deadline slack.
+
+The selected fixed comparator remains the 1 ms wait from the EXP-002
+shortest-nondominated rule. The 20 ms value above is only the adaptive policy's
+upper bound, not a claim that 20 ms is the best fixed policy.
+
+## 14. Experimental matrix
 
 Primary final matrix:
 
@@ -216,7 +237,7 @@ Secondary-model validation:
 - Direct, pass-through, best fixed, adaptive.
 - Three repetitions.
 
-## 14. Arrival and prompt methodology
+## 15. Arrival and prompt methodology
 
 The benchmark must be open-loop. A request's target arrival time is generated
 before execution, and later requests must not wait for earlier requests to
@@ -235,7 +256,7 @@ The prompt mix is:
 The final paper must identify this as a synthetic, length-controlled workload
 and must not describe it as a production trace.
 
-## 15. Analysis plan
+## 16. Analysis plan
 
 The request is the latency observation unit. The run is the replication unit.
 Thousands of requests in one run must not be described as thousands of
@@ -258,7 +279,7 @@ Required comparisons:
 - Adaptive minus best fixed: adaptive-policy effect.
 - Bursty minus constant: burst sensitivity.
 
-## 16. Exclusion policy
+## 17. Exclusion policy
 
 A run may be excluded only for:
 
@@ -272,7 +293,7 @@ A run may be excluded only for:
 The raw run must remain stored. The exclusion reason and run ID must be
 recorded in the experiment log.
 
-## 17. Threats to validity
+## 18. Threats to validity
 
 - One GPU limits hardware generality.
 - Two small models do not represent all LLM architectures.
@@ -284,7 +305,7 @@ recorded in the experiment log.
 
 The paper must state these limitations.
 
-## 18. Freeze statement
+## 19. Freeze statement
 
 This proposal freezes the research questions, hypotheses, variables, baselines,
 SLO rule, and main matrix before final data collection. Any change must be

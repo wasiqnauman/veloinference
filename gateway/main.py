@@ -15,6 +15,7 @@ from gateway.backends.factory import build_backend
 from gateway.config import Settings, settings
 from gateway.core.batcher import DynamicBatcher
 from gateway.core.clock import SystemClock
+from gateway.core.policies.adaptive import AdaptiveWindowPolicy
 from gateway.core.policies.base import BatchPolicy
 from gateway.core.policies.fixed import FixedWindowPolicy
 from gateway.core.service import InferenceService
@@ -26,9 +27,9 @@ def _build_policy(configured: Settings) -> BatchPolicy:
     """Build the policy supported by the current implementation milestone."""
     if configured.batch_policy == "fixed":
         return FixedWindowPolicy()
-    raise ValueError(
-        "Adaptive policy is reserved for CORE-005; use batch_policy=fixed"
-    )
+    if configured.batch_policy == "adaptive":
+        return AdaptiveWindowPolicy(configured.adaptive_low_load_threshold)
+    raise ValueError(f"Unsupported batch policy: {configured.batch_policy}")
 
 
 def _build_lifespan(configured: Settings):

@@ -50,6 +50,16 @@ def test_infer_pass_through_mode() -> None:
     assert response.json()["batch_size"] == 1
 
 
+def test_adaptive_policy_mode_is_available() -> None:
+    app = create_app(Settings(batch_policy="adaptive"))
+
+    with TestClient(app) as client:
+        response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json()["policy"] == "adaptive"
+
+
 class _FailingService:
     async def infer(self, _payload: object, **_kwargs: object) -> object:
         raise httpx.ReadTimeout("backend timed out")
