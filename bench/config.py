@@ -77,6 +77,12 @@ def load_experiment_config(path: Path) -> ExperimentConfig:
     calibration_rates_rps = _optional_positive_float_tuple(
         experiment, "calibration_rates_rps", "experiment"
     )
+    pilot_rates_rps = _optional_positive_float_tuple(
+        experiment, "pilot_rates_rps", "experiment"
+    )
+    pilot_wait_windows_ms = _optional_positive_int_tuple(
+        experiment, "pilot_wait_windows_ms", "experiment"
+    )
     harness_drift_threshold_ms = _nonnegative_float_or_default(
         experiment, "harness_drift_threshold_ms", "experiment", 10.0
     )
@@ -111,6 +117,8 @@ def load_experiment_config(path: Path) -> ExperimentConfig:
         health_url=health_url,
         source_path=source_path,
         calibration_rates_rps=calibration_rates_rps,
+        pilot_rates_rps=pilot_rates_rps,
+        pilot_wait_windows_ms=pilot_wait_windows_ms,
         harness_drift_threshold_ms=harness_drift_threshold_ms,
         harness_error_threshold=harness_error_threshold,
     )
@@ -317,6 +325,22 @@ def _optional_positive_float_tuple(
     result = tuple(float(item) for item in value if not isinstance(item, bool))
     if len(result) != len(value) or any(not math.isfinite(item) or item <= 0 for item in result):
         raise ConfigError(f"{section}.{key} must contain only finite numbers greater than 0")
+    return result
+
+
+def _optional_positive_int_tuple(
+    values: dict[str, Any], key: str, section: str
+) -> tuple[int, ...] | None:
+    if key not in values:
+        return None
+    value = values[key]
+    if not isinstance(value, list) or not value:
+        raise ConfigError(f"{section}.{key} must be a non-empty array of integers")
+    result = tuple(value)
+    if any(isinstance(item, bool) or not isinstance(item, int) for item in result):
+        raise ConfigError(f"{section}.{key} must contain only integers")
+    if any(item <= 0 for item in result):
+        raise ConfigError(f"{section}.{key} must contain only integers greater than 0")
     return result
 
 

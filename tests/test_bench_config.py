@@ -12,6 +12,7 @@ from bench.schema import ExperimentConfig, ModelConfig, RequestResult
 
 ROOT = Path(__file__).resolve().parents[1]
 SMOKE_CONFIG = ROOT / "configs" / "experiments" / "mock_smoke.toml"
+PILOT_CONFIG = ROOT / "configs" / "experiments" / "fixed_window_pilot.toml"
 
 
 def test_smoke_config_resolves_paths_relative_to_config_file() -> None:
@@ -27,6 +28,8 @@ def test_smoke_config_resolves_paths_relative_to_config_file() -> None:
     assert config.workload.prompt_buckets[0].weight == 1.0
     assert config.harness_drift_threshold_ms == 10.0
     assert config.harness_error_threshold == 0.01
+    assert config.pilot_rates_rps is None
+    assert config.pilot_wait_windows_ms is None
 
 
 def test_required_records_are_frozen_dataclasses() -> None:
@@ -36,6 +39,15 @@ def test_required_records_are_frozen_dataclasses() -> None:
     model = load_experiment_config(SMOKE_CONFIG).model
     with pytest.raises(FrozenInstanceError):
         model.max_tokens = 16  # type: ignore[misc]
+
+
+def test_pilot_config_contains_explicit_rates_and_wait_windows() -> None:
+    config = load_experiment_config(PILOT_CONFIG)
+
+    assert config.target_endpoint == "adip"
+    assert config.gateway_mode == "batched"
+    assert config.pilot_rates_rps == (0.5, 1.0, 2.0)
+    assert config.pilot_wait_windows_ms == (1, 5, 10, 20)
 
 
 @pytest.mark.parametrize(

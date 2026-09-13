@@ -90,6 +90,8 @@ class ExperimentConfig:
     health_url: str
     source_path: Path
     calibration_rates_rps: tuple[float, ...] | None = None
+    pilot_rates_rps: tuple[float, ...] | None = None
+    pilot_wait_windows_ms: tuple[int, ...] | None = None
     harness_drift_threshold_ms: float = 10.0
     harness_error_threshold: float = 0.01
 

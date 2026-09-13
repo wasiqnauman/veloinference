@@ -26,6 +26,7 @@ def build_calibration_requests(
     rate_per_s: float,
     run_id: str,
     prompts: tuple[object, ...],
+    policy: str = "direct",
 ) -> tuple[PlannedRequest, ...]:
     """Create all request records before a calibration rate begins."""
 
@@ -40,7 +41,7 @@ def build_calibration_requests(
             experiment_id=config.name,
             run_id=run_id,
             request_index=index,
-            policy="direct",
+            policy=policy,
             model=config.model.model_id,
             workload=config.workload.name,
             seed=config.workload.arrival.seed,
