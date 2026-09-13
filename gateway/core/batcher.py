@@ -139,9 +139,11 @@ class DynamicBatcher:
 
     async def _run(self) -> None:
         while True:
+            self._drain_queue()
             if not self._queues:
                 first_request = await self._queue.get()
                 self._enqueue_pending(first_request)
+                self._drain_queue()
 
             key = self._oldest_key()
             batch = await self._collect_batch(key)
@@ -283,6 +285,15 @@ class DynamicBatcher:
         if request.future is None or request.future.done():
             return
         self._queues.setdefault(request.metadata.batch_key, deque()).append(request)
+
+    def _drain_queue(self) -> None:
+        """Move requests already waiting at the ingress into keyed queues."""
+        while True:
+            try:
+                request = self._queue.get_nowait()
+            except asyncio.QueueEmpty:
+                return
+            self._enqueue_pending(request)
 
     def _oldest_key(self) -> BatchKey:
         return min(
