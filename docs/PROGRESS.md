@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: EXP-002 complete; next CORE-005
-Last updated: 2026-09-13 17:38 -04:00
+Status: CORE-005 complete; next EXP-003
+Last updated: 2026-09-13 17:42 -04:00
 Current branch: main
-Current commit before this tracker: 974ec10
+Current commit before this tracker: b9cc7e7
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -48,7 +48,7 @@ available on `main`.
 The next agent must use the actual distro name `Ubuntu` in WSL commands. The
 Linux-native repository is available at `/home/kennarr/src/veloinference`
 on branch `codex/research-preprint`. Its Python 3.12 environment and lockfile
-are created there, and the branch is synchronized through `974ec10`. The
+are created there, and the branch is synchronized through `b9cc7e7`. The
 Windows `main` checkout and the WSL research branch have the same source state.
 
 OBS-001 through BENCH-006 and EXP-001 are complete. Structured JSON events,
@@ -62,7 +62,8 @@ retained as an invalid harness-jitter attempt because the open-loop scheduler
 exceeded its predeclared drift-quality gate; it must not be used as a capacity
 claim. EXP-002 then completed a corrected fixed-window pilot after finding and
 fixing a real queue-drain bug in the batcher. The predeclared rule selected a
-1 ms fixed wait for the final comparison.
+1 ms fixed wait for the final comparison. CORE-005 has now implemented and
+tested the frozen adaptive policy; no final adaptive performance claim exists.
 
 ## Completed tasks
 
@@ -1416,10 +1417,53 @@ so it supports policy selection but not final headline claims.
 
 Exact next action:
 
-Begin CORE-005. Implement the minimal adaptive policy from the research design,
-write deterministic unit tests for its queue/rate/backend/deadline decisions,
-freeze its parameters using only EXP-001 and EXP-002 evidence, and do not use
-EXP-003 final-run results for tuning.
+This historical entry led to the CORE-005 execution recorded below. The current
+next action is defined by the final `## Next task` section.
+
+### CORE-005 — Frozen adaptive batching policy
+
+Status: complete  
+Date: 2026-09-13 17:42 -04:00  
+Commit: b9cc7e7
+
+Files changed:
+
+- `gateway/core/policies/adaptive.py`
+- `gateway/main.py`
+- `tests/test_adaptive_policy.py`
+- `tests/test_api.py`
+- `docs/RESEARCH_PROPOSAL.md`
+- `docs/PROGRESS.md`
+
+Observed result:
+
+- Added the pure adaptive policy required by the design. It handles full
+  queues, elapsed windows, deadline slack, zero/low arrival rates, estimated
+  batch fill time, and the configured maximum wait without I/O or mutable
+  scheduling state.
+- Enabled `batch_policy=adaptive` in application composition. Existing fixed
+  and pass-through modes remain unchanged.
+- Frozen parameters are recorded in the proposal: EWMA alpha 0.2, low-load
+  expected-companion threshold 1.0, adaptive maximum wait 20 ms, and maximum
+  batch size 8. The fixed comparator remains the selected 1 ms wait.
+
+Verification:
+
+- Windows targeted gate: 11 adaptive/API tests passed; Ruff passed.
+- WSL full gate: Ruff passed; `77 passed, 2 warnings`.
+- No adaptive live performance result has been generated yet.
+
+Current status:
+
+The adaptive implementation is frozen before final experiments. Final-run
+traffic must be used only for evaluation, never for changing these parameters.
+
+Exact next action:
+
+Begin EXP-003. Create the final primary-model experiment configuration and
+driver for direct, pass-through, selected fixed (1 ms), and adaptive modes at
+the frozen 0.25/0.50/0.75/0.90 capacity loads, with three repetitions and
+immutable raw evidence.
 
 ## Remaining task sequence
 
@@ -1492,6 +1536,6 @@ agent should execute.
 
 ## Next task
 
-CORE-005 — Implement and freeze the minimal adaptive batching policy using only
-calibration and fixed-pilot evidence; add deterministic tests before any final
-experiment run.
+EXP-003 — Create and run the primary final matrix using direct, pass-through,
+selected fixed (1 ms), and frozen adaptive policies at the declared capacity
+loads with three repetitions per condition.
