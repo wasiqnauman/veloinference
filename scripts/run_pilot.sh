@@ -6,4 +6,4 @@ REPO_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 CONFIG_PATH="${1:?usage: scripts/run_pilot.sh CONFIG_PATH}"
 
 cd "${REPO_ROOT}"
-exec .venv/bin/python -m bench.pilot --config "${CONFIG_PATH}"
+exec .venv-vllm/bin/python -m bench.pilot --config "${CONFIG_PATH}"
