@@ -74,10 +74,12 @@ async def run_calibration(config: ExperimentConfig) -> list[dict[str, object]]:
     client = DirectVllmClient(base_url="http://127.0.0.1:8001", timeout_s=120.0)
 
     try:
-        for rate_per_s in config.calibration_rates_rps:
+        for rate_index, rate_per_s in enumerate(config.calibration_rates_rps):
             summaries.append(
                 await _run_rate(config, rate_per_s, prompts, output_root, client)
             )
+            if rate_index < len(config.calibration_rates_rps) - 1:
+                await asyncio.sleep(config.cooldown_s)
     finally:
         await client.aclose()
 
