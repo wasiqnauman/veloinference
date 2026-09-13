@@ -13,3 +13,5 @@ output_dir = "../../results/raw"
 slo_derivation_rule = "not_for_capacity_claims"
 health_url = "http://127.0.0.1:8001/health"
 calibration_rates_rps = [1.0]
+harness_drift_threshold_ms = 50.0
+harness_error_threshold = 0.01

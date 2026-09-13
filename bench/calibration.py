@@ -143,7 +143,8 @@ async def _run_rate(
         client,
         results_path=request_path,
         start_delay_s=2.0,
-        harness_drift_threshold_ms=10.0,
+        harness_drift_threshold_ms=config.harness_drift_threshold_ms,
+        harness_error_threshold=config.harness_error_threshold,
     )
     stop_event.set()
     gpu_samples = await gpu_task

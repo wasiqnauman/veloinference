@@ -13,3 +13,7 @@ output_dir = "../../results/raw"
 slo_derivation_rule = "derive_after_capacity_calibration"
 health_url = "http://127.0.0.1:8001/health"
 calibration_rates_rps = [0.5, 1.0, 2.0, 4.0, 8.0, 16.0]
+# WSL2 scheduling can pause the event loop briefly while vLLM is active. Keep
+# this tolerance fixed before the run and record every request's drift.
+harness_drift_threshold_ms = 50.0
+harness_error_threshold = 0.01

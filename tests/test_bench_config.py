@@ -25,6 +25,8 @@ def test_smoke_config_resolves_paths_relative_to_config_file() -> None:
     assert config.output_dir == (ROOT / "results" / "raw").resolve()
     assert config.model.max_tokens == 8
     assert config.workload.prompt_buckets[0].weight == 1.0
+    assert config.harness_drift_threshold_ms == 10.0
+    assert config.harness_error_threshold == 0.01
 
 
 def test_required_records_are_frozen_dataclasses() -> None:

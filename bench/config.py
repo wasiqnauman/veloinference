@@ -77,6 +77,21 @@ def load_experiment_config(path: Path) -> ExperimentConfig:
     calibration_rates_rps = _optional_positive_float_tuple(
         experiment, "calibration_rates_rps", "experiment"
     )
+    harness_drift_threshold_ms = _nonnegative_float_or_default(
+        experiment, "harness_drift_threshold_ms", "experiment", 10.0
+    )
+    harness_error_threshold = (
+        _float_between(
+            experiment,
+            "harness_error_threshold",
+            0.0,
+            1.0,
+            "experiment",
+            include_lower=True,
+        )
+        if "harness_error_threshold" in experiment
+        else 0.01
+    )
 
     return ExperimentConfig(
         name=name,
@@ -96,6 +111,8 @@ def load_experiment_config(path: Path) -> ExperimentConfig:
         health_url=health_url,
         source_path=source_path,
         calibration_rates_rps=calibration_rates_rps,
+        harness_drift_threshold_ms=harness_drift_threshold_ms,
+        harness_error_threshold=harness_error_threshold,
     )
 
 
@@ -333,6 +350,14 @@ def _nonnegative_float(values: dict[str, Any], key: str, section: str) -> float:
     if value < 0:
         raise ConfigError(f"{section}.{key} must be greater than or equal to 0")
     return value
+
+
+def _nonnegative_float_or_default(
+    values: dict[str, Any], key: str, section: str, default: float
+) -> float:
+    if key not in values:
+        return default
+    return _nonnegative_float(values, key, section)
 
 
 def _float_between(
