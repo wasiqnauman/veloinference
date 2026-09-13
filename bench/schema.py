@@ -92,6 +92,10 @@ class ExperimentConfig:
     calibration_rates_rps: tuple[float, ...] | None = None
     pilot_rates_rps: tuple[float, ...] | None = None
     pilot_wait_windows_ms: tuple[int, ...] | None = None
+    final_modes: tuple[str, ...] | None = None
+    final_rates_rps: tuple[float, ...] | None = None
+    final_repetitions: tuple[int, ...] | None = None
+    adaptive_max_wait_ms: int = 20
     harness_drift_threshold_ms: float = 10.0
     harness_error_threshold: float = 0.01
 

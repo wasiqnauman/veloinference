@@ -1,0 +1,20 @@
+# Purpose: EXP-003 primary final matrix on the local RTX 3060.
+name = "exp003-primary-final"
+model_config = "../models/qwen2_5_1_5b.toml"
+workload_config = "../workloads/final_short_constant.toml"
+target_endpoint = "adip"
+adip_gateway_mode = "batched"
+policy = "fixed"
+max_batch_size = 8
+max_wait_ms = 1
+adaptive_max_wait_ms = 20
+repetition_seeds = [1729, 2718, 3141]
+cooldown_s = 5.0
+output_dir = "../../results/raw"
+slo_derivation_rule = "use_exp001_direct_p95_at_0p5_rps"
+health_url = "http://127.0.0.1:8000/health"
+final_modes = ["direct", "pass_through", "fixed", "adaptive"]
+final_rates_rps = [0.5, 1.0, 1.5, 1.8]
+final_repetitions = [1, 2, 3]
+harness_drift_threshold_ms = 50.0
+harness_error_threshold = 0.01

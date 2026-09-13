@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
+CONFIG_PATH="${1:?usage: scripts/run_final_experiments.sh CONFIG_PATH}"
+
+cd "${REPO_ROOT}"
+exec .venv-vllm/bin/python -m bench.final --config "${CONFIG_PATH}"

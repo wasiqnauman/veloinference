@@ -83,6 +83,28 @@ def load_experiment_config(path: Path) -> ExperimentConfig:
     pilot_wait_windows_ms = _optional_positive_int_tuple(
         experiment, "pilot_wait_windows_ms", "experiment"
     )
+    final_modes = _optional_string_tuple(experiment, "final_modes", "experiment")
+    if final_modes is not None and any(
+        mode not in ("direct", "pass_through", "fixed", "adaptive")
+        for mode in final_modes
+    ):
+        raise ConfigError(
+            "experiment.final_modes must contain only direct, pass_through, fixed, adaptive"
+        )
+    final_rates_rps = _optional_positive_float_tuple(
+        experiment, "final_rates_rps", "experiment"
+    )
+    final_repetitions = _optional_positive_int_tuple(
+        experiment, "final_repetitions", "experiment"
+    )
+    if final_repetitions is not None and len(final_repetitions) > len(repetition_seeds):
+        raise ConfigError(
+            "experiment.final_repetitions cannot contain more entries than "
+            "experiment.repetition_seeds"
+        )
+    adaptive_max_wait_ms = _positive_int_or_default(
+        experiment, "adaptive_max_wait_ms", "experiment", 20
+    )
     harness_drift_threshold_ms = _nonnegative_float_or_default(
         experiment, "harness_drift_threshold_ms", "experiment", 10.0
     )
@@ -119,6 +141,10 @@ def load_experiment_config(path: Path) -> ExperimentConfig:
         calibration_rates_rps=calibration_rates_rps,
         pilot_rates_rps=pilot_rates_rps,
         pilot_wait_windows_ms=pilot_wait_windows_ms,
+        final_modes=final_modes,
+        final_rates_rps=final_rates_rps,
+        final_repetitions=final_repetitions,
+        adaptive_max_wait_ms=adaptive_max_wait_ms,
         harness_drift_threshold_ms=harness_drift_threshold_ms,
         harness_error_threshold=harness_error_threshold,
     )
@@ -344,6 +370,20 @@ def _optional_positive_int_tuple(
     return result
 
 
+def _optional_string_tuple(
+    values: dict[str, Any], key: str, section: str
+) -> tuple[str, ...] | None:
+    if key not in values:
+        return None
+    value = values[key]
+    if not isinstance(value, list) or not value:
+        raise ConfigError(f"{section}.{key} must be a non-empty array of strings")
+    result = tuple(value)
+    if any(not isinstance(item, str) or not item.strip() for item in result):
+        raise ConfigError(f"{section}.{key} must contain only non-empty strings")
+    return tuple(item.strip() for item in result)
+
+
 def _float_value(values: dict[str, Any], key: str, section: str) -> float:
     value = values.get(key)
     if isinstance(value, bool) or not isinstance(value, (int, float)):
@@ -367,6 +407,14 @@ def _positive_float_or_default(
     if key not in values:
         return default
     return _positive_float(values, key, section)
+
+
+def _positive_int_or_default(
+    values: dict[str, Any], key: str, section: str, default: int
+) -> int:
+    if key not in values:
+        return default
+    return _positive_int(values, key, section)
 
 
 def _nonnegative_float(values: dict[str, Any], key: str, section: str) -> float:

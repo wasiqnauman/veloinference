@@ -27,14 +27,22 @@ def build_calibration_requests(
     run_id: str,
     prompts: tuple[object, ...],
     policy: str = "direct",
+    seed: int | None = None,
 ) -> tuple[PlannedRequest, ...]:
-    """Create all request records before a calibration rate begins."""
+    """Create all request records before a calibration rate begins.
+
+    ``seed`` identifies the repetition in the raw records. The constant
+    arrival schedule is intentionally unchanged because the final workload is
+    a controlled fixed-rate comparison; callers may still use the field to
+    distinguish declared repetitions in downstream analysis.
+    """
 
     if rate_per_s <= 0:
         raise ValueError("rate_per_s must be greater than 0")
     if not prompts:
         raise ValueError("prompts must not be empty")
     offsets = constant_arrivals(rate_per_s, config.workload.arrival.duration_s)
+    request_seed = config.workload.arrival.seed if seed is None else seed
     return tuple(
         PlannedRequest(
             schema_version=1,
@@ -44,7 +52,7 @@ def build_calibration_requests(
             policy=policy,
             model=config.model.model_id,
             workload=config.workload.name,
-            seed=config.workload.arrival.seed,
+            seed=request_seed,
             arrival_offset_s=offset,
             prompt=prompts[index % len(prompts)].text,  # type: ignore[union-attr]
             input_tokens=prompts[index % len(prompts)].input_tokens,  # type: ignore[union-attr]

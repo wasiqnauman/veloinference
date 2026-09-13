@@ -1,0 +1,13 @@
+# Purpose: primary final-matrix workload with the frozen short prompt bucket.
+name = "final-short-constant"
+arrival_kind = "constant"
+duration_s = 120.0
+seed = 1729
+rate_fraction_of_capacity = 0.25
+warmup_requests = 50
+
+[[prompt_buckets]]
+name = "short"
+minimum_tokens = 8
+maximum_tokens = 128
+weight = 1.0

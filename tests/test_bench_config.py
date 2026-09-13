@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SMOKE_CONFIG = ROOT / "configs" / "experiments" / "mock_smoke.toml"
 PILOT_CONFIG = ROOT / "configs" / "experiments" / "fixed_window_pilot.toml"
 PILOT_90_CONFIG = ROOT / "configs" / "experiments" / "fixed_window_pilot_90pct.toml"
+FINAL_CONFIG = ROOT / "configs" / "experiments" / "primary_final.toml"
 
 
 def test_smoke_config_resolves_paths_relative_to_config_file() -> None:
@@ -31,6 +32,8 @@ def test_smoke_config_resolves_paths_relative_to_config_file() -> None:
     assert config.harness_error_threshold == 0.01
     assert config.pilot_rates_rps is None
     assert config.pilot_wait_windows_ms is None
+    assert config.final_modes is None
+    assert config.adaptive_max_wait_ms == 20
 
 
 def test_required_records_are_frozen_dataclasses() -> None:
@@ -56,6 +59,15 @@ def test_pilot_90_percent_extension_has_one_explicit_rate() -> None:
 
     assert config.pilot_rates_rps == (1.8,)
     assert config.pilot_wait_windows_ms == (1, 5, 10, 20)
+
+
+def test_final_config_freezes_modes_rates_and_repetitions() -> None:
+    config = load_experiment_config(FINAL_CONFIG)
+
+    assert config.final_modes == ("direct", "pass_through", "fixed", "adaptive")
+    assert config.final_rates_rps == (0.5, 1.0, 1.5, 1.8)
+    assert config.final_repetitions == (1, 2, 3)
+    assert config.adaptive_max_wait_ms == 20
 
 
 @pytest.mark.parametrize(
