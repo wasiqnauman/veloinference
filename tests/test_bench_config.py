@@ -13,6 +13,7 @@ from bench.schema import ExperimentConfig, ModelConfig, RequestResult
 ROOT = Path(__file__).resolve().parents[1]
 SMOKE_CONFIG = ROOT / "configs" / "experiments" / "mock_smoke.toml"
 PILOT_CONFIG = ROOT / "configs" / "experiments" / "fixed_window_pilot.toml"
+PILOT_90_CONFIG = ROOT / "configs" / "experiments" / "fixed_window_pilot_90pct.toml"
 
 
 def test_smoke_config_resolves_paths_relative_to_config_file() -> None:
@@ -47,6 +48,13 @@ def test_pilot_config_contains_explicit_rates_and_wait_windows() -> None:
     assert config.target_endpoint == "adip"
     assert config.gateway_mode == "batched"
     assert config.pilot_rates_rps == (0.5, 1.0, 2.0)
+    assert config.pilot_wait_windows_ms == (1, 5, 10, 20)
+
+
+def test_pilot_90_percent_extension_has_one_explicit_rate() -> None:
+    config = load_experiment_config(PILOT_90_CONFIG)
+
+    assert config.pilot_rates_rps == (1.8,)
     assert config.pilot_wait_windows_ms == (1, 5, 10, 20)
 
 

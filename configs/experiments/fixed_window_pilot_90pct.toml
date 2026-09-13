@@ -1,0 +1,18 @@
+# Purpose: EXP-002 extension at the protocol's 0.90 measured-capacity point.
+name = "exp002-fixed-window-pilot-90pct"
+model_config = "../models/qwen2_5_1_5b.toml"
+workload_config = "../workloads/pilot_short_constant.toml"
+target_endpoint = "adip"
+adip_gateway_mode = "batched"
+policy = "fixed"
+max_batch_size = 8
+max_wait_ms = 1
+repetition_seeds = [1729]
+cooldown_s = 2.0
+output_dir = "../../results/raw"
+slo_derivation_rule = "use_exp001_direct_p95_before_final_comparison"
+health_url = "http://127.0.0.1:8000/health"
+pilot_rates_rps = [1.8]
+pilot_wait_windows_ms = [1, 5, 10, 20]
+harness_drift_threshold_ms = 50.0
+harness_error_threshold = 0.01
