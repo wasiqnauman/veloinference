@@ -15,6 +15,7 @@ SMOKE_CONFIG = ROOT / "configs" / "experiments" / "mock_smoke.toml"
 PILOT_CONFIG = ROOT / "configs" / "experiments" / "fixed_window_pilot.toml"
 PILOT_90_CONFIG = ROOT / "configs" / "experiments" / "fixed_window_pilot_90pct.toml"
 FINAL_CONFIG = ROOT / "configs" / "experiments" / "primary_final.toml"
+FINAL_SMOKE_CONFIG = ROOT / "configs" / "experiments" / "primary_final_smoke.toml"
 
 
 def test_smoke_config_resolves_paths_relative_to_config_file() -> None:
@@ -68,6 +69,15 @@ def test_final_config_freezes_modes_rates_and_repetitions() -> None:
     assert config.final_rates_rps == (0.5, 1.0, 1.5, 1.8)
     assert config.final_repetitions == (1, 2, 3)
     assert config.adaptive_max_wait_ms == 20
+
+
+def test_final_smoke_config_has_one_condition_per_mode() -> None:
+    config = load_experiment_config(FINAL_SMOKE_CONFIG)
+
+    assert config.final_modes == ("direct", "pass_through", "fixed", "adaptive")
+    assert config.final_rates_rps == (0.5,)
+    assert config.final_repetitions == (1,)
+    assert config.workload.arrival.duration_s == 4.0
 
 
 @pytest.mark.parametrize(
