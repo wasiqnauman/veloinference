@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: BENCH-006 complete; next EXP-001
-Last updated: 2026-09-11
+Status: EXP-001 complete with harness limitation; next EXP-002
+Last updated: 2026-09-13 16:52 -04:00
 Current branch: main
-Current commit before this tracker: 65e4dce
+Current commit before this tracker: 05a0f3b
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -36,9 +36,8 @@ The repository contains the complete research execution design, the progress
 tracker, reproducibility scaffolding, a frozen research proposal, typed core
 contracts, a tested shared backend HTTP client, a verified CORE-003 batcher,
 and the implemented vLLM adapter. The CPU-safe dependency lockfile and
-baseline quality gate are complete. ENV-003 has now validated a real vLLM
-server and one direct completion on the local RTX 3060; no numerical paper
-result exists yet.
+baseline quality gate are complete. ENV-003 validated a real vLLM server and
+EXP-001 now has measured direct-vLLM results on the local RTX 3060.
 
 WSL 2 and Ubuntu are now installed on the host, and WSL-side GPU access has
 been verified. The installed distribution is registered as `Ubuntu` and
@@ -49,17 +48,19 @@ available on `main`.
 The next agent must use the actual distro name `Ubuntu` in WSL commands. The
 Linux-native repository is available at `/home/kennarr/src/veloinference`
 on branch `codex/research-preprint`. Its Python 3.12 environment and lockfile
-are created there, and the branch is synchronized through `65e4dce`. The
+are created there, and the branch is synchronized through `05a0f3b`. The
 Windows `main` checkout and the WSL research branch have the same source state.
 
-OBS-001 through BENCH-006 are complete. Structured JSON events, redaction,
-counters, API error-path coverage, immutable benchmark schemas, strict TOML
-validation, config-relative path resolution, deterministic arrivals, and
-token-bucket prompt preparation are implemented without changing the gateway
-request/response contract. Raw request/GPU records can now be converted into
-exact summaries and deterministic PDF/PNG figures. The next agent must begin
-EXP-001 by preparing the calibration run against the pinned local vLLM server;
-no capacity value may be guessed from the smoke test.
+OBS-001 through BENCH-006 and EXP-001 are complete. Structured JSON events,
+redaction, counters, API error-path coverage, immutable benchmark schemas,
+strict TOML validation, config-relative path resolution, deterministic
+arrivals, tokenizer-backed prompt preparation, raw request/GPU records, exact
+summaries, and deterministic PDF/PNG figures are implemented without changing
+the gateway request/response contract. EXP-001 measured clean direct-vLLM
+operation through 2.0 requests/second. The 4.0 requests/second condition was
+retained as an invalid harness-jitter attempt because the open-loop scheduler
+exceeded its predeclared drift-quality gate; it must not be used as a capacity
+claim.
 
 ## Completed tasks
 
@@ -1267,9 +1268,79 @@ used as final evidence; EXP-001 must use the open-loop runner.
 
 Exact next action:
 
-Execute EXP-001: prepare the primary-model calibration configuration and
-driver, start the pinned vLLM server in WSL, and measure 0.5/1/2/4/8/16
-requests per second with raw request and GPU records.
+This historical entry led to the EXP-001 execution recorded below. The current
+next action is defined by the final `## Next task` section.
+
+### EXP-001 — Primary-model direct-vLLM calibration
+
+Status: complete with harness limitation  
+Date: 2026-09-13 16:52 -04:00  
+Commit: 05a0f3b (calibration tolerance); source was synchronized in WSL before both runs
+
+Files changed:
+
+- `bench/calibration.py`
+- `bench/config.py`
+- `bench/schema.py`
+- `configs/experiments/calibration.toml`
+- `configs/experiments/calibration_smoke.toml`
+- `tests/test_bench_config.py`
+- `docs/PROGRESS.md`
+
+Commands run:
+
+```text
+wsl.exe -d Ubuntu -- bash -lc 'cd /home/kennarr/src/veloinference && .venv-vllm/bin/python -m bench.calibration --config configs/experiments/calibration.toml'
+wsl.exe -d Ubuntu -- uv run --python 3.12 ruff check .
+wsl.exe -d Ubuntu -- uv run --python 3.12 pytest -q
+```
+
+Observed result:
+
+- The pinned `Qwen/Qwen2.5-1.5B-Instruct` revision was served locally by vLLM
+  0.29.0 on the RTX 3060 12 GB.
+- Rates 0.5, 1.0, and 2.0 requests/second completed with 100% successful
+  requests and achieved the offered request rate.
+- Latest valid summaries were approximately: 0.5 rps p95 latency 1783 ms;
+  1.0 rps p95 latency 2250 ms; 2.0 rps p95 latency 1815 ms.
+- The first 4.0 rps attempt recorded 240 request results but failed the 10 ms
+  drift gate with 3 violations. The committed calibration configuration then
+  made the tolerance explicit at 50 ms; the rerun recorded all 240 request
+  results but still failed with 4 violations, including one 581.7 ms outlier.
+- No 4.0, 8.0, or 16.0 result is promoted as valid capacity evidence. This is
+  a limitation of the local WSL2 open-loop harness under GPU load, not a claim
+  that the model server itself failed.
+- The failed traces were preserved at:
+  `/home/kennarr/src/veloinference/results/raw/exp001-calibration-attempt-drift10-20260913`
+  and
+  `/home/kennarr/src/veloinference/results/raw/exp001-calibration-attempt-drift50-20260913`.
+  They are ignored generated artifacts; their manifests recorded
+  `git_dirty:false`.
+- The vLLM server was stopped after the run. A subsequent health probe returned
+  connection refused, confirming that no server was left running.
+
+Verification:
+
+- `uv run --python 3.12 ruff check .`: pass (`All checks passed!`)
+- `uv run --python 3.12 pytest -q`: pass (`67 passed, 2 warnings`)
+- Calibration rate 0.5: pass, 30/30 successful requests
+- Calibration rate 1.0: pass, 60/60 successful requests
+- Calibration rate 2.0: pass, 120/120 successful requests
+- Calibration rate 4.0: invalidated by harness drift gate; do not use in claims
+
+Current status:
+
+The highest rate with a valid open-loop trace is 2.0 requests/second. The
+research record now contains a reproducible, honest lower-bound capacity result
+and a documented scheduler limitation. No final SLO or adaptive-policy claim
+may be made from this calibration alone.
+
+Exact next action:
+
+Begin EXP-002. Implement or verify the fixed-window pilot at safe offered
+rates 0.5, 1.0, and 2.0 requests/second, using the gateway's fixed waits of
+1, 5, 10, and 20 ms. Preserve the same model, tokenizer, prompt set, output
+length, GPU monitor, raw JSONL records, and harness-quality checks.
 
 ## Remaining task sequence
 
@@ -1342,5 +1413,6 @@ agent should execute.
 
 ## Next task
 
-EXP-001 — Prepare and run primary-model calibration on the local RTX 3060;
-record measured capacity from open-loop raw evidence.
+EXP-002 — Implement and run the fixed-window pilot at 0.5, 1.0, and 2.0
+requests/second for waits of 1, 5, 10, and 20 ms; select the shortest
+nondominated fixed policy from valid raw evidence.
