@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: EXP-003 smoke complete; next EXP-003 final matrix
-Last updated: 2026-09-13 17:52 -04:00
+Status: EXP-003 final matrix running; 1 complete, 1 started
+Last updated: 2026-09-13 17:58 -04:00
 Current branch: main
-Current commit before this tracker: 6b97f0d
+Current commit before this tracker: fc021b2
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -1579,6 +1579,49 @@ Run `configs/experiments/primary_final.toml` on WSL with the vLLM server
 running, then verify every manifest, summary, failure count, and raw artifact
 before analysis.
 
+### EXP-003-RUN — Primary final matrix launched
+
+Status: in progress  
+Date: 2026-09-13 17:58 -04:00  
+Commit: fc021b2 (tracker launch record)
+
+Files changed:
+
+- none; this is a live execution checkpoint
+
+Commands run:
+
+```text
+wsl.exe -d Ubuntu -- bash -lc '... vllm serve Qwen/Qwen2.5-1.5B-Instruct --port 8001 ...'
+wsl.exe -d Ubuntu -- bash -lc 'cd /home/kennarr/src/veloinference && .venv-vllm/bin/python -m bench.final --config configs/experiments/primary_final.toml'
+```
+
+Observed result at this checkpoint:
+
+- The vLLM server is healthy on port 8001 with the cached Qwen 1.5B model.
+- The final driver declared the exact 48-condition matrix: four modes, four
+  rates, and three repetitions.
+- `direct-rate-0p5-rep-1` is complete. `direct-rate-1p0-rep-1` has started.
+  No condition has reported a failure.
+- Raw artifacts are being written under
+  `/home/kennarr/src/veloinference/results/raw/exp003-primary-final`.
+- The run is intentionally long because each condition performs 50 sequential
+  warmups before its 120-second measurement window. Do not restart it or
+  modify the committed configuration while it is active.
+
+Current status:
+
+The primary experiment is actively running in WSL session `17463`; the vLLM
+server is in session `22975`. Both sessions must remain alive until the final
+driver exits. This is not yet a complete EXP-003 result.
+
+Exact next action:
+
+Poll the raw-artifact directory until the final driver exits. Then verify all
+48 manifests are complete, all summaries exist, every failure count is zero
+or explicitly explainable, stop vLLM, and commit the completed EXP-003
+verification in this tracker.
+
 ## Remaining task sequence
 
 The remaining tasks are defined in docs/RESEARCH_TO_ARXIV_DESIGN.md:
@@ -1650,5 +1693,5 @@ agent should execute.
 
 ## Next task
 
-EXP-003 — Run the 48-condition primary final matrix on WSL, then verify every
-manifest, summary, failure count, and raw artifact before analysis.
+EXP-003-RUN — Monitor the active 48-condition primary matrix and complete its
+artifact verification after the driver exits.
