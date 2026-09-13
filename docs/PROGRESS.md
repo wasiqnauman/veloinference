@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: CORE-005 complete; next EXP-003
-Last updated: 2026-09-13 17:42 -04:00
+Status: EXP-003 scaffolding complete; next EXP-003-SMOKE
+Last updated: 2026-09-13 18:05 -04:00
 Current branch: main
-Current commit before this tracker: b9cc7e7
+Current commit before this tracker: f0bcb44
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -1460,10 +1460,69 @@ traffic must be used only for evaluation, never for changing these parameters.
 
 Exact next action:
 
-Begin EXP-003. Create the final primary-model experiment configuration and
-driver for direct, pass-through, selected fixed (1 ms), and adaptive modes at
-the frozen 0.25/0.50/0.75/0.90 capacity loads, with three repetitions and
-immutable raw evidence.
+Run a short four-mode EXP-003 lifecycle smoke on WSL before launching the
+full GPU matrix. The smoke must exercise direct, pass-through, fixed, and
+adaptive modes and leave complete manifests and summaries.
+
+### EXP-003-SCAFFOLD — Primary final-matrix runner
+
+Status: complete  
+Date: 2026-09-13 18:05 -04:00  
+Commit: f0bcb44
+
+Files changed:
+
+- `bench/final.py`
+- `bench/calibration.py`
+- `bench/config.py`
+- `bench/pilot.py`
+- `bench/schema.py`
+- `configs/experiments/primary_final.toml`
+- `configs/workloads/final_short_constant.toml`
+- `scripts/run_final_experiments.sh`
+- `tests/test_bench_config.py`
+
+Commands run:
+
+```text
+uv run ruff check bench gateway tests/test_bench_config.py
+uv run pytest -q tests/test_bench_config.py -k "smoke_config or required_records or pilot_90_percent or final_config"
+uv run python -m py_compile bench/final.py bench/calibration.py bench/config.py
+wsl.exe -d Ubuntu -- bash -lc 'cd /home/kennarr/src/veloinference && git fetch origin main && git merge --ff-only origin/main && uv run --python 3.12 ruff check . && uv run --python 3.12 pytest -q'
+```
+
+Observed result:
+
+- Added a single committed driver for the 48-condition primary matrix:
+  four modes, four rates, and three declared repetitions.
+- Direct mode uses the vLLM endpoint. Pass-through, fixed, and adaptive modes
+  use the gateway. The fixed comparator is configured at 1 ms and adaptive is
+  configured at the frozen 20 ms maximum wait.
+- Every condition writes a manifest, request-level JSONL, GPU JSONL, summary,
+  and an aggregate generated summary. Repetition seeds are recorded in both
+  manifests and request records while the constant arrival schedule stays
+  controlled and identical across modes.
+
+Verification:
+
+- Windows Ruff: pass.
+- Windows selected config tests: pass (`4 passed`); the remaining Windows
+  tests were not used because pytest could not access the existing Windows
+  temp directory (`WinError 5`).
+- WSL full gate: pass (`78 passed, 2 warnings`); vLLM was not running during
+  this software-only verification.
+
+Current status:
+
+The final runner and primary configuration are committed and validated. No
+EXP-003 performance claim exists yet. The full matrix must not be launched
+until the short lifecycle smoke confirms all four process paths.
+
+Exact next action:
+
+Create a short WSL smoke configuration, run all four modes against the local
+vLLM server, verify complete artifacts and stopped services, then commit that
+smoke step and update this ledger.
 
 ## Remaining task sequence
 
@@ -1536,6 +1595,6 @@ agent should execute.
 
 ## Next task
 
-EXP-003 — Create and run the primary final matrix using direct, pass-through,
-selected fixed (1 ms), and frozen adaptive policies at the declared capacity
-loads with three repetitions per condition.
+EXP-003-SMOKE — Create and run the short four-mode lifecycle smoke on WSL,
+then verify its manifests, summaries, and service cleanup before the full
+primary matrix.
