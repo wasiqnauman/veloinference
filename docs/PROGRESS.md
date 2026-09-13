@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: EXP-001 complete with harness limitation; next EXP-002
-Last updated: 2026-09-13 16:52 -04:00
+Status: EXP-002 complete; next CORE-005
+Last updated: 2026-09-13 17:38 -04:00
 Current branch: main
-Current commit before this tracker: 05a0f3b
+Current commit before this tracker: 974ec10
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -48,7 +48,7 @@ available on `main`.
 The next agent must use the actual distro name `Ubuntu` in WSL commands. The
 Linux-native repository is available at `/home/kennarr/src/veloinference`
 on branch `codex/research-preprint`. Its Python 3.12 environment and lockfile
-are created there, and the branch is synchronized through `05a0f3b`. The
+are created there, and the branch is synchronized through `974ec10`. The
 Windows `main` checkout and the WSL research branch have the same source state.
 
 OBS-001 through BENCH-006 and EXP-001 are complete. Structured JSON events,
@@ -60,7 +60,9 @@ the gateway request/response contract. EXP-001 measured clean direct-vLLM
 operation through 2.0 requests/second. The 4.0 requests/second condition was
 retained as an invalid harness-jitter attempt because the open-loop scheduler
 exceeded its predeclared drift-quality gate; it must not be used as a capacity
-claim.
+claim. EXP-002 then completed a corrected fixed-window pilot after finding and
+fixing a real queue-drain bug in the batcher. The predeclared rule selected a
+1 ms fixed wait for the final comparison.
 
 ## Completed tasks
 
@@ -1337,10 +1339,87 @@ may be made from this calibration alone.
 
 Exact next action:
 
-Begin EXP-002. Implement or verify the fixed-window pilot at safe offered
-rates 0.5, 1.0, and 2.0 requests/second, using the gateway's fixed waits of
-1, 5, 10, and 20 ms. Preserve the same model, tokenizer, prompt set, output
-length, GPU monitor, raw JSONL records, and harness-quality checks.
+This historical entry led to the EXP-002 execution recorded below. The current
+next action is defined by the final `## Next task` section.
+
+### EXP-002 — Corrected fixed-window pilot
+
+Status: complete  
+Date: 2026-09-13 17:38 -04:00  
+Commits: `9f5d9f2`, `4e3894c`, `e0cb26c`, `368da2b`, `974ec10`, plus this tracker commit
+
+Files changed:
+
+- `bench/pilot.py`
+- `bench/calibration.py`
+- `bench/config.py`
+- `bench/schema.py`
+- `gateway/core/batcher.py`
+- `configs/experiments/fixed_window_pilot.toml`
+- `configs/experiments/fixed_window_pilot_90pct.toml`
+- `configs/workloads/pilot_short_constant.toml`
+- `scripts/run_pilot.sh`
+- `tests/test_batcher.py`
+- `tests/test_bench_config.py`
+- `tests/test_calibration.py`
+- `docs/EXPERIMENT_LOG.md`
+- `docs/RESULT_CLAIMS.md`
+- `docs/PROGRESS.md`
+
+Commands run:
+
+```text
+wsl.exe -d Ubuntu -- uv run --python 3.12 pytest -q
+wsl.exe -d Ubuntu -- .venv-vllm/bin/python -m bench.pilot --config configs/experiments/fixed_window_pilot.toml
+wsl.exe -d Ubuntu -- .venv-vllm/bin/python -m bench.pilot --config configs/experiments/fixed_window_pilot_90pct.toml
+```
+
+Observed result:
+
+- The first 12-condition pilot was excluded because all batches were size 1.
+  The new slow-backend regression reproduced the cause, and commit `368da2b`
+  fixed it by draining already queued ingress requests before policy selection.
+- The corrected main pilot produced 12 complete conditions: waits 1/5/10/20
+  ms crossed with rates 0.5/1.0/2.0 rps. The explicit 90% extension produced
+  four more conditions at 1.8 rps.
+- All 16 corrected conditions achieved the offered request rate, had zero
+  request failures, and had clean manifests. Corrected higher-load conditions
+  formed multi-request batches.
+- At 0.50 rps, p95 latency for waits 1/5/10/20 ms was approximately
+  1919.9/1929.8/1963.7/1791.5 ms. At 1.8 rps, it was approximately
+  3786.8/2814.4/3300.9/3392.2 ms.
+- The predeclared Pareto rule leaves 1, 5, and 20 ms nondominated and removes
+  10 ms as dominated by 5 ms. The shortest nondominated wait is therefore
+  1 ms. This choice is frozen before EXP-003.
+- Corrected raw artifacts are preserved at
+  `/home/kennarr/src/veloinference/results/raw/exp002-fixed-window-pilot` and
+  `/home/kennarr/src/veloinference/results/raw/exp002-fixed-window-pilot-90pct`.
+  The excluded first attempt is at
+  `/home/kennarr/src/veloinference/results/raw/exp002-fixed-window-pilot-attempt-singletons-20260913`.
+
+Verification:
+
+- WSL batcher regression: pass (`5 passed`)
+- WSL full gate before the pilot: pass (`69 passed, 2 warnings`)
+- Corrected main pilot summaries: 12/12 present; all success counts equal
+  record counts and all failure counts are zero
+- Corrected 90% extension summaries: 4/4 present; all 54 requests per run
+  succeeded
+- vLLM health after cleanup: connection refused, confirming the server was
+  stopped
+
+Current status:
+
+The fixed policy is frozen at `max_wait_ms=1` for EXP-003. The pilot remains
+exploratory evidence: it uses one repetition and 30-second measurement windows,
+so it supports policy selection but not final headline claims.
+
+Exact next action:
+
+Begin CORE-005. Implement the minimal adaptive policy from the research design,
+write deterministic unit tests for its queue/rate/backend/deadline decisions,
+freeze its parameters using only EXP-001 and EXP-002 evidence, and do not use
+EXP-003 final-run results for tuning.
 
 ## Remaining task sequence
 
@@ -1413,6 +1492,6 @@ agent should execute.
 
 ## Next task
 
-EXP-002 — Implement and run the fixed-window pilot at 0.5, 1.0, and 2.0
-requests/second for waits of 1, 5, 10, and 20 ms; select the shortest
-nondominated fixed policy from valid raw evidence.
+CORE-005 — Implement and freeze the minimal adaptive batching policy using only
+calibration and fixed-pilot evidence; add deterministic tests before any final
+experiment run.
