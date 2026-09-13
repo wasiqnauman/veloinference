@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: EXP-003 scaffolding complete; next EXP-003-SMOKE
-Last updated: 2026-09-13 18:05 -04:00
+Status: EXP-003 smoke complete; next EXP-003 final matrix
+Last updated: 2026-09-13 17:52 -04:00
 Current branch: main
-Current commit before this tracker: f0bcb44
+Current commit before this tracker: 6b97f0d
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -48,7 +48,7 @@ available on `main`.
 The next agent must use the actual distro name `Ubuntu` in WSL commands. The
 Linux-native repository is available at `/home/kennarr/src/veloinference`
 on branch `codex/research-preprint`. Its Python 3.12 environment and lockfile
-are created there, and the branch is synchronized through `b9cc7e7`. The
+are created there, and the branch is synchronized through `6b97f0d`. The
 Windows `main` checkout and the WSL research branch have the same source state.
 
 OBS-001 through BENCH-006 and EXP-001 are complete. Structured JSON events,
@@ -1520,9 +1520,64 @@ until the short lifecycle smoke confirms all four process paths.
 
 Exact next action:
 
-Create a short WSL smoke configuration, run all four modes against the local
-vLLM server, verify complete artifacts and stopped services, then commit that
-smoke step and update this ledger.
+The short smoke has now passed. Run the committed primary configuration on
+WSL with the vLLM server running, preserve all raw artifacts, and do not
+modify frozen policy or workload parameters during execution.
+
+### EXP-003-SMOKE — Four-mode lifecycle validation
+
+Status: complete  
+Date: 2026-09-13 17:52 -04:00  
+Commit: 6b97f0d
+
+Files changed:
+
+- `configs/experiments/primary_final_smoke.toml`
+- `configs/workloads/final_smoke.toml`
+- `tests/test_bench_config.py`
+- `docs/PROGRESS.md`
+
+Commands run:
+
+```text
+wsl.exe -d Ubuntu -- bash -lc 'cd /home/kennarr/src/veloinference && git fetch origin main && git merge --ff-only origin/main && uv run --python 3.12 ruff check . && uv run --python 3.12 pytest -q'
+wsl.exe -d Ubuntu -- ... vllm serve Qwen/Qwen2.5-1.5B-Instruct ...
+wsl.exe -d Ubuntu -- bash -lc 'cd /home/kennarr/src/veloinference && .venv-vllm/bin/python -m bench.final --config configs/experiments/primary_final_smoke.toml'
+```
+
+Observed result:
+
+- The cached Qwen 1.5B model started successfully on the local RTX 3060.
+- Direct, pass-through, fixed, and adaptive modes each produced a complete
+  manifest, request JSONL, GPU JSONL, and summary under
+  `/home/kennarr/src/veloinference/results/raw/exp003-primary-smoke`.
+- The aggregate summary contains four entries. Each mode completed two
+  measurement requests with zero failures. The p95 values were approximately
+  2121.9 ms direct, 1471.4 ms pass-through, 1908.7 ms fixed, and 2261.7 ms
+  adaptive. These are lifecycle-smoke observations only, not paper claims.
+- Gateway logs were written under
+  `/home/kennarr/src/veloinference/results/system/exp003-primary-smoke`.
+
+Verification:
+
+- WSL full gate before smoke: pass (`79 passed, 2 warnings`).
+- Four manifests: pass; all have `status=complete` and `git_dirty=false`.
+- Four summaries: pass; all have `success_count=2` and `failure_count=0`.
+- Aggregate summary length: pass (`4`).
+- Service cleanup: pass; ports 8000 and 8001 both refused connections after
+  the run.
+
+Current status:
+
+The final runner can start and stop every intended service path and preserve
+the expected raw evidence. The smoke data is excluded from final claims. The
+local GPU is idle and ready for the 48-condition primary run.
+
+Exact next action:
+
+Run `configs/experiments/primary_final.toml` on WSL with the vLLM server
+running, then verify every manifest, summary, failure count, and raw artifact
+before analysis.
 
 ## Remaining task sequence
 
@@ -1595,6 +1650,5 @@ agent should execute.
 
 ## Next task
 
-EXP-003-SMOKE — Create and run the short four-mode lifecycle smoke on WSL,
-then verify its manifests, summaries, and service cleanup before the full
-primary matrix.
+EXP-003 — Run the 48-condition primary final matrix on WSL, then verify every
+manifest, summary, failure count, and raw artifact before analysis.
