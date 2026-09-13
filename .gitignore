@@ -13,6 +13,7 @@ build/
 .uv-cache/
 
 results/raw/
+results/system/
 results/system/runtime/
 results/summaries/generated/
 results/figures/generated/
