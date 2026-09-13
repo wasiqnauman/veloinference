@@ -82,7 +82,7 @@ async def run_calibration(config: ExperimentConfig) -> list[dict[str, object]]:
         await client.aclose()
 
     write_json_atomic(
-        config.output_dir.parent / "summaries" / f"{config.name}.json",
+        config.output_dir.parent / "summaries" / "generated" / f"{config.name}.json",
         {"experiment_id": config.name, "summaries": summaries},
     )
     return summaries
