@@ -1,7 +1,7 @@
 # ADIP Project Progress Tracker
 
-Status: EXP-003 final matrix running; 1 complete, 1 started
-Last updated: 2026-09-13 17:58 -04:00
+Status: EXP-003 final matrix running; 2 complete, 1 started
+Last updated: 2026-09-13 18:02 -04:00
 Current branch: main
 Current commit before this tracker: fc021b2
 Primary execution target: local Windows machine, RTX 3060 12 GB  
@@ -1601,8 +1601,9 @@ Observed result at this checkpoint:
 - The vLLM server is healthy on port 8001 with the cached Qwen 1.5B model.
 - The final driver declared the exact 48-condition matrix: four modes, four
   rates, and three repetitions.
-- `direct-rate-0p5-rep-1` is complete. `direct-rate-1p0-rep-1` has started.
-  No condition has reported a failure.
+- `direct-rate-0p5-rep-1` and `direct-rate-1p0-rep-1` are complete. The next
+  condition, `direct-rate-1p5-rep-1`, has started. No condition has reported
+  a failure.
 - Raw artifacts are being written under
   `/home/kennarr/src/veloinference/results/raw/exp003-primary-final`.
 - The run is intentionally long because each condition performs 50 sequential
