@@ -1,0 +1,215 @@
+% Purpose: arXiv-ready manuscript source for the ADIP research project.
+% Numerical claims remain marked TODO until verified experiment artifacts exist.
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{microtype}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+
+\newcommand{\TODO}[1]{\textcolor{red}{[TODO: #1]}}
+\newcommand{\adip}{\textsc{ADIP}}
+\newcommand{\vllm}{\textsc{vLLM}}
+
+\title{Latency-Aware Micro-Batching for Local Large Language Model Serving:\\
+A Reproducible Study of Fixed and Adaptive Dispatch}
+\author{Wasiq \TODO{add surname and affiliation}\\
+\texttt{\TODO{add contact email}}}
+\date{\TODO{insert submission date}}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Serving a language model through an asynchronous gateway introduces a trade-off
+between batching efficiency and per-request latency. We present a small,
+reproducible empirical study of that trade-off on a single consumer GPU. The
+study compares direct model serving, pass-through gateway serving, a fixed
+micro-batching window, and a frozen adaptive dispatch policy under controlled
+open-loop workloads. The contribution is an auditable measurement protocol,
+an implementation that records request-level and GPU-level evidence, and an
+honest analysis of when batching helps or hurts. \TODO{Populate the final
+quantitative findings only from verified EXP-003 and EXP-004 summaries.}
+\end{abstract}
+
+\section{Introduction}
+\label{sec:introduction}
+
+Large language model serving systems must balance utilization, throughput, and
+latency. Prior systems have shown the value of memory-efficient serving and
+fine-grained scheduling for generative models \citep{kwon2023pagedattention,yu2022orca}.
+Dynamic batching can improve device utilization by combining nearby requests,
+but waiting for companions adds queueing delay. This paper studies
+that engineering trade-off in a deliberately small setting: one local GPU,
+one open model, and one asynchronous gateway.
+
+Our goal is not to claim a new serving algorithm. Instead, we ask whether a
+carefully controlled local experiment can produce useful evidence about the
+operating regimes of a fixed and an adaptive batching policy. The project is
+also designed as a research-reproducibility artifact: configurations are
+committed, arrivals are generated before execution, prompts are counted with
+the target tokenizer, and raw request and GPU observations are retained.
+
+We make three practical contributions:
+\begin{enumerate}
+  \item a typed, tested gateway implementation with direct, pass-through,
+        fixed-window, and adaptive dispatch paths;
+  \item a predeclared open-loop evaluation protocol with calibration, pilot,
+        final, and sensitivity stages; and
+  \item an artifact package that connects every reported aggregate to raw
+        request records, run manifests, GPU samples, and analysis code.
+\end{enumerate}
+
+\section{Research Questions}
+\label{sec:questions}
+
+The primary research question is:
+\begin{quote}
+Under a fixed local hardware and model budget, when does adaptive
+micro-batching improve the throughput--latency trade-off relative to a
+preselected fixed wait window?
+\end{quote}
+
+We decompose it into the following questions:
+\begin{enumerate}
+  \item How does the selected fixed window compare with direct and
+        pass-through serving across increasing offered rates?
+  \item Does the frozen adaptive policy reduce tail latency or improve
+        effective throughput at the same offered rate?
+  \item How stable are the observations across repetitions and under the
+        planned workload and model sensitivity checks?
+\end{enumerate}
+
+\section{System and Implementation}
+\label{sec:system}
+
+\subsection{Gateway architecture}
+
+\adip{} is an asynchronous HTTP inference gateway. Requests enter a bounded
+queue and are either sent directly to the backend or grouped into batches by a
+policy. The gateway records request identifiers, queue time, backend time,
+batch identifiers, batch sizes, status, and structured events. The local
+backend is \vllm{} serving
+\texttt{Qwen/Qwen2.5-1.5B-Instruct} at the committed revision
+\texttt{989aa7980e4cf806f80c7fef2b1adb7bc71aa306}.
+
+\subsection{Dispatch policies}
+
+The fixed policy waits for its configured window or until the maximum batch
+size is reached. The adaptive policy was frozen before final evaluation. Its
+parameters are EWMA smoothing factor $0.2$, low-load expected-companion
+threshold $1.0$, maximum wait $20$ ms, and maximum batch size $8$. The fixed
+comparator uses the $1$ ms window selected by the predeclared pilot rule.
+
+\section{Experimental Method}
+\label{sec:method}
+
+\subsection{Hardware and software}
+
+All experiments run locally on an NVIDIA RTX 3060 with 12 GB VRAM through WSL
+Ubuntu. The exact software versions, model revision, environment variables,
+and launch commands are recorded in the repository progress ledger and
+experiment logs. \TODO{Populate the final environment table from the verified
+run manifests.}
+
+\subsection{Workload and arrival process}
+
+The primary workload uses deterministic constant arrivals, a 120-second
+measurement window, 50 sequential warmups, and a short prompt bucket covering
+8--128 input tokens under the target tokenizer. The final offered rates are
+$0.5$, $1.0$, $1.5$, and $1.8$ requests per second. Each condition has three
+declared repetitions with seeds $1729$, $2718$, and $3141$.
+
+\subsection{Evaluation protocol}
+
+We first calibrated direct serving and rejected a condition when the open-loop
+harness exceeded its declared scheduling-drift quality gate. We then ran a
+fixed-window pilot at several waits and selected the shortest nondominated
+window under a predeclared Pareto rule. Only after freezing the adaptive
+parameters did we start the primary matrix. A secondary experiment will test
+the planned workload and model sensitivities.
+
+\subsection{Metrics}
+
+For each condition we report offered rate, achieved throughput, success and
+failure counts, p50/p95/p99 end-to-end latency, queue and backend timing when
+available, mean batch size, arrival drift, and GPU utilization and VRAM. All
+tail statistics are computed from request-level records rather than server
+logs alone.
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Primary matrix}
+
+The primary matrix contains 48 conditions. \TODO{Insert the verified primary
+summary table generated by ANA-001. Do not include the interrupted attempt.}
+
+\begin{table}[t]
+  \centering
+  \caption{Primary results placeholder. Replace with an analysis-generated
+  table after all 48 valid conditions are complete.}
+  \label{tab:primary-placeholder}
+  \begin{tabular}{lrrrr}
+    \toprule
+    Mode & Rate & p50 (ms) & p95 (ms) & Throughput \\
+    \midrule
+    \TODO{mode} & \TODO{rate} & \TODO{value} & \TODO{value} & \TODO{value} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Sensitivity and robustness}
+
+\TODO{Describe EXP-004 only after it has run. Report repetitions, excluded
+conditions, and negative results explicitly.}
+
+\subsection{Failure and validity accounting}
+
+The interrupted primary attempt is retained as an excluded artifact so that
+the analysis is auditable. It must not be pooled with valid final conditions.
+\TODO{Add the final validity table, including any harness-invalid conditions
+and the exact exclusion rule.}
+
+\section{Discussion}
+\label{sec:discussion}
+
+\TODO{Discuss the observed latency--batching trade-off without claiming
+generalization beyond the tested local model, GPU, prompt bucket, and arrival
+process. Compare adaptive and fixed policies only at matched offered rates.}
+
+\section{Limitations}
+\label{sec:limitations}
+
+This is a single-GPU study of one small open model and a narrow prompt and
+arrival distribution. It does not establish production-scale serving
+performance, broad model generalization, or superiority over all batching
+algorithms. The local WSL runtime and harness are part of the measured setup.
+These limitations are central to interpreting the results as evidence of
+research capability rather than as a universal systems benchmark.
+
+\section{Reproducibility and Artifact Availability}
+\label{sec:artifact}
+
+The repository contains the source implementation, strict TOML
+configurations, test suite, experiment logs, progress ledger, and scripts used
+to launch the experiments. Large raw artifacts are excluded from Git but are
+kept in the local results tree during analysis. The final release should add
+the exact commit, environment lockfile, generated tables, generated figures,
+and a clean-clone reproduction transcript.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+\TODO{Write a concise conclusion after the final analysis. State the strongest
+supported result, the most important negative result, and the exact scope of
+the evidence.}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}
