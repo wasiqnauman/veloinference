@@ -58,3 +58,33 @@ def test_incomplete_final_run_is_rejected(tmp_path: Path) -> None:
             run_id="direct-rate-1p5-rep-1",
             resume_existing=True,
         )
+
+
+def test_invalid_harness_run_is_reused_as_nonclaim(tmp_path: Path) -> None:
+    run_dir = tmp_path / "direct" / "direct-rate-1p5-rep-1"
+    run_dir.mkdir(parents=True)
+    (run_dir / "manifest.json").write_text(
+        json.dumps(
+            {
+                "status": "invalid_harness",
+                "experiment_id": "exp003-primary-final",
+                "invalid_reason": "4/180 requests exceeded 50 ms",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = _load_existing_summary(
+        run_dir,
+        run_id="direct-rate-1p5-rep-1",
+        resume_existing=True,
+    )
+
+    assert result == {
+        "schema_version": 1,
+        "experiment_id": "exp003-primary-final",
+        "run_id": "direct-rate-1p5-rep-1",
+        "status": "invalid_harness",
+        "valid": False,
+        "invalid_reason": "4/180 requests exceeded 50 ms",
+    }

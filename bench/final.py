@@ -16,7 +16,7 @@ from bench.config import ConfigError, load_experiment_config
 from bench.gpu_monitor import monitor_gpu
 from bench.pilot import _start_gateway, _stop_gateway, _wait_for_gateway
 from bench.prompts import HuggingFaceTokenCounter, build_prompt_set
-from bench.runner import run_open_loop
+from bench.runner import HarnessOverloadError, run_open_loop
 from bench.schema import ExperimentConfig, PlannedRequest, PreparedPrompt
 from bench.storage import append_jsonl, write_json_atomic
 from bench.summarize import summarize_records, summary_to_mapping
@@ -90,8 +90,8 @@ async def run_final(config: ExperimentConfig) -> list[dict[str, object]]:
                     if existing_summary is not None:
                         summaries.append(existing_summary)
                         continue
-                    summaries.append(
-                        await _run_condition(
+                    try:
+                        summary = await _run_condition(
                             config,
                             mode,
                             wait_ms,
@@ -102,7 +102,13 @@ async def run_final(config: ExperimentConfig) -> list[dict[str, object]]:
                             output_root,
                             client,
                         )
-                    )
+                    except HarnessOverloadError as exc:
+                        run_dir = output_root / mode / run_id
+                        _mark_invalid_harness(run_dir, str(exc))
+                        summary = _invalid_summary(
+                            config, mode, rate_per_s, repetition, str(exc)
+                        )
+                    summaries.append(summary)
                     is_last = (
                         repetition_index == len(config.final_repetitions) - 1
                         and rate_index == len(config.final_rates_rps) - 1
@@ -242,12 +248,20 @@ def _load_existing_summary(
 
     manifest_path = run_dir / "manifest.json"
     summary_path = run_dir / "summary.json"
-    if not manifest_path.exists() or not summary_path.exists():
+    if not manifest_path.exists():
         raise ConfigError(
             f"existing run is incomplete: {run_dir}; archive it before resuming"
         )
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    if not isinstance(manifest, dict) or manifest.get("status") != "complete":
+    if not isinstance(manifest, dict):
+        raise ConfigError(f"existing manifest is invalid: {run_dir}")
+    if manifest.get("status") == "invalid_harness":
+        return _invalid_summary_from_manifest(manifest, run_id)
+    if manifest.get("status") != "complete":
+        raise ConfigError(
+            f"existing run is incomplete: {run_dir}; archive it before resuming"
+        )
+    if not summary_path.exists():
         raise ConfigError(
             f"existing run is incomplete: {run_dir}; archive it before resuming"
         )
@@ -255,6 +269,57 @@ def _load_existing_summary(
     if not isinstance(summary, dict) or summary.get("run_id") != run_id:
         raise ConfigError(f"existing summary does not match run id: {run_dir}")
     return summary
+
+
+def _mark_invalid_harness(run_dir: Path, reason: str) -> None:
+    """Mark a completed request trace as invalid without fabricating metrics."""
+
+    manifest_path = run_dir / "manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if not isinstance(manifest, dict):
+        raise ConfigError(f"manifest is invalid and cannot be marked: {run_dir}")
+    manifest.update(
+        {
+            "status": "invalid_harness",
+            "ended_at_utc": _utc_now(),
+            "invalid_reason": reason,
+        }
+    )
+    write_json_atomic(manifest_path, manifest)
+
+
+def _invalid_summary(
+    config: ExperimentConfig,
+    mode: str,
+    rate_per_s: float,
+    repetition: int,
+    reason: str,
+) -> dict[str, object]:
+    """Create an aggregate marker that analysis must exclude from metrics."""
+
+    return {
+        "schema_version": 1,
+        "experiment_id": config.name,
+        "run_id": _run_id(mode, rate_per_s, repetition),
+        "status": "invalid_harness",
+        "valid": False,
+        "invalid_reason": reason,
+    }
+
+
+def _invalid_summary_from_manifest(
+    manifest: dict[str, object], run_id: str
+) -> dict[str, object]:
+    """Reconstruct a terminal invalid marker during a resumed run."""
+
+    return {
+        "schema_version": 1,
+        "experiment_id": manifest.get("experiment_id"),
+        "run_id": run_id,
+        "status": "invalid_harness",
+        "valid": False,
+        "invalid_reason": manifest.get("invalid_reason", "unknown harness error"),
+    }
 
 
 def parse_args() -> argparse.Namespace:
