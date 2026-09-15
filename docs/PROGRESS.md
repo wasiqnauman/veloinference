@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: EXP-003 recovery prepared; next resumed final matrix
-Last updated: 2026-09-15 07:37 -04:00
+Status: EXP-003 resumed; 2 reused, 1 running
+Last updated: 2026-09-15 07:39 -04:00
 Current branch: main
-Current commit before this tracker: f6994b9
+Current commit before this tracker: 59cb5d7
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -1674,6 +1674,44 @@ Start vLLM on port 8001 and run the committed primary configuration. Confirm
 that the runner skips the two complete direct conditions, then let it execute
 the remaining conditions without changing the matrix.
 
+### EXP-003-RUN-RESUME — Safe-resume primary matrix launched
+
+Status: in progress  
+Date: 2026-09-15 07:39 -04:00  
+Commit: 59cb5d7 (tracker launch record)
+
+Files changed:
+
+- none; this is a live execution checkpoint
+
+Commands run:
+
+```text
+wsl.exe -d Ubuntu -- bash -lc '... vllm serve Qwen/Qwen2.5-1.5B-Instruct --port 8001 ...'
+wsl.exe -d Ubuntu -- bash -lc 'cd /home/kennarr/src/veloinference && .venv-vllm/bin/python -m bench.final --config configs/experiments/primary_final.toml'
+```
+
+Observed result at this checkpoint:
+
+- vLLM is healthy on port 8001.
+- The runner reused the two complete direct summaries without appending to
+  their JSONL files.
+- A fresh `direct-rate-1p5-rep-1` run directory was created and marked
+  `started`; no new failure has been reported.
+- The primary runner is in WSL session `64487`; vLLM is in session `79887`.
+
+Current status:
+
+The remaining matrix is running safely. The archived partial attempt remains
+outside the final output tree and must not be included in analysis.
+
+Exact next action:
+
+Monitor the final output tree until the runner exits, then verify 48 complete
+manifests and summaries, calculate final aggregate checks, stop vLLM, and
+begin ANA-001 analysis. The paper deliverable must be written in LaTeX under
+`paper/` after the final evidence is verified.
+
 ## Remaining task sequence
 
 The remaining tasks are defined in docs/RESEARCH_TO_ARXIV_DESIGN.md:
@@ -1745,5 +1783,5 @@ agent should execute.
 
 ## Next task
 
-EXP-003-RUN-RESUME — Run the safe-resume primary matrix and verify all 48 final
-conditions after completion.
+EXP-003-RUN-RESUME — Monitor the safe-resume primary matrix and verify all 48
+final conditions after completion.
