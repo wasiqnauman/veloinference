@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: EXP-003 resumed; paper LaTeX scaffold complete
-Last updated: 2026-09-15 07:42 -04:00
+Status: EXP-003 harness boundary recorded; next safe resume
+Last updated: 2026-09-15 07:46 -04:00
 Current branch: main
-Current commit before this tracker: b24fb51
+Current commit before this tracker: 817d3dd
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -1764,6 +1764,57 @@ Continue monitoring the resumed EXP-003 matrix. After all valid conditions
 finish, run ANA-001 to generate tables and figures, then replace only the
 appropriate LaTeX TODO sections with evidence-backed text.
 
+### EXP-003-HARNESS — Record high-rate drift invalidation
+
+Status: complete  
+Date: 2026-09-15 07:46 -04:00  
+Commit: 817d3dd (implementation); tracker commit follows
+
+Files changed:
+
+- `bench/final.py`
+- `tests/test_final.py`
+- WSL raw-artifact archive only; no tracked raw files
+
+Commands run:
+
+```text
+wsl.exe -d Ubuntu -- bash -lc 'cd /home/kennarr/src/veloinference && git fetch origin main && git merge --ff-only origin/main && uv run --python 3.12 ruff check . && uv run --python 3.12 pytest -q'
+wsl.exe -d Ubuntu -- bash -lc 'mkdir -p .../results/raw/exp003-primary-final-interrupted/direct/2026-09-15 && mv .../direct-rate-1p5-rep-1 .../2026-09-15/direct-rate-1p5-rep-1'
+```
+
+Observed result:
+
+- The resumed direct 1.5 rps condition produced 180 request records but was
+  rejected by the predeclared harness gate: `4/180` requests exceeded 50 ms
+  drift, which is above the allowed 1% invalidation threshold.
+- No latency summary was produced for that attempt. The request trace and
+  started manifest were preserved under
+  `/home/kennarr/src/veloinference/results/raw/exp003-primary-final-interrupted/`.
+- The final driver now marks a harness-rejected condition as
+  `invalid_harness`, adds a `valid=false` aggregate marker, and continues to
+  later conditions. It still refuses incomplete ordinary runs and never
+  appends to an interrupted JSONL file.
+
+Verification:
+
+- WSL Ruff: pass.
+- WSL full gate: pass (`83 passed, 2 warnings`).
+- The invalid attempt remains outside the final output tree.
+
+Current status:
+
+The 50 ms / 1% drift rule remains unchanged and is now an explicit negative
+result boundary. High-rate conditions may be excluded if the local harness
+violates that rule; they must not be converted into performance claims.
+
+Exact next action:
+
+Restart vLLM and rerun the committed primary configuration. The driver must
+reuse the two complete direct summaries, execute missing conditions, record
+any new drift violations as `invalid_harness`, and continue until every
+condition is terminal.
+
 ## Remaining task sequence
 
 The remaining tasks are defined in docs/RESEARCH_TO_ARXIV_DESIGN.md:
@@ -1835,5 +1886,5 @@ agent should execute.
 
 ## Next task
 
-EXP-003-RUN-RESUME — Monitor the safe-resume primary matrix and verify all 48
-final conditions after completion.
+EXP-003-RUN-RESUME — Restart the safe-resume primary matrix with terminal
+harness-invalid handling, then verify all 48 conditions after completion.
