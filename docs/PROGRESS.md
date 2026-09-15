@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: EXP-003 resumed; 2 reused, 1 running
-Last updated: 2026-09-15 07:39 -04:00
+Status: EXP-003 resumed; paper LaTeX scaffold complete
+Last updated: 2026-09-15 07:42 -04:00
 Current branch: main
-Current commit before this tracker: 59cb5d7
+Current commit before this tracker: b24fb51
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -1711,6 +1711,58 @@ Monitor the final output tree until the runner exits, then verify 48 complete
 manifests and summaries, calculate final aggregate checks, stop vLLM, and
 begin ANA-001 analysis. The paper deliverable must be written in LaTeX under
 `paper/` after the final evidence is verified.
+
+### PAPER-SCAFFOLD — Add arXiv LaTeX manuscript source
+
+Status: complete  
+Date: 2026-09-15 07:42 -04:00  
+Commit: b24fb51 (manuscript scaffold); tracker commit follows
+
+Files changed:
+
+- `paper/main.tex`
+- `paper/references.bib`
+- `paper/README.md`
+- `paper/figures/.gitkeep`
+- `paper/tables/.gitkeep`
+
+Commands run:
+
+```text
+lualatex --interaction=nonstopmode --halt-on-error main.tex
+bibtex main
+lualatex --interaction=nonstopmode --halt-on-error main.tex
+lualatex --interaction=nonstopmode --halt-on-error main.tex
+```
+
+Observed result:
+
+- The manuscript source compiles to `paper/main.pdf` with LuaLaTeX and
+  resolved bibliography citations.
+- The paper contains the research questions, system description, protocol,
+  metrics, limitations, reproducibility plan, and placeholder table.
+- Numerical sections contain explicit TODO markers so incomplete or smoke-run
+  data cannot become accidental paper claims.
+
+Verification:
+
+- LuaLaTeX: pass; PDF generated with four pages.
+- BibTeX: pass; bibliography generated.
+- Final LuaLaTeX pass: pass; citations resolved.
+- One minor overfull line and MiKTeX update notices remain; final paper QA
+  must address layout after real tables and figures are inserted.
+
+Current status:
+
+The project now has a compilable LaTeX manuscript scaffold. It is not a final
+paper: author metadata, verified results, tables, figures, discussion, and
+conclusion remain to be populated after analysis.
+
+Exact next action:
+
+Continue monitoring the resumed EXP-003 matrix. After all valid conditions
+finish, run ANA-001 to generate tables and figures, then replace only the
+appropriate LaTeX TODO sections with evidence-backed text.
 
 ## Remaining task sequence
 
