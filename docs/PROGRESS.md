@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: EXP-003 running; 10 direct conditions complete, direct repetition 3 at 1.5 rps
-Last updated: 2026-09-15 08:16 -04:00
+Status: EXP-003 running; 11 direct conditions complete, direct repetition 3 at 1.8 rps
+Last updated: 2026-09-15 08:19 -04:00
 Current branch: main
-Current commit before this tracker: 320e03d
+Current commit before this tracker: 22e1311
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -1818,8 +1818,8 @@ condition is terminal.
 ### EXP-003-RUN-RETRY — Direct-mode retry completed; repetition 2 in progress
 
 Status: in progress  
-Date: 2026-09-15 08:16 -04:00  
-Commit: 320e03d (tracker checkpoint)
+Date: 2026-09-15 08:19 -04:00  
+Commit: 22e1311 (tracker checkpoint)
 
 Files changed:
 
@@ -1834,14 +1834,14 @@ Observed result at this checkpoint:
 - The 1.5 rps retry summary reports p95 latency 2074.63 ms and p95 arrival
   drift 1.82 ms. These values are preliminary condition evidence, not a final
   paper claim until the full matrix and validity audit finish.
-- Direct repetition 3 at 0.5 and 1.0 rps completed successfully; the runner
-  is now executing 1.5 rps. WSL runner session is `3680`; vLLM session is
-  `12234`.
+- Direct repetition 3 at 0.5, 1.0, and 1.5 rps completed successfully; the
+  runner is now executing 1.8 rps. WSL runner session is `3680`; vLLM session
+  is `12234`.
 
 Current status:
 
-The resumed matrix is progressing normally. Ten direct conditions are
-complete, and direct repetition 3 is active at 1.5 rps. The earlier invalid
+The resumed matrix is progressing normally. Eleven direct conditions are
+complete, and direct repetition 3 is active at 1.8 rps. The earlier invalid
 1.5 rps attempt remains archived and excluded.
 
 Exact next action:
