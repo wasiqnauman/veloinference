@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: EXP-003 final matrix running; 2 complete, 1 started
-Last updated: 2026-09-13 18:02 -04:00
+Status: EXP-003 recovery prepared; next resumed final matrix
+Last updated: 2026-09-15 07:37 -04:00
 Current branch: main
-Current commit before this tracker: fc021b2
+Current commit before this tracker: f6994b9
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -1623,6 +1623,57 @@ Poll the raw-artifact directory until the final driver exits. Then verify all
 or explicitly explainable, stop vLLM, and commit the completed EXP-003
 verification in this tracker.
 
+### EXP-003-RECOVERY — Preserve interrupted run and enable safe resume
+
+Status: complete  
+Date: 2026-09-15 07:37 -04:00  
+Commit: f6994b9 (implementation); tracker commit follows
+
+Files changed:
+
+- `bench/final.py`
+- `bench/config.py`
+- `bench/schema.py`
+- `configs/experiments/primary_final.toml`
+- `tests/test_final.py`
+- WSL raw-artifact archive only; no tracked raw files
+
+Commands run:
+
+```text
+wsl.exe -d Ubuntu -- bash -lc 'cd /home/kennarr/src/veloinference && git fetch origin main && git merge --ff-only origin/main && uv run --python 3.12 ruff check . && uv run --python 3.12 pytest -q'
+wsl.exe -d Ubuntu -- bash -lc 'mkdir -p .../results/raw/exp003-primary-final-interrupted/direct && mv .../direct-rate-1p5-rep-1 .../exp003-primary-final-interrupted/direct/direct-rate-1p5-rep-1'
+```
+
+Observed result:
+
+- The final runner now reuses only runs with a complete manifest and matching
+  summary when `resume_existing = true`.
+- It rejects incomplete or mismatched existing directories instead of
+  appending to their JSONL files.
+- The interrupted `direct-rate-1p5-rep-1` directory was moved, not deleted,
+  to `/home/kennarr/src/veloinference/results/raw/exp003-primary-final-interrupted`.
+- The two valid completed conditions remain in the original final directory.
+
+Verification:
+
+- WSL Ruff: pass.
+- WSL full gate: pass (`82 passed, 2 warnings`).
+- Archived directory still contains its `manifest.json` and `requests.jsonl`.
+- Original interrupted run directory is clear and ready for a fresh attempt.
+
+Current status:
+
+The primary matrix can now be restarted safely. Complete conditions will be
+skipped, the archived partial attempt will remain excluded from final claims,
+and missing conditions will be written into the original final output tree.
+
+Exact next action:
+
+Start vLLM on port 8001 and run the committed primary configuration. Confirm
+that the runner skips the two complete direct conditions, then let it execute
+the remaining conditions without changing the matrix.
+
 ## Remaining task sequence
 
 The remaining tasks are defined in docs/RESEARCH_TO_ARXIV_DESIGN.md:
@@ -1694,5 +1745,5 @@ agent should execute.
 
 ## Next task
 
-EXP-003-RUN — Monitor the active 48-condition primary matrix and complete its
-artifact verification after the driver exits.
+EXP-003-RUN-RESUME — Run the safe-resume primary matrix and verify all 48 final
+conditions after completion.
