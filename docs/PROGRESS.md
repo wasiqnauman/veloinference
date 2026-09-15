@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: EXP-003 harness boundary recorded; next safe resume
-Last updated: 2026-09-15 07:46 -04:00
+Status: EXP-003 running; 4 direct conditions complete
+Last updated: 2026-09-15 07:55 -04:00
 Current branch: main
-Current commit before this tracker: 817d3dd
+Current commit before this tracker: 55341fd
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -1814,6 +1814,39 @@ Restart vLLM and rerun the committed primary configuration. The driver must
 reuse the two complete direct summaries, execute missing conditions, record
 any new drift violations as `invalid_harness`, and continue until every
 condition is terminal.
+
+### EXP-003-RUN-RETRY — Direct-mode retry completed
+
+Status: in progress  
+Date: 2026-09-15 07:55 -04:00  
+Commit: 55341fd (tracker launch record)
+
+Files changed:
+
+- none; this is a live execution checkpoint
+
+Observed result at this checkpoint:
+
+- The safe-resume driver reused the two existing complete direct summaries.
+- It then completed fresh direct runs at 1.5 and 1.8 rps, producing valid
+  summaries with zero request failures. Direct mode now has four complete
+  conditions for repetition 1.
+- The 1.5 rps retry summary reports p95 latency 2074.63 ms and p95 arrival
+  drift 1.82 ms. These values are preliminary condition evidence, not a final
+  paper claim until the full matrix and validity audit finish.
+- The runner has advanced to pass-through mode. WSL runner session is `3680`;
+  vLLM session is `12234`.
+
+Current status:
+
+The resumed matrix is progressing normally through gateway modes. The earlier
+invalid 1.5 rps attempt remains archived and excluded.
+
+Exact next action:
+
+Continue monitoring the same sessions until all gateway modes and repetitions
+reach terminal status. Do not stop the server or change the configuration
+unless a new terminal failure requires recovery.
 
 ## Remaining task sequence
 
