@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: EXP-003 running; 4 direct conditions complete
-Last updated: 2026-09-15 07:55 -04:00
+Status: EXP-003 running; 4 direct repetition-1 conditions complete, repetition 2 started
+Last updated: 2026-09-15 07:56 -04:00
 Current branch: main
-Current commit before this tracker: 55341fd
+Current commit before this tracker: c886f6d
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -1815,11 +1815,11 @@ reuse the two complete direct summaries, execute missing conditions, record
 any new drift violations as `invalid_harness`, and continue until every
 condition is terminal.
 
-### EXP-003-RUN-RETRY — Direct-mode retry completed
+### EXP-003-RUN-RETRY — Direct-mode retry completed; repetition 2 started
 
 Status: in progress  
-Date: 2026-09-15 07:55 -04:00  
-Commit: 55341fd (tracker launch record)
+Date: 2026-09-15 07:56 -04:00  
+Commit: c886f6d (tracker launch record)
 
 Files changed:
 
@@ -1834,13 +1834,14 @@ Observed result at this checkpoint:
 - The 1.5 rps retry summary reports p95 latency 2074.63 ms and p95 arrival
   drift 1.82 ms. These values are preliminary condition evidence, not a final
   paper claim until the full matrix and validity audit finish.
-- The runner has advanced to pass-through mode. WSL runner session is `3680`;
-  vLLM session is `12234`.
+- The runner has started direct repetition 2 at 0.5 rps. WSL runner session is
+  `3680`; vLLM session is `12234`.
 
 Current status:
 
-The resumed matrix is progressing normally through gateway modes. The earlier
-invalid 1.5 rps attempt remains archived and excluded.
+The resumed matrix is progressing normally. Direct repetition 1 is complete,
+and direct repetition 2 is active. The earlier invalid 1.5 rps attempt remains
+archived and excluded.
 
 Exact next action:
 
@@ -1919,5 +1920,5 @@ agent should execute.
 
 ## Next task
 
-EXP-003-RUN-RESUME — Restart the safe-resume primary matrix with terminal
-harness-invalid handling, then verify all 48 conditions after completion.
+EXP-003-RUN-RETRY-CONTINUE — Monitor the active safe-resume primary matrix,
+then verify all 48 conditions after completion.
