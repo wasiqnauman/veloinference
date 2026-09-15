@@ -81,6 +81,15 @@ async def run_final(config: ExperimentConfig) -> list[dict[str, object]]:
             for repetition_index, repetition in enumerate(config.final_repetitions):
                 repetition_seed = config.repetition_seeds[repetition_index]
                 for rate_index, rate_per_s in enumerate(config.final_rates_rps):
+                    run_id = _run_id(mode, rate_per_s, repetition)
+                    existing_summary = _load_existing_summary(
+                        output_root / mode / run_id,
+                        run_id=run_id,
+                        resume_existing=config.resume_existing,
+                    )
+                    if existing_summary is not None:
+                        summaries.append(existing_summary)
+                        continue
                     summaries.append(
                         await _run_condition(
                             config,
@@ -123,8 +132,7 @@ async def _run_condition(
     output_root: Path,
     client: InferenceClient,
 ) -> dict[str, object]:
-    rate_label = str(rate_per_s).replace(".", "p")
-    run_id = f"{mode}-rate-{rate_label}-rep-{repetition}"
+    run_id = _run_id(mode, rate_per_s, repetition)
     run_dir = output_root / mode / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
     request_path = run_dir / "requests.jsonl"
@@ -210,6 +218,43 @@ async def _run_condition(
     manifest.update({"status": "complete", "ended_at_utc": _utc_now()})
     write_json_atomic(manifest_path, manifest)
     return summary_to_mapping(summary)
+
+
+def _run_id(mode: str, rate_per_s: float, repetition: int) -> str:
+    """Return the stable directory identifier for one matrix condition."""
+
+    rate_label = str(rate_per_s).replace(".", "p")
+    return f"{mode}-rate-{rate_label}-rep-{repetition}"
+
+
+def _load_existing_summary(
+    run_dir: Path, *, run_id: str, resume_existing: bool
+) -> dict[str, object] | None:
+    """Reuse complete evidence or reject an unsafe existing run directory."""
+
+    if not run_dir.exists():
+        return None
+    if not resume_existing:
+        raise ConfigError(
+            f"run directory already exists: {run_dir}; set "
+            "experiment.resume_existing=true to reuse complete evidence"
+        )
+
+    manifest_path = run_dir / "manifest.json"
+    summary_path = run_dir / "summary.json"
+    if not manifest_path.exists() or not summary_path.exists():
+        raise ConfigError(
+            f"existing run is incomplete: {run_dir}; archive it before resuming"
+        )
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if not isinstance(manifest, dict) or manifest.get("status") != "complete":
+        raise ConfigError(
+            f"existing run is incomplete: {run_dir}; archive it before resuming"
+        )
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    if not isinstance(summary, dict) or summary.get("run_id") != run_id:
+        raise ConfigError(f"existing summary does not match run id: {run_dir}")
+    return summary
 
 
 def parse_args() -> argparse.Namespace:

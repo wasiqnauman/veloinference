@@ -68,6 +68,7 @@ def test_final_config_freezes_modes_rates_and_repetitions() -> None:
     assert config.final_modes == ("direct", "pass_through", "fixed", "adaptive")
     assert config.final_rates_rps == (0.5, 1.0, 1.5, 1.8)
     assert config.final_repetitions == (1, 2, 3)
+    assert config.resume_existing is True
     assert config.adaptive_max_wait_ms == 20
 
 

@@ -102,6 +102,7 @@ def load_experiment_config(path: Path) -> ExperimentConfig:
             "experiment.final_repetitions cannot contain more entries than "
             "experiment.repetition_seeds"
         )
+    resume_existing = _bool_or_default(experiment, "resume_existing", "experiment", False)
     adaptive_max_wait_ms = _positive_int_or_default(
         experiment, "adaptive_max_wait_ms", "experiment", 20
     )
@@ -144,6 +145,7 @@ def load_experiment_config(path: Path) -> ExperimentConfig:
         final_modes=final_modes,
         final_rates_rps=final_rates_rps,
         final_repetitions=final_repetitions,
+        resume_existing=resume_existing,
         adaptive_max_wait_ms=adaptive_max_wait_ms,
         harness_drift_threshold_ms=harness_drift_threshold_ms,
         harness_error_threshold=harness_error_threshold,
@@ -382,6 +384,17 @@ def _optional_string_tuple(
     if any(not isinstance(item, str) or not item.strip() for item in result):
         raise ConfigError(f"{section}.{key} must contain only non-empty strings")
     return tuple(item.strip() for item in result)
+
+
+def _bool_or_default(
+    values: dict[str, Any], key: str, section: str, default: bool
+) -> bool:
+    if key not in values:
+        return default
+    value = values[key]
+    if not isinstance(value, bool):
+        raise ConfigError(f"{section}.{key} must be a boolean")
+    return value
 
 
 def _float_value(values: dict[str, Any], key: str, section: str) -> float:

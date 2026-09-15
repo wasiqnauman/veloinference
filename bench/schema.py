@@ -95,6 +95,7 @@ class ExperimentConfig:
     final_modes: tuple[str, ...] | None = None
     final_rates_rps: tuple[float, ...] | None = None
     final_repetitions: tuple[int, ...] | None = None
+    resume_existing: bool = False
     adaptive_max_wait_ms: int = 20
     harness_drift_threshold_ms: float = 10.0
     harness_error_threshold: float = 0.01

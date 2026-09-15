@@ -16,5 +16,6 @@ health_url = "http://127.0.0.1:8000/health"
 final_modes = ["direct", "pass_through", "fixed", "adaptive"]
 final_rates_rps = [0.5, 1.0, 1.5, 1.8]
 final_repetitions = [1, 2, 3]
+resume_existing = true
 harness_drift_threshold_ms = 50.0
 harness_error_threshold = 0.01
