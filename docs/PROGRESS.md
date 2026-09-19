@@ -2872,3 +2872,71 @@ contents and checksum.
 ## Next task
 
 PAPER-003 — Build and audit the isolated arXiv submission bundle.
+
+### PAPER-003 — Build and audit the isolated arXiv submission bundle
+
+Status: complete
+
+Date: 2026-09-19 19:45 -04:00
+
+Commit message: `docs: audit arxiv source bundle`
+
+Files changed:
+
+- `paper/ARXIV_SUBMISSION.md`: exact archive inventory, checksum, isolated
+  build evidence, data-release boundary, and human submission requirements.
+- `docs/PROGRESS.md`: final implementation checkpoint and next-agent handoff.
+
+Commands run:
+
+~~~text
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+bibtex main
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+pdftotext main.pdf main.txt
+pdfinfo main.pdf
+Compress-Archive -Path main.tex,macros.tex,references.bib,main.bbl,sections,figures,tables -DestinationPath dist/veloinference-arxiv-source-2026-09-19.zip -CompressionLevel Optimal
+Get-FileHash -Algorithm SHA256 dist/veloinference-arxiv-source-2026-09-19.zip
+~~~
+
+Observed result:
+
+- The source compiled successfully in the isolated directory
+  `tmp/arxiv-source-20260919-final`.
+- The isolated PDF has 12 pages and is 320,778 bytes.
+- The final log scan found no LaTeX/package warning, box warning, undefined
+  citation, or undefined reference.
+- Key PDF text assertions passed for the audited request count, primary paired
+  effect, mechanism fit, and raw-data availability statement.
+- The ZIP contains exactly 15 required source files and no generated PDF, PNG
+  preview, log, auxiliary file, or local raw trace.
+- ZIP size: 77,020 bytes.
+- ZIP SHA-256:
+  `3fa38209036b96d1bd3b8a9bddc76c1facd2f946d732fee37dcfb57473e1e086`.
+
+Simple summary:
+
+The paper now has a small, clean arXiv upload package that was tested outside
+the repository's normal paper directory. It rebuilds the same 12-page paper,
+and the archive has an exact file list and checksum so another agent can verify
+it has not changed.
+
+Current status:
+
+The research implementation, final analysis, claim audit, manuscript, PDF, and
+arXiv source package are complete. No arXiv upload has been performed. The
+current paper uses the public author text `Wasiq` and affiliation `Independent
+Researcher`; these must not be treated as final without user confirmation. Raw
+experiment traces remain local and are not represented as a public dataset.
+
+Exact next action:
+
+Ask the user to provide the final public author name, contact-email choice,
+affiliation, arXiv category choice, and license. Apply only those confirmed
+metadata changes, rebuild and re-audit the PDF and ZIP, then let the user upload
+through their arXiv account and inspect arXiv's generated preview.
+
+## Next task
+
+SUBMIT-001 — Confirm author metadata and complete the arXiv account submission.
