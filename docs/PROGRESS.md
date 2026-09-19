@@ -2586,5 +2586,49 @@ restarting `adaptive-rate-1p5-rep-2`.
 
 ## Next task
 
-EXP-003-RESUME-3 — Resume from 42 complete conditions and finish the six
-remaining adaptive conditions without changing the frozen configuration.
+EXP-003-RESUME-3 — Resume from 42 complete conditions and verify the exact
+restart boundary.
+
+### EXP-003-RESUME-3 — Resume the final matrix from 42 conditions
+
+Status: in progress
+
+Date: 2026-09-19 19:05 -04:00
+
+Commit: 9a00fc3 (tracker checkpoint)
+
+Files changed:
+
+- `docs/PROGRESS.md`
+
+Commands run:
+
+~~~text
+.venv-vllm/bin/vllm serve Qwen/Qwen2.5-1.5B-Instruct --host 127.0.0.1 --port 8001 --dtype half --max-model-len 2048 --gpu-memory-utilization 0.85 --max-num-seqs 8 --enforce-eager --served-model-name Qwen/Qwen2.5-1.5B-Instruct
+.venv-vllm/bin/python -m bench.final --config configs/experiments/primary_final.toml
+~~~
+
+Observed result:
+
+- vLLM 0.29.0 loaded the cached Qwen model and `/health` returned HTTP 200.
+- The final runner reused all 42 complete summaries.
+- Primary statuses are 42 complete and one started.
+- The active condition is exactly `adaptive-rate-1p5-rep-2`, which is the
+  interrupted condition recorded by EXP-003-PAUSE-2.
+- vLLM session is `38393`; final-runner session is `78754`.
+
+Current status:
+
+The frozen matrix is running again without any configuration change. Six
+adaptive conditions remain, including the active condition.
+
+Exact next action:
+
+Monitor sessions `78754` and `38393` to 48 terminal conditions. Then stop
+vLLM, audit manifests and raw artifacts, run the final analyzer, and populate
+the paper only from its generated evidence.
+
+## Next task
+
+EXP-003-FINALIZE — Finish the six remaining adaptive conditions and perform
+the terminal-state and artifact audit.
