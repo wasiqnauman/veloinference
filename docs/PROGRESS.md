@@ -2632,3 +2632,75 @@ the paper only from its generated evidence.
 
 EXP-003-FINALIZE — Finish the six remaining adaptive conditions and perform
 the terminal-state and artifact audit.
+
+### EXP-003-FINALIZE — Complete and audit the primary final matrix
+
+Status: complete
+
+Date: 2026-09-19 19:25 -04:00
+
+Commit: 49c87cb (tracker checkpoint)
+
+Files changed:
+
+- `docs/PROGRESS.md`
+
+Operational result outside Git:
+
+- Finished the six remaining adaptive conditions without changing the frozen
+  matrix.
+- Stopped the vLLM server after the final manifest became terminal.
+- Verified that ports 8000 and 8001 are closed and no benchmark or vLLM
+  process remains.
+
+Audit performed:
+
+- Enumerated the expected Cartesian product of four modes, four offered rates,
+  and three repetitions, and matched it against every manifest.
+- Required every manifest to be `complete`, every run ID to be unique, and
+  every `summary.json`, `requests.jsonl`, and `gpu.jsonl` artifact to be
+  present and nonempty.
+- Independently recomputed request success counts and the fraction of arrivals
+  more than 50 ms late from all request records.
+- Checked seeds, wait windows, model revision, dtype, warmup count, measurement
+  duration, maximum batch size, and clean-worktree flags against the frozen
+  configuration.
+- Compared source commits recorded by the manifests. The first two direct
+  conditions record `6b97f0d`; the remaining 46 record `817d3dd`. The diff
+  changes safe-resume handling and invalid-harness bookkeeping only. Request
+  generation, clients, warmup, open-loop timing, and summarization are
+  unchanged, and all 48 manifests report a clean worktree.
+
+Observed result:
+
+- Planned conditions: 48; complete: 48; missing: 0; extra: 0.
+- Measured requests: 6,912 successful and zero failed.
+- No condition exceeded the validity gate of more than 1% of arrivals over
+  50 ms late. The maximum observed late fraction was 0.556%, and the maximum
+  condition-level p95 arrival drift was 2.280 ms.
+- All 48 runs used model revision
+  `989aa7980e4cf806f80c7fef2b1adb7bc71aa306` and recorded `git_dirty=false`.
+- GPU monitoring produced 5,726 samples: 4,988 valid samples and 738 samples
+  with `FileNotFoundError` after the restart because `nvidia-smi` was absent
+  from the resumed WSL process path. Request-level latency, queue, backend, and
+  batching evidence is complete; complete-matrix GPU utilization, VRAM, and
+  power claims are not permitted.
+- The full collection spans 2026-09-13 through 2026-09-19 and includes
+  documented pauses/restarts. Together with fixed condition order, this is an
+  internal-validity limitation that must remain explicit in the manuscript.
+
+Current status:
+
+EXP-003 is complete and the request-level dataset passed the terminal evidence
+audit. Raw WSL artifacts remain local and unmodified. The paper still contains
+claim-gated result placeholders and must not be described as final yet.
+
+Exact next action:
+
+Run `bench.analyze_final` against the immutable 48-condition raw tree, inspect
+the generated machine-readable summary, tables, and figures, and record only
+audited numerical claims in `docs/RESULT_CLAIMS.md`.
+
+## Next task
+
+ANA-002 — Generate and audit the final statistical analysis artifacts.
