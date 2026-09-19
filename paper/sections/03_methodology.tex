@@ -106,7 +106,10 @@ request-wise average of that field is size biased: a group of four contributes
 four observations while a singleton contributes one. For mechanism claims we
 therefore group records by batch ID and report the call-weighted mean number of
 prompts per backend HTTP call. The raw request-weighted mean remains in each
-run summary for auditability but is not labeled as a call-level average.
+run summary for auditability but is not labeled as a call-level average. The
+same unique-call grouping yields $\bar S_{\mathrm{call}}$ for
+Eq.~\ref{eq:occupancy-prediction}; the analyzer reports measured group size,
+predicted group size, and their ratio for every fixed and adaptive run.
 
 The primary effects are paired by rate and seed:
 \begin{align}

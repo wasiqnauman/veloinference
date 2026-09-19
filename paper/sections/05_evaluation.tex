@@ -44,11 +44,13 @@ rather than by implementation component.
 \begin{figure*}[t]
   \centering
   \includegraphics[width=0.96\textwidth]{figures/mechanism_effects.pdf}
-  \caption{Mechanism accounting for \model{} on one \gpu{}. Panel A separates
-  gateway queue and backend time for gateway modes. Hatching denotes queue
-  time stacked above backend time. Panel B shows paired p95-latency effects by
-  repetition seed; error bars are 95\% Student-$t$ intervals over the three
-  paired differences.}
+  \caption{Mechanism accounting for \model{} on one \gpu{}. Panel A compares
+  measured call-weighted outer grouping with the serial-occupancy prediction
+  $\max(1,\lambda\bar S_{\mathrm{call}})$. Panel B separates gateway queue
+  and backend time; hatching denotes queue time stacked above backend time.
+  Panel C shows paired p95-latency effects by repetition seed. Error bars are
+  two-sided 95\% Student-$t$ intervals over three run-level values or paired
+  differences.}
   \label{fig:mechanism}
 \end{figure*}
 }{}

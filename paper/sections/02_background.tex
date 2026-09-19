@@ -86,6 +86,19 @@ that arrives behind an in-flight call cannot reach \vllm{} until the outer
 worker returns, even though \vllm{} could otherwise admit it into continuous
 batching.
 
+This gives a quantitative prediction in the continuously busy regime. Let
+$\bar S_{\mathrm{call}}$ be mean backend occupancy weighted once per outer
+call. The next call's expected group size should track
+\begin{equation}
+  \widehat B_{\mathrm{occupancy}}
+  = \max\!\left(1,\lambda \bar S_{\mathrm{call}}\right),
+  \label{eq:occupancy-prediction}
+\end{equation}
+where the floor at one represents the request that begins a cycle after an idle
+period. Agreement with Eq.~\ref{eq:occupancy-prediction}, despite
+$w\ll\Delta$, is evidence for backlog coalescing; systematic excess over it
+would suggest intentional waiting or residual queue growth.
+
 Our evaluation tests which mechanism dominates by jointly examining observed
 batch size, gateway queue time, backend time, achieved throughput, and tail
 latency. This mechanism-level accounting is the paper's main distinction from

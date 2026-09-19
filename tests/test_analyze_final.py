@@ -15,6 +15,7 @@ from bench.analyze_final import (
     load_terminal_matrix,
     mean_ci95,
     mean_outer_group_size_per_call,
+    outer_call_metrics,
     paired_effects,
     parse_run_id,
     plot_mechanism,
@@ -103,10 +104,30 @@ def test_paired_effects_pair_matching_repetition_seeds() -> None:
 def test_outer_group_mean_weights_backend_calls_not_requests(tmp_path) -> None:
     requests_path = tmp_path / "requests.jsonl"
     records = [
-        {"request_index": 0, "batch_id": "singleton", "batch_size": 1},
-        {"request_index": 1, "batch_id": "triple", "batch_size": 3},
-        {"request_index": 2, "batch_id": "triple", "batch_size": 3},
-        {"request_index": 3, "batch_id": "triple", "batch_size": 3},
+        {
+            "request_index": 0,
+            "batch_id": "singleton",
+            "batch_size": 1,
+            "backend_ms": 10.0,
+        },
+        {
+            "request_index": 1,
+            "batch_id": "triple",
+            "batch_size": 3,
+            "backend_ms": 30.0,
+        },
+        {
+            "request_index": 2,
+            "batch_id": "triple",
+            "batch_size": 3,
+            "backend_ms": 30.0,
+        },
+        {
+            "request_index": 3,
+            "batch_id": "triple",
+            "batch_size": 3,
+            "backend_ms": 30.0,
+        },
     ]
     requests_path.write_text(
         "\n".join(json.dumps(record) for record in records) + "\n",
@@ -114,6 +135,7 @@ def test_outer_group_mean_weights_backend_calls_not_requests(tmp_path) -> None:
     )
 
     assert mean_outer_group_size_per_call(requests_path) == 2.0
+    assert outer_call_metrics(requests_path) == (2.0, 20.0)
 
 
 def test_complete_matrix_generates_all_publication_artifacts(tmp_path) -> None:
@@ -143,6 +165,7 @@ def test_complete_matrix_generates_all_publication_artifacts(tmp_path) -> None:
                             "request_index": 0,
                             "batch_id": run.run_id,
                             "batch_size": 1,
+                            "backend_ms": 100.0,
                         }
                     )
                     + "\n",

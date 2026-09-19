@@ -2452,5 +2452,76 @@ the vLLM process cleanly, and run the analyzer against the immutable raw tree.
 
 ## Next task
 
+ANA-001-OCCUPANCY-TEST — Turn the serial-backlog explanation into a measured
+versus predicted mechanism test.
+
+### ANA-001-OCCUPANCY-TEST — Add a quantitative backlog prediction
+
+Status: complete
+
+Date: 2026-09-19 05:43 -04:00
+
+Commit: b2d7d02 (tracker checkpoint)
+
+Files changed:
+
+- `bench/analyze_final.py`
+- `tests/test_analyze_final.py`
+- `paper/sections/02_background.tex`
+- `paper/sections/03_methodology.tex`
+- `paper/sections/05_evaluation.tex`
+- `docs/PROGRESS.md`
+
+Functional summary:
+
+- Added call-weighted backend occupancy derived once per unique outer batch.
+- Defined the serial-occupancy prediction as
+  `max(1, offered_rate * mean_backend_seconds_per_call)`.
+- Records predicted group size and measured/predicted fit ratio for every fixed
+  and adaptive run in the machine-readable analysis output.
+- Expanded the mechanism figure into three panels: measured versus predicted
+  grouping, queue/backend latency decomposition, and paired p95-latency effect.
+- Added the formal prediction and its interpretation to the manuscript.
+- The completed fixed runs available during development showed fit ratios from
+  0.978 to 1.000; these remain partial diagnostics until all repetitions finish.
+
+Commands run:
+
+~~~text
+uv run --group research ruff check bench/analyze_final.py tests/test_analyze_final.py
+uv run --group research pytest -q tests/test_analyze_final.py --basetemp tmp/pytest-occupancy
+uv run --group research ruff check .
+uv run --group research pytest -q --basetemp tmp/pytest-full-occupancy
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+bibtex main
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+~~~
+
+Observed result:
+
+- Focused analysis tests: 6 passed.
+- Repository-wide Ruff: passed.
+- Repository-wide tests: 89 passed; only dependency deprecation and the
+  pre-existing inaccessible `.pytest_cache` warning remain.
+- The synthetic three-panel mechanism figure was visually inspected and has
+  legible labels, legends, and panel ordering.
+- LuaLaTeX produced an eight-page, 199422-byte PDF with no matched layout,
+  citation, or undefined-reference warning.
+- EXP-003 advanced to 34 complete conditions with
+  `fixed-rate-1p5-rep-3` active.
+
+Current status:
+
+The central hypothesis now has a quantitative out-of-summary prediction that
+can be accepted or rejected by the final raw call records.
+
+Exact next action:
+
+Let EXP-003 reach 48 terminal conditions, audit statuses and exclusions, stop
+the vLLM process cleanly, and run the analyzer against the immutable raw tree.
+
+## Next task
+
 EXP-003-FINALIZE — Let the frozen primary matrix reach 48 terminal conditions,
 then verify manifests, exclusions, summaries, and process shutdown.

@@ -45,6 +45,9 @@ METRICS = (
     "mean_backend_ms",
     "mean_batch_size",
     "mean_outer_group_size_per_call",
+    "mean_outer_backend_ms_per_call",
+    "occupancy_predicted_group_size",
+    "occupancy_fit_ratio",
     "mean_gpu_utilization_percent",
     "max_vram_used_mb",
     "mean_power_draw_w",
@@ -63,9 +66,9 @@ class RunResult:
     summary: dict[str, object]
 
 
-def mean_outer_group_size_per_call(requests_path: Path) -> float:
-    """Return the call-weighted mean prompt count from request-level records."""
-    groups: dict[str, tuple[int, int]] = {}
+def outer_call_metrics(requests_path: Path) -> tuple[float, float | None]:
+    """Return call-weighted group size and backend duration from raw records."""
+    groups: dict[str, tuple[int, int, float | None]] = {}
     for line_number, line in enumerate(
         requests_path.read_text(encoding="utf-8").splitlines(),
         start=1,
@@ -79,20 +82,44 @@ def mean_outer_group_size_per_call(requests_path: Path) -> float:
             key = f"request:{record.get('request_index', line_number)}"
         else:
             key = f"batch:{batch_id}"
-        previous_size, count = groups.get(key, (reported_size, 0))
+        backend_value = record.get("backend_ms")
+        backend_ms = None if backend_value is None else float(backend_value)
+        previous_size, count, previous_backend_ms = groups.get(
+            key,
+            (reported_size, 0, backend_ms),
+        )
         if previous_size != reported_size:
             raise ValueError(f"Inconsistent batch size in {requests_path}: {key}")
-        groups[key] = (reported_size, count + 1)
+        if (
+            previous_backend_ms is not None
+            and backend_ms is not None
+            and not math.isclose(previous_backend_ms, backend_ms, abs_tol=1e-9)
+        ):
+            raise ValueError(f"Inconsistent backend time in {requests_path}: {key}")
+        groups[key] = (reported_size, count + 1, previous_backend_ms)
 
     if not groups:
         raise ValueError(f"Run has no request records: {requests_path}")
-    for key, (reported_size, count) in groups.items():
+    for key, (reported_size, count, _) in groups.items():
         if key.startswith("batch:") and count != reported_size:
             raise ValueError(
                 f"Incomplete batch records in {requests_path}: "
                 f"{key} reports {reported_size}, observed {count}"
             )
-    return fmean(reported_size for reported_size, _ in groups.values())
+    backend_times = [
+        backend_ms
+        for _, _, backend_ms in groups.values()
+        if backend_ms is not None
+    ]
+    return (
+        fmean(reported_size for reported_size, _, _ in groups.values()),
+        fmean(backend_times) if backend_times else None,
+    )
+
+
+def mean_outer_group_size_per_call(requests_path: Path) -> float:
+    """Return the call-weighted mean prompt count from request-level records."""
+    return outer_call_metrics(requests_path)[0]
 
 
 def parse_run_id(run_id: str) -> tuple[str, float, int]:
@@ -159,9 +186,16 @@ def load_terminal_matrix(root: Path) -> tuple[list[RunResult], list[dict[str, ob
             requests_path = manifest_path.parent / "requests.jsonl"
             if not requests_path.is_file():
                 raise ValueError(f"Complete run has no request records: {run_id}")
-            summary["mean_outer_group_size_per_call"] = (
-                mean_outer_group_size_per_call(requests_path)
-            )
+            mean_group_size, mean_call_backend_ms = outer_call_metrics(requests_path)
+            summary["mean_outer_group_size_per_call"] = mean_group_size
+            summary["mean_outer_backend_ms_per_call"] = mean_call_backend_ms
+            if mode in {"fixed", "adaptive"} and mean_call_backend_ms is not None:
+                predicted_group_size = max(1.0, rate * mean_call_backend_ms / 1000.0)
+                summary["occupancy_predicted_group_size"] = predicted_group_size
+                summary["occupancy_fit_ratio"] = mean_group_size / predicted_group_size
+            else:
+                summary["occupancy_predicted_group_size"] = None
+                summary["occupancy_fit_ratio"] = None
             completed.append(RunResult(run_id, mode, rate, repetition, summary))
         elif status == "invalid_harness":
             excluded.append(
@@ -353,9 +387,56 @@ def plot_mechanism(
     effects: list[dict[str, object]],
     output_dir: Path,
 ) -> tuple[Path, Path]:
-    """Plot queue/backend decomposition and paired p95 effects."""
+    """Plot occupancy prediction, latency decomposition, and paired p95 effects."""
     output_dir.mkdir(parents=True, exist_ok=True)
-    figure, axes = plt.subplots(1, 2, figsize=(9.2, 3.7), constrained_layout=True)
+    figure, axes = plt.subplot_mosaic(
+        [["occupancy", "decomposition"], ["effect", "effect"]],
+        figsize=(9.2, 6.4),
+        constrained_layout=True,
+    )
+    for mode in ("fixed", "adaptive"):
+        rows = [row for row in aggregates if row["mode"] == mode]
+        observed = [
+            float(row["mean_outer_group_size_per_call"]["mean"] or 0.0)
+            for row in rows
+        ]
+        observed_error = [
+            float(row["mean_outer_group_size_per_call"]["half_width"] or 0.0)
+            for row in rows
+        ]
+        predicted = [
+            float(row["occupancy_predicted_group_size"]["mean"] or 0.0)
+            for row in rows
+        ]
+        axes["occupancy"].errorbar(
+            RATES,
+            observed,
+            yerr=observed_error,
+            color=COLORS[mode],
+            marker="o",
+            linewidth=1.7,
+            capsize=3,
+            label=f"{LABELS[mode]} measured",
+        )
+        axes["occupancy"].plot(
+            RATES,
+            predicted,
+            color=COLORS[mode],
+            linestyle="--",
+            linewidth=1.4,
+            label=f"{LABELS[mode]} $\\lambda S$",
+        )
+    axes["occupancy"].set_title(
+        "A  Serial-occupancy prediction",
+        loc="left",
+        fontweight="bold",
+    )
+    axes["occupancy"].set_xlabel("Offered load (requests/s)")
+    axes["occupancy"].set_ylabel("Mean prompts per backend HTTP call")
+    axes["occupancy"].set_xticks(RATES)
+    axes["occupancy"].grid(alpha=0.22, linewidth=0.6)
+    axes["occupancy"].legend(frameon=False, fontsize=8)
+
     gateway_modes = ("pass_through", "fixed", "adaptive")
     width = 0.085
     for mode_index, mode in enumerate(gateway_modes):
@@ -363,14 +444,33 @@ def plot_mechanism(
         x = [rate + (mode_index - 1) * width for rate in RATES]
         queue = [float(row["mean_queue_ms"]["mean"] or 0.0) for row in rows]
         backend = [float(row["mean_backend_ms"]["mean"] or 0.0) for row in rows]
-        axes[0].bar(x, backend, width=width, color=COLORS[mode], alpha=0.82, label=LABELS[mode])
-        axes[0].bar(x, queue, width=width, bottom=backend, color=COLORS[mode], alpha=0.35, hatch="//")
-    axes[0].set_title("A  Queue and backend time", loc="left", fontweight="bold")
-    axes[0].set_xlabel("Offered load (requests/s)")
-    axes[0].set_ylabel("Mean time per request (ms)")
-    axes[0].set_xticks(RATES)
-    axes[0].grid(axis="y", alpha=0.22, linewidth=0.6)
-    axes[0].legend(frameon=False, fontsize=8)
+        axes["decomposition"].bar(
+            x,
+            backend,
+            width=width,
+            color=COLORS[mode],
+            alpha=0.82,
+            label=LABELS[mode],
+        )
+        axes["decomposition"].bar(
+            x,
+            queue,
+            width=width,
+            bottom=backend,
+            color=COLORS[mode],
+            alpha=0.35,
+            hatch="//",
+        )
+    axes["decomposition"].set_title(
+        "B  Queue and backend time",
+        loc="left",
+        fontweight="bold",
+    )
+    axes["decomposition"].set_xlabel("Offered load (requests/s)")
+    axes["decomposition"].set_ylabel("Mean time per request (ms)")
+    axes["decomposition"].set_xticks(RATES)
+    axes["decomposition"].grid(axis="y", alpha=0.22, linewidth=0.6)
+    axes["decomposition"].legend(frameon=False, fontsize=8)
 
     comparison_styles = {
         "Proxy minus direct": ("#009E73", "o"),
@@ -381,7 +481,7 @@ def plot_mechanism(
         rows = [row for row in effects if row["comparison"] == comparison]
         means = [float(row["p95_latency_ms_absolute"]["mean"] or 0.0) for row in rows]
         errors = [float(row["p95_latency_ms_absolute"]["half_width"] or 0.0) for row in rows]
-        axes[1].errorbar(
+        axes["effect"].errorbar(
             RATES,
             means,
             yerr=errors,
@@ -391,13 +491,17 @@ def plot_mechanism(
             capsize=3,
             label=comparison,
         )
-    axes[1].axhline(0.0, color="#333333", linewidth=0.8)
-    axes[1].set_title("B  Paired tail-latency effect", loc="left", fontweight="bold")
-    axes[1].set_xlabel("Offered load (requests/s)")
-    axes[1].set_ylabel("Mean paired p95 delta (ms)")
-    axes[1].set_xticks(RATES)
-    axes[1].grid(alpha=0.22, linewidth=0.6)
-    axes[1].legend(frameon=False, fontsize=8)
+    axes["effect"].axhline(0.0, color="#333333", linewidth=0.8)
+    axes["effect"].set_title(
+        "C  Paired tail-latency effect",
+        loc="left",
+        fontweight="bold",
+    )
+    axes["effect"].set_xlabel("Offered load (requests/s)")
+    axes["effect"].set_ylabel("Mean paired p95 delta (ms)")
+    axes["effect"].set_xticks(RATES)
+    axes["effect"].grid(alpha=0.22, linewidth=0.6)
+    axes["effect"].legend(frameon=False, fontsize=8)
     return _save_figure(figure, output_dir, "mechanism_effects")
 
 
