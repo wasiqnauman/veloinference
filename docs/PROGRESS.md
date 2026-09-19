@@ -2787,3 +2787,88 @@ complete LuaLaTeX PDF.
 ## Next task
 
 PAPER-002 — Produce and verify the evidence-complete arXiv manuscript.
+
+### PAPER-002 — Produce and verify the evidence-complete manuscript
+
+Status: complete
+
+Date: 2026-09-19 20:05 -04:00
+
+Commit: 4c812c5 (analysis checkpoint)
+
+Files changed:
+
+- `paper/main.tex`: final abstract, float control, and section assembly.
+- `paper/macros.tex`: all four claim gates replaced by verified EXP-003
+  findings.
+- `paper/sections/01_introduction.tex`: claim-bounded hypothesis,
+  contributions, and scope.
+- `paper/sections/02_background.tex`: mechanism framing aligned with the
+  count-normalized completion metric.
+- `paper/sections/03_methodology.tex`: exact throughput-measurement boundary
+  and latency estimands.
+- `paper/sections/05_evaluation.tex`: complete RQ1--RQ3 results, confidence
+  intervals, mechanism fit, audit result, and telemetry exclusion.
+- `paper/sections/06_discussion.tex`: interpretation, design rule, threats to
+  validity, and artifact-availability boundary.
+- `paper/sections/07_conclusion.tex`: evidence-complete conclusion.
+- `paper/references.bib`: primary-source-verified related work and complete
+  OSDI page ranges.
+- `paper/README.md`: final source map and release gate.
+- `docs/RESULT_CLAIMS.md`: distinguishes means of paired relative changes from
+  ratios of aggregate means.
+
+Commands run:
+
+~~~text
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+bibtex main
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+pdftoppm -png -r 130 paper/main.pdf tmp/paper-render-verified/page
+uv run --group research ruff check .
+uv run --group research pytest -q --basetemp tmp/pytest-paper-final
+~~~
+
+Observed result:
+
+- `paper/main.pdf`: 12 letter-size pages, 320,778 bytes.
+- Final LaTeX log: no matched LaTeX/package warning, overfull box, underfull
+  box, undefined citation, or undefined reference.
+- PDF text assertions found the audited request count, primary paired effect,
+  mechanism fit, and raw-data availability statement.
+- All 12 final PDF pages were rendered and visually inspected. Text, equations,
+  architecture diagram, two generated figures, three tables, references, and
+  the appendix are legible and unclipped.
+- Repository-wide Ruff: passed.
+- Repository-wide tests: 89 passed; only two dependency deprecations and the
+  pre-existing inaccessible `.pytest_cache` warning remain.
+- Related-work titles, authors, venues, years, identifiers, and technical
+  summaries were checked against official USENIX or arXiv pages.
+
+Manuscript result:
+
+- The hypothesis is supported within the declared single-GPU regime: observed
+  multi-request outer groups are quantitatively consistent with serial backend
+  occupancy, not with the 1--20 ms intentional wait windows.
+- Fixed batching increases paired p95 latency at 1.0--1.8 requests/s while
+  pass-through overhead and adaptive-policy improvement remain unresolved.
+- The paper explicitly avoids unsupported capacity, GPU-utilization, public
+  dataset, production-generalization, and causal-identification claims.
+
+Current status:
+
+The manuscript source and local PDF are evidence-complete and visually
+verified. The paper is not yet submitted to arXiv. Submission still requires
+the user's final public author name, contact/affiliation choice, arXiv category,
+license selection, and submission account action.
+
+Exact next action:
+
+Create a minimal arXiv source bundle from committed manuscript inputs, verify
+that it rebuilds in an isolated directory, and record the exact bundle
+contents and checksum.
+
+## Next task
+
+PAPER-003 — Build and audit the isolated arXiv submission bundle.

@@ -8,9 +8,15 @@ companions found during an intentional micro-window and backlog accumulated
 while a serial outer worker awaits the backend. \adip{} turns that distinction
 into a falsifiable, request-level experiment on commodity hardware.
 
-\PrimaryFinding\ \AdaptiveFinding
-Within the tested scope, the practical conclusion follows the full
-throughput--latency decomposition, not batch size alone. The artifact and
-methodology make that conclusion auditable and provide a base for bursty,
-heterogeneous, and larger-model validation without changing the frozen primary
-hypothesis.
+Across the 48-condition experiment, fixed batching forms larger calls at
+1.0--1.8 requests/s but adds 1.05--1.51 seconds of paired p95 latency relative
+to pass-through. A measured-occupancy model predicts those groups with 0.86\%
+mean absolute percentage error, while queueing adds 0.77--0.83 seconds and
+backend time does not fall consistently. Pass-through overhead and the
+adaptive policy's advantage remain unresolved under the run-level intervals.
+
+Within this tested scope, the practical result is precise: a larger outer
+batch is not evidence of useful batching. When it is created by serial gateway
+occupancy, it can be a measurement of withheld scheduling opportunity. The
+artifact makes that result auditable and provides a predeclared base for
+randomized, bursty, heterogeneous, and larger-model validation.

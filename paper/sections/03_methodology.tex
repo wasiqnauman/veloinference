@@ -6,11 +6,11 @@
 We organize the evaluation around three questions.
 
 \begin{description}[leftmargin=3.2em,style=nextline]
-  \item[RQ1: Layering cost.] What latency and utilization change is introduced
-        by a pass-through gateway relative to direct \vllm{}?
+  \item[RQ1: Layering cost.] What latency change is introduced by a
+        pass-through gateway relative to direct \vllm{}?
   \item[RQ2: Outer batching.] At matched offered load, does fixed gateway
-        batching improve throughput or latency after accounting for queue time
-        and the backend's own continuous batching?
+        batching improve end-to-end latency or backend time after accounting
+        for queueing and the backend's own continuous batching?
   \item[RQ3: Adaptation.] Does a frozen low-load bypass policy avoid harmful
         waiting while preserving useful backlog coalescing?
 \end{description}
@@ -93,13 +93,17 @@ failures remain in the denominator and are never converted to zero latency.
 \subsection{Metrics and uncertainty}
 
 The request is the latency observation unit; the run is the replication unit.
-For each run we compute achieved requests/s, output tokens/s, success and
-failure counts, p50/p95/p99 end-to-end latency, mean and p95 gateway queue time,
-mean backend time, mean batch size, GPU utilization, peak VRAM, power, and p95
-arrival drift. We then average the three run-level values for each condition
-and report a two-sided 95\% Student-$t$ interval. With only three repetitions,
-these intervals are necessarily wide; figures show each run point to prevent
-the mean from hiding instability.
+For each run we compute successful request count divided by the 120-second
+schedule, output tokens/s, success and failure counts, p50/p95/p99 end-to-end
+latency, mean and p95 gateway queue time, mean backend time, mean batch size,
+GPU utilization, peak VRAM, power, and p95 arrival drift. The first quantity is
+a count-normalized load-completion check: because the harness waits for every
+scheduled request, it equals offered load when all requests succeed. It is not
+an independent estimate of completion capacity or saturation throughput. We
+then average the three run-level values for each condition and report a
+two-sided 95\% Student-$t$ interval. With only three repetitions, these
+intervals are necessarily wide; figures show each run point to prevent the
+mean from hiding instability.
 
 Each request record carries its outer batch ID and reported batch size. A
 request-wise average of that field is size biased: a group of four contributes
@@ -111,12 +115,12 @@ same unique-call grouping yields $\bar S_{\mathrm{call}}$ for
 Eq.~\ref{eq:occupancy-prediction}; the analyzer reports measured group size,
 predicted group size, and their ratio for every fixed and adaptive run.
 
-The primary effects are paired by rate and seed:
+The primary latency effects are paired by rate and seed:
 \begin{align}
   \Delta_{\mathrm{proxy}} &= M_{\mathrm{pass}}-M_{\mathrm{direct}},\\
   \Delta_{\mathrm{fixed}} &= M_{\mathrm{fixed}}-M_{\mathrm{pass}},\\
   \Delta_{\mathrm{adaptive}} &= M_{\mathrm{adaptive}}-M_{\mathrm{fixed}},
 \end{align}
 for metric $M$. Absolute and relative deltas are both retained. We interpret
-throughput separately from goodput and offered load separately from achieved
-load.
+the count-normalized completion check separately from goodput, service
+capacity, and saturation throughput.

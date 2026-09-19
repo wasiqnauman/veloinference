@@ -11,8 +11,7 @@ run or console output.
 
 - `main.tex`: document preamble, title, abstract, and section assembly. Compile
   this file only.
-- `macros.tex`: experiment constants and the temporary result macros. The four
-  result macros must be replaced with audited findings before release.
+- `macros.tex`: experiment constants and claim-ledger-backed result macros.
 - `sections/01_introduction.tex`: motivation, hypothesis, research questions,
   contributions, and scope.
 - `sections/02_background.tex`: continuous batching, outer batching, and the
@@ -61,8 +60,10 @@ lualatex -interaction=nonstopmode -halt-on-error main.tex
 
 Before calling the manuscript submission-ready:
 
-1. Replace every temporary result macro in `macros.tex` from the audited JSON.
-2. Confirm `rg -n "TODO|placeholder|pending" paper` finds no unresolved claim.
+1. Verify every result macro in `macros.tex` against the audited JSON and
+   `docs/RESULT_CLAIMS.md`.
+2. Confirm `rg -n "TODO|placeholder|pending" paper -g "*.tex"` finds no
+   unresolved claim.
 3. Confirm the LaTeX log has no undefined references or layout warnings.
 4. Render every PDF page to an image and inspect figures, tables, equations,
    citations, clipping, and font size.

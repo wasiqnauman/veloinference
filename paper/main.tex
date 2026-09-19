@@ -10,6 +10,7 @@
 \usepackage{xcolor}
 \usepackage{enumitem}
 \usepackage{multirow}
+\usepackage{placeins}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,fit}
 \usepackage[hidelinks]{hyperref}
@@ -38,10 +39,10 @@ while a serial gateway worker awaits the backend. We test this claim with a
 predeclared, open-loop matrix comparing direct \vllm{}, gateway pass-through,
 a fixed 1\,ms policy, and a frozen adaptive policy over four offered loads and
 three run-level repetitions. The study records request traces, gateway queue
-and backend time, batch formation, GPU telemetry, and harness validity.
-\HeadlineResults
-The result is a reproducible account of when a second scheduler adds useful
-coalescing and when it merely moves queueing in front of an engine that already
+and backend time, batch formation, available GPU telemetry, and harness
+validity.
+\HeadlineResults{} The result is a reproducible account of how a second scheduler can report
+larger batches while merely moving queueing in front of an engine that already
 batches continuously.
 \end{abstract}
 

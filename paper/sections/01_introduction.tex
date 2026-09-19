@@ -40,11 +40,11 @@ exceeds the queueing delay and loss of scheduling freedom imposed on \vllm{}.
 \end{quote}
 
 The null hypothesis is operationally useful: fixed and adaptive gateway
-batching provide no repeatable throughput or tail-latency advantage over
-pass-through at matched offered load. A positive result requires a paired,
-run-level improvement that is visible across repetitions; a negative result is
-evidence that the engine, not the gateway, should own scheduling for the tested
-regime.
+batching provide no repeatable tail-latency advantage over pass-through at
+matched offered load. A positive result requires a paired, run-level
+improvement visible across repetitions and a latency decomposition that repays
+added queueing; a negative result is evidence that the engine, not the gateway,
+should own scheduling for the tested regime.
 
 We study the question with \adip{}, an asynchronous gateway and measurement
 artifact. The final matrix compares four paths---direct \vllm{}, gateway
@@ -52,8 +52,8 @@ pass-through, fixed-window batching, and a frozen adaptive policy---at
 0.5, 1.0, 1.5, and 1.8 requests/s. Every condition uses identical prompts,
 generation parameters, open-loop arrivals, and one local \gpu{}. Three seeds
 serve as the replication unit. We retain request-level latency, queue and
-backend decomposition, batch identifiers and sizes, GPU telemetry, failures,
-and arrival drift.
+backend decomposition, batch identifiers and sizes, available GPU telemetry,
+failures, and arrival drift.
 
 The paper makes four contributions:
 
@@ -67,9 +67,9 @@ The paper makes four contributions:
   \item It evaluates the schedulers using predeclared open-loop arrivals and
         run-level uncertainty rather than treating requests from one run as
         independent replications.
-  \item It publishes the complete validity trail, including interrupted and
-        harness-rejected attempts, so neutral or negative findings remain
-        auditable.
+  \item It records the complete validity trail, including interrupted and
+        harness-rejected attempts, and binds final claims to machine-readable
+        analysis artifacts so neutral or negative findings remain auditable.
 \end{enumerate}
 
 The scope is intentionally narrow. We do not propose a replacement for
