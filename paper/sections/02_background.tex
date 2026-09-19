@@ -46,24 +46,39 @@ being implied by the constant-rate result.
 \label{sec:mechanism-model}
 
 Let $\lambda$ be the request arrival rate and $w$ the gateway's intentional
-wait window. Under a Poisson approximation, useful for intuition even though
-our primary arrivals are deterministic,
+wait window. The primary workload schedules requests periodically, so its
+nominal inter-arrival gap is
+\begin{equation}
+  \Delta = \lambda^{-1}.
+  \label{eq:periodic-gap}
+\end{equation}
+In the absence of backlog or harness jitter, the number of companions that can
+arrive during a window is exactly zero whenever $w<\Delta$. At the largest
+tested rate, 1.8 requests/s, $\Delta=555.6$\,ms: both the 1\,ms fixed window
+and the 20\,ms adaptive cap close hundreds of milliseconds before the next
+scheduled arrival. Thus, the primary workload makes a sharper prediction than
+``small batches are unlikely'': intentional waiting alone should form no
+multi-request batch.
+
+For comparison, if arrivals were memoryless rather than periodic, a Poisson
+approximation gives
 \begin{equation}
   \mathbb{E}[N_w] = \lambda w, \qquad
   P(N_w \ge 1) = 1-e^{-\lambda w},
   \label{eq:window}
 \end{equation}
-where $N_w$ is the number of companion arrivals during the window. At the
-largest tested rate, 1.8 requests/s, a 1\,ms window yields
+where $N_w$ is the number of companion arrivals during the window. At
+1.8 requests/s, a 1\,ms window yields
 $\mathbb{E}[N_w]=0.0018$ and $P(N_w\ge1)\approx0.18\%$. Even a 20\,ms cap
-yields only 0.036 expected companions and a 3.54\% probability. Intentional
-micro-waiting alone should therefore produce almost exclusively singleton
-batches in this regime.
+yields only 0.036 expected companions and a 3.54\% probability. The Poisson
+case is therefore a conservative stress intuition, not the data-generating
+model used for the confirmatory matrix.
 
 Now let $S$ be the time for which a serial gateway worker awaits one backend
-call. Requests continue to arrive during that interval, creating approximately
-$\lambda S$ queued companions. When the worker returns and drains the ingress
-queue, it can dispatch a multi-request backend call even if $w$ is nearly zero.
+call. Requests continue to arrive during that interval, creating on the order
+of $\lambda S$ queued companions (up to the phase and integer boundary of the
+periodic schedule). When the worker returns and drains the ingress queue, it
+can dispatch a multi-request backend call even if $w$ is nearly zero.
 This \emph{backlog coalescing} is qualitatively different from
 Eq.~\ref{eq:window}: its control variable is service occupancy, not the
 micro-wait. It also exposes the cost of a serial outer scheduler. A request

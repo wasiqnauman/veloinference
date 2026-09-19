@@ -2205,5 +2205,67 @@ the vLLM process cleanly, and run the analyzer against the immutable raw tree.
 
 ## Next task
 
+PAPER-001-MECHANISM-CORRECTION — State the exact deterministic-arrival
+prediction before using a Poisson comparison.
+
+### PAPER-001-MECHANISM-CORRECTION — Tighten the batch-formation model
+
+Status: complete
+
+Date: 2026-09-19 05:31 -04:00
+
+Commit: b5388b1 (tracker checkpoint)
+
+Files changed:
+
+- `paper/sections/02_background.tex`
+- `docs/PROGRESS.md`
+
+Functional summary:
+
+- Replaced the Poisson-first argument with the exact model for the benchmark's
+  periodic open-loop schedule.
+- Defined the nominal inter-arrival gap as `Delta = 1 / lambda` and showed that
+  a wait window shorter than that gap admits no scheduled companion in the
+  absence of backlog or harness jitter.
+- Quantified the strongest tested case: 1.8 requests/s has a 555.6 ms period,
+  far above both the 1 ms fixed window and 20 ms adaptive cap.
+- Retained the Poisson calculation only as a conservative comparison for
+  memoryless traffic and clarified the periodic phase boundary in the backlog
+  approximation.
+
+Commands run:
+
+~~~text
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+bibtex main
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+pdftoppm -f 2 -singlefile -png -r 130 main.pdf ../tmp/pdfs/paper-mechanism-page2
+pdftoppm -f 3 -singlefile -png -r 130 main.pdf ../tmp/pdfs/paper-mechanism-page3
+~~~
+
+Observed result:
+
+- LuaLaTeX produced an eight-page, 187704-byte PDF.
+- The final log contains no overfull box, underfull box, package warning,
+  LaTeX warning, or undefined-reference match.
+- Pages 2 and 3 were visually inspected; the equations, page break, and
+  surrounding prose are legible and unclipped.
+- EXP-003 advanced to 30 complete conditions with
+  `fixed-rate-1p5-rep-2` active during this edit.
+
+Current status:
+
+The mechanism argument now matches the actual deterministic data-generating
+process and makes a stronger, testable backlog-coalescing prediction.
+
+Exact next action:
+
+Let EXP-003 reach 48 terminal conditions, audit statuses and exclusions, stop
+the vLLM process cleanly, and run the analyzer against the immutable raw tree.
+
+## Next task
+
 EXP-003-FINALIZE — Let the frozen primary matrix reach 48 terminal conditions,
 then verify manifests, exclusions, summaries, and process shutdown.
