@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: EXP-003 recovery complete; 22 conditions complete and safe resume pending
-Last updated: 2026-09-19 05:00 -04:00
+Status: EXP-003 running; 22 conditions complete and pass-through repetition 3 resumed
+Last updated: 2026-09-19 05:04 -04:00
 Current branch: main
-Current commit before this tracker: 27460c4
+Current commit before this tracker: d71af67
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -1899,6 +1899,50 @@ Exact next action:
 Start vLLM with the recorded environment and command, then run
 `python -m bench.final --config configs/experiments/primary_final.toml` from
 the WSL execution checkout. Verify that the first 22 conditions are reused.
+
+### EXP-003-RUN-RESUME-2 — Resume the final matrix from 22 conditions
+
+Status: in progress  
+Date: 2026-09-19 05:04 -04:00  
+Commit: d71af67 (tracker checkpoint)
+
+Files changed:
+
+- `docs/PROGRESS.md`
+
+Commands run:
+
+~~~text
+.venv-vllm/bin/vllm serve Qwen/Qwen2.5-1.5B-Instruct ... --port 8001
+.venv-vllm/bin/python -m bench.final --config configs/experiments/primary_final.toml
+~~~
+
+Observed result:
+
+- vLLM 0.29.0 started successfully and `/health` returned success.
+- The Hugging Face cached `main` ref resolves to the frozen model revision
+  `989aa7980e4cf806f80c7fef2b1adb7bc71aa306`.
+- The safe-resume runner reused all 22 complete summaries and started
+  `pass_through-rate-1p5-rep-3`.
+- WSL runner session is `9030`; vLLM session is `44899`.
+
+Verification:
+
+- manifests: 23
+- summaries: 22
+- statuses: 22 complete, 1 started
+- active run: `pass_through-rate-1p5-rep-3`
+
+Current status:
+
+The frozen final matrix is running from the exact interrupted condition. No
+configuration or validity threshold changed.
+
+Exact next action:
+
+Monitor sessions `9030` and `44899` until all 48 conditions are terminal.
+Record every harness-invalid condition and do not include it in performance
+claims.
 
 ## Remaining task sequence
 
