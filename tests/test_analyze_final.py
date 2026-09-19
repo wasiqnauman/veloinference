@@ -14,6 +14,7 @@ from bench.analyze_final import (
     aggregate_runs,
     load_terminal_matrix,
     mean_ci95,
+    mean_outer_group_size_per_call,
     paired_effects,
     parse_run_id,
     plot_mechanism,
@@ -39,6 +40,7 @@ def _run(mode: str, rate: float, repetition: int, p95: float) -> RunResult:
             "mean_queue_ms": 1.0,
             "mean_backend_ms": p95 - 1.0,
             "mean_batch_size": 2.0,
+            "mean_outer_group_size_per_call": 2.0,
             "mean_gpu_utilization_percent": 50.0,
             "max_vram_used_mb": 4096.0,
             "mean_power_draw_w": 90.0,
@@ -98,6 +100,22 @@ def test_paired_effects_pair_matching_repetition_seeds() -> None:
     )
 
 
+def test_outer_group_mean_weights_backend_calls_not_requests(tmp_path) -> None:
+    requests_path = tmp_path / "requests.jsonl"
+    records = [
+        {"request_index": 0, "batch_id": "singleton", "batch_size": 1},
+        {"request_index": 1, "batch_id": "triple", "batch_size": 3},
+        {"request_index": 2, "batch_id": "triple", "batch_size": 3},
+        {"request_index": 3, "batch_id": "triple", "batch_size": 3},
+    ]
+    requests_path.write_text(
+        "\n".join(json.dumps(record) for record in records) + "\n",
+        encoding="utf-8",
+    )
+
+    assert mean_outer_group_size_per_call(requests_path) == 2.0
+
+
 def test_complete_matrix_generates_all_publication_artifacts(tmp_path) -> None:
     raw_root = tmp_path / "raw"
     for mode_index, mode in enumerate(MODES):
@@ -117,6 +135,17 @@ def test_complete_matrix_generates_all_publication_artifacts(tmp_path) -> None:
                 )
                 (run_dir / "summary.json").write_text(
                     json.dumps({"run_id": run.run_id, **run.summary}),
+                    encoding="utf-8",
+                )
+                (run_dir / "requests.jsonl").write_text(
+                    json.dumps(
+                        {
+                            "request_index": 0,
+                            "batch_id": run.run_id,
+                            "batch_size": 1,
+                        }
+                    )
+                    + "\n",
                     encoding="utf-8",
                 )
 

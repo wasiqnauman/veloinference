@@ -44,6 +44,7 @@ METRICS = (
     "mean_queue_ms",
     "mean_backend_ms",
     "mean_batch_size",
+    "mean_outer_group_size_per_call",
     "mean_gpu_utilization_percent",
     "max_vram_used_mb",
     "mean_power_draw_w",
@@ -60,6 +61,38 @@ class RunResult:
     rate: float
     repetition: int
     summary: dict[str, object]
+
+
+def mean_outer_group_size_per_call(requests_path: Path) -> float:
+    """Return the call-weighted mean prompt count from request-level records."""
+    groups: dict[str, tuple[int, int]] = {}
+    for line_number, line in enumerate(
+        requests_path.read_text(encoding="utf-8").splitlines(),
+        start=1,
+    ):
+        if not line.strip():
+            continue
+        record = json.loads(line)
+        reported_size = int(record.get("batch_size") or 1)
+        batch_id = record.get("batch_id")
+        if batch_id is None:
+            key = f"request:{record.get('request_index', line_number)}"
+        else:
+            key = f"batch:{batch_id}"
+        previous_size, count = groups.get(key, (reported_size, 0))
+        if previous_size != reported_size:
+            raise ValueError(f"Inconsistent batch size in {requests_path}: {key}")
+        groups[key] = (reported_size, count + 1)
+
+    if not groups:
+        raise ValueError(f"Run has no request records: {requests_path}")
+    for key, (reported_size, count) in groups.items():
+        if key.startswith("batch:") and count != reported_size:
+            raise ValueError(
+                f"Incomplete batch records in {requests_path}: "
+                f"{key} reports {reported_size}, observed {count}"
+            )
+    return fmean(reported_size for reported_size, _ in groups.values())
 
 
 def parse_run_id(run_id: str) -> tuple[str, float, int]:
@@ -123,6 +156,12 @@ def load_terminal_matrix(root: Path) -> tuple[list[RunResult], list[dict[str, ob
             summary = json.loads(summary_path.read_text(encoding="utf-8"))
             if summary.get("run_id") != run_id:
                 raise ValueError(f"Summary run ID mismatch: {run_id}")
+            requests_path = manifest_path.parent / "requests.jsonl"
+            if not requests_path.is_file():
+                raise ValueError(f"Complete run has no request records: {run_id}")
+            summary["mean_outer_group_size_per_call"] = (
+                mean_outer_group_size_per_call(requests_path)
+            )
             completed.append(RunResult(run_id, mode, rate, repetition, summary))
         elif status == "invalid_harness":
             excluded.append(
@@ -195,7 +234,7 @@ def paired_effects(runs: list[RunResult]) -> list[dict[str, object]]:
                 "p95_latency_ms",
                 "achieved_request_throughput",
                 "mean_gpu_utilization_percent",
-                "mean_batch_size",
+                "mean_outer_group_size_per_call",
             ):
                 absolute: list[float] = []
                 relative: list[float] = []
@@ -255,9 +294,9 @@ def plot_overview(
         (axes[0, 1], "p95_latency_ms", "Tail latency", "p95 latency (ms)"),
         (
             axes[1, 0],
-            "mean_batch_size",
+            "mean_outer_group_size_per_call",
             "Outer request grouping",
-            "prompts per backend HTTP call",
+            "mean prompts per backend HTTP call",
         ),
         (axes[1, 1], "mean_gpu_utilization_percent", "GPU utilization", "mean utilization (%)"),
     )
@@ -380,7 +419,7 @@ def write_primary_table(aggregates: list[dict[str, object]], output_path: Path) 
                 float(row["rate_rps"]),
                 _latex_stat(row["achieved_request_throughput"], 2),
                 _latex_stat(row["p95_latency_ms"], 0),
-                _latex_stat(row["mean_batch_size"], 2),
+                _latex_stat(row["mean_outer_group_size_per_call"], 2),
                 _latex_stat(row["mean_gpu_utilization_percent"], 1),
             )
         )

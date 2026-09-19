@@ -2383,5 +2383,74 @@ the vLLM process cleanly, and run the analyzer against the immutable raw tree.
 
 ## Next task
 
+ANA-001-CALL-WEIGHTING — Derive an unbiased call-level outer-group metric from
+raw batch IDs instead of relabeling the request-weighted run summary.
+
+### ANA-001-CALL-WEIGHTING — Correct outer-group weighting
+
+Status: complete
+
+Date: 2026-09-19 05:39 -04:00
+
+Commit: f4d1880 (tracker checkpoint)
+
+Files changed:
+
+- `bench/analyze_final.py`
+- `tests/test_analyze_final.py`
+- `paper/sections/03_methodology.tex`
+- `paper/sections/05_evaluation.tex`
+- `docs/PROGRESS.md`
+
+Functional summary:
+
+- Identified that the stored `mean_batch_size` is request weighted because each
+  request in a group repeats the group's size; using it as a per-call mean
+  would over-weight large groups.
+- Added raw-record grouping by batch ID and a new
+  `mean_outer_group_size_per_call` metric that weights each backend HTTP call
+  exactly once.
+- Validates reported group sizes against the number of observed records and
+  fails on missing or inconsistent raw request artifacts.
+- Retains the request-weighted summary value for auditability but switches all
+  publication figures, tables, and paired grouping effects to the call-level
+  metric.
+- Added a regression test where one singleton and one group of three correctly
+  produce a call-weighted mean of 2.0 rather than a request-weighted 2.5.
+
+Commands run:
+
+~~~text
+uv run --group research ruff check bench/analyze_final.py tests/test_analyze_final.py
+uv run --group research pytest -q tests/test_analyze_final.py --basetemp tmp/pytest-call-weighted
+uv run --group research python -c "...validate every current WSL requests.jsonl..."
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+bibtex main
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+~~~
+
+Observed result:
+
+- Focused Ruff: passed.
+- Analysis tests: 6 passed.
+- All 33 request files present at the checkpoint passed group-consistency
+  validation; call-level means ranged from 1.0 to 3.1304.
+- LuaLaTeX produced an eight-page, 188688-byte PDF with no matched layout,
+  citation, or undefined-reference warning.
+- EXP-003 had 32 complete conditions with `fixed-rate-0p5-rep-3` active.
+
+Current status:
+
+The paper's outer-group statistic now has the stated backend-call unit and is
+derived directly from auditable request records.
+
+Exact next action:
+
+Let EXP-003 reach 48 terminal conditions, audit statuses and exclusions, stop
+the vLLM process cleanly, and run the analyzer against the immutable raw tree.
+
+## Next task
+
 EXP-003-FINALIZE — Let the frozen primary matrix reach 48 terminal conditions,
 then verify manifests, exclusions, summaries, and process shutdown.

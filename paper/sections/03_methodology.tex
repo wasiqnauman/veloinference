@@ -101,6 +101,13 @@ and report a two-sided 95\% Student-$t$ interval. With only three repetitions,
 these intervals are necessarily wide; figures show each run point to prevent
 the mean from hiding instability.
 
+Each request record carries its outer batch ID and reported batch size. A
+request-wise average of that field is size biased: a group of four contributes
+four observations while a singleton contributes one. For mechanism claims we
+therefore group records by batch ID and report the call-weighted mean number of
+prompts per backend HTTP call. The raw request-weighted mean remains in each
+run summary for auditability but is not labeled as a call-level average.
+
 The primary effects are paired by rate and seed:
 \begin{align}
   \Delta_{\mathrm{proxy}} &= M_{\mathrm{pass}}-M_{\mathrm{direct}},\\
