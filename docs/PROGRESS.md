@@ -2523,5 +2523,68 @@ the vLLM process cleanly, and run the analyzer against the immutable raw tree.
 
 ## Next task
 
-EXP-003-FINALIZE — Let the frozen primary matrix reach 48 terminal conditions,
-then verify manifests, exclusions, summaries, and process shutdown.
+EXP-003-PAUSE-2 — Stop the active matrix at the user's request and leave a
+safe, exact resume boundary.
+
+### EXP-003-PAUSE-2 — Pause and preserve the second final-matrix run
+
+Status: complete
+
+Date: 2026-09-19 19:02 -04:00
+
+Commit: b5a4f42 (tracker checkpoint)
+
+Files changed:
+
+- `docs/PROGRESS.md`
+
+Operational changes outside Git:
+
+- Stopped the WSL final runner with `Ctrl-C` while it was warming up
+  `adaptive-rate-1p5-rep-2`.
+- Stopped the vLLM 0.29.0 server on port 8001 with `Ctrl-C`.
+- Moved the one partial run directory, containing only `manifest.json`, from
+  the primary tree to the recoverable archive:
+  `/home/kennarr/src/veloinference/results/raw/exp003-primary-final-interrupted/adaptive/2026-09-19/adaptive-rate-1p5-rep-2`.
+
+Observed result:
+
+- Primary manifests: 42.
+- Primary summaries: 42.
+- Primary statuses: 42 complete, zero started, zero failed, zero
+  `invalid_harness`.
+- Completed modes: direct 12/12, pass-through 12/12, fixed 12/12, adaptive
+  6/12.
+- Last completed condition: `adaptive-rate-1p0-rep-2`.
+- Exact condition to restart: `adaptive-rate-1p5-rep-2`.
+- Ports 8000 and 8001 are closed, and no final-runner, vLLM, or Uvicorn process
+  remains.
+
+Current status:
+
+The experiment is paused at a safe resume boundary. No partial request or GPU
+record was admitted to the primary tree, and all 42 completed summaries remain
+immutable. The paper still contains claim-gated result placeholders.
+
+Exact resume commands:
+
+~~~text
+cd /home/kennarr/src/veloinference
+export CUDA_HOME=/home/kennarr/src/veloinference/.venv-vllm/lib/python3.12/site-packages/nvidia/cu13
+export PATH=/home/kennarr/src/veloinference/.venv-vllm/bin:/home/kennarr/src/veloinference/.venv-vllm/lib/python3.12/site-packages/nvidia/cu13/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+export LD_LIBRARY_PATH=/home/kennarr/src/veloinference/.venv-vllm/lib/python3.12/site-packages/nvidia/cu13/lib:/usr/lib/wsl/lib:/usr/lib
+export VLLM_WSL2_ENABLE_PIN_MEMORY=1
+.venv-vllm/bin/vllm serve Qwen/Qwen2.5-1.5B-Instruct --host 127.0.0.1 --port 8001 --dtype half --max-model-len 2048 --gpu-memory-utilization 0.85 --max-num-seqs 8 --enforce-eager --served-model-name Qwen/Qwen2.5-1.5B-Instruct
+.venv-vllm/bin/python -m bench.final --config configs/experiments/primary_final.toml
+~~~
+
+Exact next action:
+
+Start vLLM with the recorded environment, verify `/health`, start the safe
+resume runner, and confirm it reuses all 42 complete summaries before
+restarting `adaptive-rate-1p5-rep-2`.
+
+## Next task
+
+EXP-003-RESUME-3 — Resume from 42 complete conditions and finish the six
+remaining adaptive conditions without changing the frozen configuration.
