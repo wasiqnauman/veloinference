@@ -2322,5 +2322,66 @@ the vLLM process cleanly, and run the analyzer against the immutable raw tree.
 
 ## Next task
 
+PAPER-001-ORDER-VALIDITY — Document the frozen runner's fixed execution order
+and its effect on causal interpretation.
+
+### PAPER-001-ORDER-VALIDITY — Record the non-randomized execution limitation
+
+Status: complete
+
+Date: 2026-09-19 05:35 -04:00
+
+Commit: fa8bf36 (tracker checkpoint)
+
+Files changed:
+
+- `paper/sections/03_methodology.tex`
+- `paper/sections/06_discussion.tex`
+- `docs/PROGRESS.md`
+
+Functional summary:
+
+- Documented the exact execution order: mode, then repetition, then increasing
+  offered rate.
+- Clarified that seed pairing controls workload construction but does not
+  balance wall-clock position.
+- Added fixed-order temporal and thermal confounding to the threats-to-validity
+  section and limited interpretation of small cross-mode effects accordingly.
+- Preserved the stronger within-mode queue/grouping mechanism as the principal
+  evidence while explicitly acknowledging that it is not immune to host drift.
+
+Commands run:
+
+~~~text
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+bibtex main
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+pdftoppm -f 4 -singlefile -png -r 120 main.pdf ../tmp/pdfs/paper-order-page4
+pdftoppm -f 7 -singlefile -png -r 120 main.pdf ../tmp/pdfs/paper-order-page7
+~~~
+
+Observed result:
+
+- LuaLaTeX produced an eight-page, 188246-byte PDF.
+- The final log contains no overfull box, underfull box, package warning,
+  LaTeX warning, or undefined-reference match.
+- Pages 4 and 7 were visually inspected; the added validity text is legible
+  and the surrounding equations, conclusion, and references remain unclipped.
+- EXP-003 advanced to 31 complete conditions with
+  `fixed-rate-1p8-rep-2` active during this edit.
+
+Current status:
+
+The paper no longer implies that paired seeds compensate for non-randomized
+wall-clock order. This limitation is visible before the result claims.
+
+Exact next action:
+
+Let EXP-003 reach 48 terminal conditions, audit statuses and exclusions, stop
+the vLLM process cleanly, and run the analyzer against the immutable raw tree.
+
+## Next task
+
 EXP-003-FINALIZE — Let the frozen primary matrix reach 48 terminal conditions,
 then verify manifests, exclusions, summaries, and process shutdown.

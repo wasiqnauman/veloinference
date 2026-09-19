@@ -73,6 +73,12 @@ from every aggregate. A five-second cooldown separates conditions. The final
 matrix contains $4\times4\times3=48$ conditions and 5,760 seconds of measured
 traffic, excluding warmup and cooldown. The fixed 1\,ms comparator and adaptive
 parameters were frozen from calibration and pilot data before the final matrix.
+The runner executes the declared order by mode (direct, pass-through, fixed,
+adaptive), then repetition, then increasing rate. This deterministic order
+makes interruption recovery auditable but does not balance slow temporal or
+thermal drift. Seed pairing controls workload construction, not wall-clock
+position; we treat the lack of randomized interleaving as a validity
+limitation rather than implying otherwise.
 
 \subsection{Validity gate and failure accounting}
 

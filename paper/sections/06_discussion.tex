@@ -39,7 +39,11 @@ that reduced backend cost exceeds added queueing for the target workload.
 the Windows display-driver model. Absolute latency, host scheduling, power,
 and thermal behavior may differ on native Linux or datacenter GPUs. We treat
 arrival drift as a validity variable precisely because the host is part of the
-measured system.
+measured system. Conditions were executed in a fixed, recoverable order rather
+than randomized or interleaved. Warmup, cooldown, and GPU telemetry expose
+gross state changes, but they cannot remove slow temporal or thermal
+confounding. Small cross-mode effects must therefore be interpreted more
+cautiously than the within-mode queue and grouping mechanism.
 
 \textbf{Model and workload.} \model{} is small enough to run reproducibly on
 12\,GB VRAM. Larger models, long contexts, quantization, tensor parallelism,
