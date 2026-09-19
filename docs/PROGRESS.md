@@ -2704,3 +2704,86 @@ audited numerical claims in `docs/RESULT_CLAIMS.md`.
 ## Next task
 
 ANA-002 — Generate and audit the final statistical analysis artifacts.
+
+### ANA-002 — Generate and audit final analysis artifacts
+
+Status: complete
+
+Date: 2026-09-19 19:35 -04:00
+
+Commit: 2697d1c (tracker checkpoint)
+
+Files changed or created:
+
+- `.gitignore`: retains the final machine-readable analysis summary while
+  continuing to ignore other generated summaries.
+- `bench/analyze_final.py`: replaces incomplete GPU telemetry in the
+  publication overview/table with queue delay and adds a run-level
+  serial-occupancy fit summary.
+- `tests/test_analyze_final.py`: verifies the queue-delay publication output
+  and the occupancy-fit artifact, including undefined R-squared handling for
+  a zero-variance synthetic fixture.
+- `results/summaries/generated/exp003-analysis.json`: final machine-readable
+  aggregates, paired effects, exclusions, and mechanism-fit statistics.
+- `paper/figures/primary_overview.{pdf,png}`: throughput, p95 latency, outer
+  grouping, and queue delay across the 16 conditions.
+- `paper/figures/mechanism_effects.{pdf,png}`: occupancy prediction, queue and
+  backend decomposition, and paired p95-latency effects.
+- `paper/tables/primary_results.tex`: all 16 aggregate conditions.
+- `paper/tables/paired_effects.tex`: 12 paired policy effects.
+- `docs/RESULT_CLAIMS.md`: audited claims, exact supporting run IDs, negative
+  results, and prohibited interpretations.
+
+Commands run:
+
+~~~text
+uv run --group research python -m bench.analyze_final --input "\\wsl.localhost\Ubuntu\home\kennarr\src\veloinference\results\raw\exp003-primary-final" --summary results/summaries/generated/exp003-analysis.json --figure-dir paper/figures --table-dir paper/tables
+uv run --group research ruff check bench/analyze_final.py tests/test_analyze_final.py
+uv run --group research pytest -q tests/test_analyze_final.py --basetemp tmp/pytest-final-fit-2
+~~~
+
+Observed result:
+
+- Analyzer accepted 48 complete runs and excluded zero.
+- Focused tests: 6 passed; Ruff: passed.
+- Fixed batching versus pass-through increased paired p95 latency by
+  1,510 ms [1,330, 1,690] at 1.0 requests/s, 1,047 ms [303, 1,791] at
+  1.5 requests/s, and 1,370 ms [484, 2,256] at 1.8 requests/s. Brackets are
+  two-sided 95% Student-t intervals over three paired repetitions.
+- At 0.5 requests/s, calls remained singleton and the paired effect interval
+  crossed zero.
+- Across 24 fixed/adaptive runs, the serial-occupancy diagnostic achieved
+  0.020 requests/call mean absolute error, 0.86% mean absolute percentage
+  error, descriptive R-squared 0.9985, and measured/predicted ratios from
+  0.978 to 1.000.
+- Pass-through versus direct and adaptive versus fixed effects were unresolved
+  at every tested rate because all corresponding intervals crossed zero.
+- The final paper-facing figures were visually inspected. Labels, legends,
+  confidence intervals, and panel ordering are legible.
+
+Interpretation boundary:
+
+- The occupancy fit uses backend occupancy measured in the same run and is a
+  mechanism-consistency diagnostic, not independent causal proof.
+- The count-normalized throughput metric equals offered load after all
+  scheduled requests complete; it is not an independent saturation-capacity
+  estimate.
+- GPU utilization, VRAM, and power are retained in the JSON with per-metric
+  sample counts but removed from paper-facing comparisons because telemetry is
+  incomplete after restart.
+
+Current status:
+
+The final evidence package is generated, audited, and claim-gated. The
+manuscript still contains pending macros and must now be rewritten to match the
+verified ledger exactly.
+
+Exact next action:
+
+Replace every pending manuscript claim with ledger-backed results, integrate
+the mechanism analysis and limitations, then rebuild and visually inspect the
+complete LuaLaTeX PDF.
+
+## Next task
+
+PAPER-002 — Produce and verify the evidence-complete arXiv manuscript.

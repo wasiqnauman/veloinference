@@ -1,0 +1,2668 @@
+{
+  "schema_version": 1,
+  "analysis_unit": "run",
+  "confidence_interval": "two-sided 95% Student-t over run-level values",
+  "completed_run_count": 48,
+  "excluded_run_count": 0,
+  "excluded": [],
+  "occupancy_fit": {
+    "n": 24,
+    "mean_absolute_error_requests_per_call": 0.02040128901910207,
+    "mean_absolute_percentage_error": 0.8602949459573674,
+    "r_squared": 0.9985225460938056,
+    "fit_ratio_min": 0.9781874002301139,
+    "fit_ratio_max": 1.0
+  },
+  "aggregates": [
+    {
+      "mode": "direct",
+      "rate_rps": 0.5,
+      "run_ids": [
+        "direct-rate-0p5-rep-1",
+        "direct-rate-0p5-rep-2",
+        "direct-rate-0p5-rep-3"
+      ],
+      "repetitions": [
+        1,
+        2,
+        3
+      ],
+      "achieved_request_throughput": {
+        "n": 3,
+        "mean": 0.5,
+        "lower": 0.5,
+        "upper": 0.5,
+        "half_width": 0.0
+      },
+      "p50_latency_ms": {
+        "n": 3,
+        "mean": 1569.7652870000857,
+        "lower": 1181.2066771893653,
+        "upper": 1958.323896810806,
+        "half_width": 388.5586098107204
+      },
+      "p95_latency_ms": {
+        "n": 3,
+        "mean": 2114.965828083244,
+        "lower": 1507.8661658397637,
+        "upper": 2722.0654903267246,
+        "half_width": 607.0996622434805
+      },
+      "p99_latency_ms": {
+        "n": 3,
+        "mean": 2224.2694315399644,
+        "lower": 1597.152379904158,
+        "upper": 2851.386483175771,
+        "half_width": 627.1170516358065
+      },
+      "mean_queue_ms": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_backend_ms": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_batch_size": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_group_size_per_call": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_backend_ms_per_call": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "occupancy_predicted_group_size": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "occupancy_fit_ratio": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_gpu_utilization_percent": {
+        "n": 3,
+        "mean": 39.560200351326976,
+        "lower": 38.60908816501499,
+        "upper": 40.511312537638965,
+        "half_width": 0.9511121863119906
+      },
+      "max_vram_used_mb": {
+        "n": 3,
+        "mean": 11133.0,
+        "lower": 11072.711661484678,
+        "upper": 11193.288338515322,
+        "half_width": 60.28833851532229
+      },
+      "mean_power_draw_w": {
+        "n": 3,
+        "mean": 94.89733133931539,
+        "lower": 91.06696141083745,
+        "upper": 98.72770126779332,
+        "half_width": 3.830369928477936
+      },
+      "p95_arrival_drift_ms": {
+        "n": 3,
+        "mean": 1.881349916657389,
+        "lower": 1.6566739655250087,
+        "upper": 2.1060258677897696,
+        "half_width": 0.2246759511323804
+      }
+    },
+    {
+      "mode": "direct",
+      "rate_rps": 1.0,
+      "run_ids": [
+        "direct-rate-1p0-rep-1",
+        "direct-rate-1p0-rep-2",
+        "direct-rate-1p0-rep-3"
+      ],
+      "repetitions": [
+        1,
+        2,
+        3
+      ],
+      "achieved_request_throughput": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "p50_latency_ms": {
+        "n": 3,
+        "mean": 1717.0346498333327,
+        "lower": 1310.7474796252136,
+        "upper": 2123.3218200414517,
+        "half_width": 406.28717020811905
+      },
+      "p95_latency_ms": {
+        "n": 3,
+        "mean": 2334.188919066712,
+        "lower": 1729.5432125173293,
+        "upper": 2938.834625616095,
+        "half_width": 604.6457065493827
+      },
+      "p99_latency_ms": {
+        "n": 3,
+        "mean": 2431.390760226605,
+        "lower": 1826.4872010629206,
+        "upper": 3036.2943193902893,
+        "half_width": 604.9035591636843
+      },
+      "mean_queue_ms": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_backend_ms": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_batch_size": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_group_size_per_call": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_backend_ms_per_call": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "occupancy_predicted_group_size": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "occupancy_fit_ratio": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_gpu_utilization_percent": {
+        "n": 3,
+        "mean": 46.484593837535016,
+        "lower": 37.34290969038079,
+        "upper": 55.62627798468924,
+        "half_width": 9.14168414715422
+      },
+      "max_vram_used_mb": {
+        "n": 3,
+        "mean": 11134.0,
+        "lower": 11073.7628617814,
+        "upper": 11194.2371382186,
+        "half_width": 60.2371382186
+      },
+      "mean_power_draw_w": {
+        "n": 3,
+        "mean": 101.45602240896358,
+        "lower": 84.98093452151973,
+        "upper": 117.93111029640743,
+        "half_width": 16.475087887443845
+      },
+      "p95_arrival_drift_ms": {
+        "n": 3,
+        "mean": 1.93654308342938,
+        "lower": 1.4553969973592915,
+        "upper": 2.4176891694994684,
+        "half_width": 0.4811460860700886
+      }
+    },
+    {
+      "mode": "direct",
+      "rate_rps": 1.5,
+      "run_ids": [
+        "direct-rate-1p5-rep-1",
+        "direct-rate-1p5-rep-2",
+        "direct-rate-1p5-rep-3"
+      ],
+      "repetitions": [
+        1,
+        2,
+        3
+      ],
+      "achieved_request_throughput": {
+        "n": 3,
+        "mean": 1.5,
+        "lower": 1.5,
+        "upper": 1.5,
+        "half_width": 0.0
+      },
+      "p50_latency_ms": {
+        "n": 3,
+        "mean": 1645.944514000007,
+        "lower": 1350.1614340390413,
+        "upper": 1941.7275939609729,
+        "half_width": 295.7830799609657
+      },
+      "p95_latency_ms": {
+        "n": 3,
+        "mean": 2010.1779045333349,
+        "lower": 1781.1983048862821,
+        "upper": 2239.1575041803876,
+        "half_width": 228.97959964705268
+      },
+      "p99_latency_ms": {
+        "n": 3,
+        "mean": 2116.064348726602,
+        "lower": 1885.5644917814311,
+        "upper": 2346.564205671773,
+        "half_width": 230.4998569451709
+      },
+      "mean_queue_ms": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_backend_ms": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_batch_size": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_group_size_per_call": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_backend_ms_per_call": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "occupancy_predicted_group_size": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "occupancy_fit_ratio": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_gpu_utilization_percent": {
+        "n": 3,
+        "mean": 50.02366709395623,
+        "lower": 41.906703035190624,
+        "upper": 58.14063115272183,
+        "half_width": 8.116964058765605
+      },
+      "max_vram_used_mb": {
+        "n": 3,
+        "mean": 11148.333333333334,
+        "lower": 11146.8991157567,
+        "upper": 11149.767550909968,
+        "half_width": 1.4342175766333334
+      },
+      "mean_power_draw_w": {
+        "n": 3,
+        "mean": 103.5326584532118,
+        "lower": 92.57186718349529,
+        "upper": 114.4934497229283,
+        "half_width": 10.960791269716514
+      },
+      "p95_arrival_drift_ms": {
+        "n": 3,
+        "mean": 1.9781982444106552,
+        "lower": 1.5679627111315286,
+        "upper": 2.388433777689782,
+        "half_width": 0.4102355332791266
+      }
+    },
+    {
+      "mode": "direct",
+      "rate_rps": 1.8,
+      "run_ids": [
+        "direct-rate-1p8-rep-1",
+        "direct-rate-1p8-rep-2",
+        "direct-rate-1p8-rep-3"
+      ],
+      "repetitions": [
+        1,
+        2,
+        3
+      ],
+      "achieved_request_throughput": {
+        "n": 3,
+        "mean": 1.8,
+        "lower": 1.8,
+        "upper": 1.8,
+        "half_width": 0.0
+      },
+      "p50_latency_ms": {
+        "n": 3,
+        "mean": 1542.078934166644,
+        "lower": 1144.3897107088708,
+        "upper": 1939.7681576244174,
+        "half_width": 397.6892234577734
+      },
+      "p95_latency_ms": {
+        "n": 3,
+        "mean": 1869.5813994166692,
+        "lower": 1196.0505482706367,
+        "upper": 2543.112250562702,
+        "half_width": 673.5308511460324
+      },
+      "p99_latency_ms": {
+        "n": 3,
+        "mean": 2025.3952856500991,
+        "lower": 1086.7948218222095,
+        "upper": 2963.9957494779887,
+        "half_width": 938.6004638278897
+      },
+      "mean_queue_ms": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_backend_ms": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_batch_size": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_group_size_per_call": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_backend_ms_per_call": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "occupancy_predicted_group_size": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "occupancy_fit_ratio": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_gpu_utilization_percent": {
+        "n": 3,
+        "mean": 52.90262545696245,
+        "lower": 40.27529892524214,
+        "upper": 65.52995198868275,
+        "half_width": 12.62732653172031
+      },
+      "max_vram_used_mb": {
+        "n": 3,
+        "mean": 11143.666666666666,
+        "lower": 11124.857079488173,
+        "upper": 11162.47625384516,
+        "half_width": 18.809587178492958
+      },
+      "mean_power_draw_w": {
+        "n": 3,
+        "mean": 107.85892299292597,
+        "lower": 93.8460358337249,
+        "upper": 121.87181015212704,
+        "half_width": 14.012887159201073
+      },
+      "p95_arrival_drift_ms": {
+        "n": 3,
+        "mean": 1.7714923240816176,
+        "lower": 1.4308979948573937,
+        "upper": 2.1120866533058416,
+        "half_width": 0.34059432922422395
+      }
+    },
+    {
+      "mode": "pass_through",
+      "rate_rps": 0.5,
+      "run_ids": [
+        "pass_through-rate-0p5-rep-1",
+        "pass_through-rate-0p5-rep-2",
+        "pass_through-rate-0p5-rep-3"
+      ],
+      "repetitions": [
+        1,
+        2,
+        3
+      ],
+      "achieved_request_throughput": {
+        "n": 3,
+        "mean": 0.5,
+        "lower": 0.5,
+        "upper": 0.5,
+        "half_width": 0.0
+      },
+      "p50_latency_ms": {
+        "n": 3,
+        "mean": 1372.7112986668242,
+        "lower": 1252.3579001819692,
+        "upper": 1493.0646971516792,
+        "half_width": 120.3533984848551
+      },
+      "p95_latency_ms": {
+        "n": 3,
+        "mean": 1935.1780717332986,
+        "lower": 1567.9868708407953,
+        "upper": 2302.369272625802,
+        "half_width": 367.19120089250316
+      },
+      "p99_latency_ms": {
+        "n": 3,
+        "mean": 2145.0121009001055,
+        "lower": 1828.1082393107902,
+        "upper": 2461.915962489421,
+        "half_width": 316.90386158931534
+      },
+      "mean_queue_ms": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_backend_ms": {
+        "n": 3,
+        "mean": 1438.4807941444199,
+        "lower": 1312.082961255648,
+        "upper": 1564.8786270331918,
+        "half_width": 126.39783288877189
+      },
+      "mean_batch_size": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_group_size_per_call": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_backend_ms_per_call": {
+        "n": 3,
+        "mean": 1438.4807941444199,
+        "lower": 1312.0829612556477,
+        "upper": 1564.878627033192,
+        "half_width": 126.3978328887722
+      },
+      "occupancy_predicted_group_size": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "occupancy_fit_ratio": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_gpu_utilization_percent": {
+        "n": 3,
+        "mean": 38.152542372881356,
+        "lower": 35.532179598702164,
+        "upper": 40.77290514706055,
+        "half_width": 2.6203627741791933
+      },
+      "max_vram_used_mb": {
+        "n": 3,
+        "mean": 11154.333333333334,
+        "lower": 11035.552753221038,
+        "upper": 11273.11391344563,
+        "half_width": 118.78058011229554
+      },
+      "mean_power_draw_w": {
+        "n": 3,
+        "mean": 96.97562146892658,
+        "lower": 96.33462775056194,
+        "upper": 97.61661518729122,
+        "half_width": 0.6409937183646383
+      },
+      "p95_arrival_drift_ms": {
+        "n": 3,
+        "mean": 2.0120403832985776,
+        "lower": 1.9234750922634867,
+        "upper": 2.1006056743336683,
+        "half_width": 0.0885652910350909
+      }
+    },
+    {
+      "mode": "pass_through",
+      "rate_rps": 1.0,
+      "run_ids": [
+        "pass_through-rate-1p0-rep-1",
+        "pass_through-rate-1p0-rep-2",
+        "pass_through-rate-1p0-rep-3"
+      ],
+      "repetitions": [
+        1,
+        2,
+        3
+      ],
+      "achieved_request_throughput": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "p50_latency_ms": {
+        "n": 3,
+        "mean": 1466.1081063333465,
+        "lower": 977.7283643404339,
+        "upper": 1954.4878483262592,
+        "half_width": 488.37974199291267
+      },
+      "p95_latency_ms": {
+        "n": 3,
+        "mean": 1883.5153461500188,
+        "lower": 977.2261039361464,
+        "upper": 2789.804588363891,
+        "half_width": 906.2892422138724
+      },
+      "p99_latency_ms": {
+        "n": 3,
+        "mean": 2013.5907128231127,
+        "lower": 1046.5812562092094,
+        "upper": 2980.600169437016,
+        "half_width": 967.0094566139032
+      },
+      "mean_queue_ms": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_backend_ms": {
+        "n": 3,
+        "mean": 1501.643819322232,
+        "lower": 1026.469376225367,
+        "upper": 1976.8182624190972,
+        "half_width": 475.17444309686516
+      },
+      "mean_batch_size": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_group_size_per_call": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_backend_ms_per_call": {
+        "n": 3,
+        "mean": 1501.643819322232,
+        "lower": 1026.469376225367,
+        "upper": 1976.8182624190972,
+        "half_width": 475.1744430968651
+      },
+      "occupancy_predicted_group_size": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "occupancy_fit_ratio": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_gpu_utilization_percent": {
+        "n": 3,
+        "mean": 51.54621848739496,
+        "lower": 36.64099752419949,
+        "upper": 66.45143945059043,
+        "half_width": 14.90522096319547
+      },
+      "max_vram_used_mb": {
+        "n": 3,
+        "mean": 11178.333333333334,
+        "lower": 10963.253291245135,
+        "upper": 11393.413375421533,
+        "half_width": 215.08004208819898
+      },
+      "mean_power_draw_w": {
+        "n": 3,
+        "mean": 112.48473389355742,
+        "lower": 95.55155559466303,
+        "upper": 129.4179121924518,
+        "half_width": 16.933178298894397
+      },
+      "p95_arrival_drift_ms": {
+        "n": 3,
+        "mean": 1.879688683440387,
+        "lower": 1.5261421844116019,
+        "upper": 2.2332351824691723,
+        "half_width": 0.35354649902878515
+      }
+    },
+    {
+      "mode": "pass_through",
+      "rate_rps": 1.5,
+      "run_ids": [
+        "pass_through-rate-1p5-rep-1",
+        "pass_through-rate-1p5-rep-2",
+        "pass_through-rate-1p5-rep-3"
+      ],
+      "repetitions": [
+        1,
+        2,
+        3
+      ],
+      "achieved_request_throughput": {
+        "n": 3,
+        "mean": 1.5,
+        "lower": 1.5,
+        "upper": 1.5,
+        "half_width": 0.0
+      },
+      "p50_latency_ms": {
+        "n": 3,
+        "mean": 1654.6184228332852,
+        "lower": 1095.0081952203122,
+        "upper": 2214.228650446258,
+        "half_width": 559.610227612973
+      },
+      "p95_latency_ms": {
+        "n": 3,
+        "mean": 2172.4596355998383,
+        "lower": 1626.057076423332,
+        "upper": 2718.8621947763445,
+        "half_width": 546.4025591765062
+      },
+      "p99_latency_ms": {
+        "n": 3,
+        "mean": 2305.708080366546,
+        "lower": 1735.3975395383127,
+        "upper": 2876.018621194779,
+        "half_width": 570.3105408282332
+      },
+      "mean_queue_ms": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_backend_ms": {
+        "n": 3,
+        "mean": 1688.408577885181,
+        "lower": 1209.4164543266215,
+        "upper": 2167.4007014437407,
+        "half_width": 478.99212355855946
+      },
+      "mean_batch_size": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_group_size_per_call": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_backend_ms_per_call": {
+        "n": 3,
+        "mean": 1688.408577885181,
+        "lower": 1209.4164543266215,
+        "upper": 2167.4007014437407,
+        "half_width": 478.99212355855946
+      },
+      "occupancy_predicted_group_size": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "occupancy_fit_ratio": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_gpu_utilization_percent": {
+        "n": 3,
+        "mean": 48.398257608128,
+        "lower": 38.12280681542241,
+        "upper": 58.67370840083359,
+        "half_width": 10.27545079270559
+      },
+      "max_vram_used_mb": {
+        "n": 3,
+        "mean": 11106.333333333334,
+        "lower": 10996.571171389542,
+        "upper": 11216.095495277126,
+        "half_width": 109.762161943792
+      },
+      "mean_power_draw_w": {
+        "n": 3,
+        "mean": 102.84509234202157,
+        "lower": 81.36050629850808,
+        "upper": 124.32967838553506,
+        "half_width": 21.484586043513485
+      },
+      "p95_arrival_drift_ms": {
+        "n": 3,
+        "mean": 1.8802364166824965,
+        "lower": 1.612379479695369,
+        "upper": 2.148093353669624,
+        "half_width": 0.26785693698712765
+      }
+    },
+    {
+      "mode": "pass_through",
+      "rate_rps": 1.8,
+      "run_ids": [
+        "pass_through-rate-1p8-rep-1",
+        "pass_through-rate-1p8-rep-2",
+        "pass_through-rate-1p8-rep-3"
+      ],
+      "repetitions": [
+        1,
+        2,
+        3
+      ],
+      "achieved_request_throughput": {
+        "n": 3,
+        "mean": 1.8,
+        "lower": 1.8,
+        "upper": 1.8,
+        "half_width": 0.0
+      },
+      "p50_latency_ms": {
+        "n": 3,
+        "mean": 1625.5025931666107,
+        "lower": 1286.1104270945905,
+        "upper": 1964.894759238631,
+        "half_width": 339.3921660720203
+      },
+      "p95_latency_ms": {
+        "n": 3,
+        "mean": 2120.166943416668,
+        "lower": 1896.9343399242932,
+        "upper": 2343.3995469090423,
+        "half_width": 223.23260349237464
+      },
+      "p99_latency_ms": {
+        "n": 3,
+        "mean": 2322.421142416647,
+        "lower": 2052.93951192686,
+        "upper": 2591.9027729064337,
+        "half_width": 269.481630489787
+      },
+      "mean_queue_ms": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_backend_ms": {
+        "n": 3,
+        "mean": 1661.483970137341,
+        "lower": 1347.189842395536,
+        "upper": 1975.778097879146,
+        "half_width": 314.2941277418049
+      },
+      "mean_batch_size": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_group_size_per_call": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_backend_ms_per_call": {
+        "n": 3,
+        "mean": 1661.483970137341,
+        "lower": 1347.189842395536,
+        "upper": 1975.778097879146,
+        "half_width": 314.2941277418049
+      },
+      "occupancy_predicted_group_size": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "occupancy_fit_ratio": {
+        "n": 0,
+        "mean": null,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_gpu_utilization_percent": {
+        "n": 3,
+        "mean": 49.82072829131653,
+        "lower": 44.150942700572315,
+        "upper": 55.49051388206074,
+        "half_width": 5.669785590744209
+      },
+      "max_vram_used_mb": {
+        "n": 3,
+        "mean": 11117.333333333334,
+        "lower": 11048.431156503844,
+        "upper": 11186.235510162824,
+        "half_width": 68.90217682948902
+      },
+      "mean_power_draw_w": {
+        "n": 3,
+        "mean": 104.23072829131654,
+        "lower": 90.74565460232813,
+        "upper": 117.71580198030495,
+        "half_width": 13.485073688988415
+      },
+      "p95_arrival_drift_ms": {
+        "n": 3,
+        "mean": 1.8088718796187564,
+        "lower": 1.3945485352928364,
+        "upper": 2.2231952239446766,
+        "half_width": 0.41432334432592005
+      }
+    },
+    {
+      "mode": "fixed",
+      "rate_rps": 0.5,
+      "run_ids": [
+        "fixed-rate-0p5-rep-1",
+        "fixed-rate-0p5-rep-2",
+        "fixed-rate-0p5-rep-3"
+      ],
+      "repetitions": [
+        1,
+        2,
+        3
+      ],
+      "achieved_request_throughput": {
+        "n": 3,
+        "mean": 0.5,
+        "lower": 0.5,
+        "upper": 0.5,
+        "half_width": 0.0
+      },
+      "p50_latency_ms": {
+        "n": 3,
+        "mean": 1400.372266666712,
+        "lower": 1308.5631306820237,
+        "upper": 1492.1814026514003,
+        "half_width": 91.80913598468835
+      },
+      "p95_latency_ms": {
+        "n": 3,
+        "mean": 1812.1893401666719,
+        "lower": 1532.2625368241572,
+        "upper": 2092.1161435091863,
+        "half_width": 279.9268033425146
+      },
+      "p99_latency_ms": {
+        "n": 3,
+        "mean": 1897.118547683439,
+        "lower": 1667.6176708754808,
+        "upper": 2126.6194244913972,
+        "half_width": 229.50087680795818
+      },
+      "mean_queue_ms": {
+        "n": 3,
+        "mean": 1.5764662388897301,
+        "lower": 0.29829309502814016,
+        "upper": 2.85463938275132,
+        "half_width": 1.27817314386159
+      },
+      "mean_backend_ms": {
+        "n": 3,
+        "mean": 1432.2303319333416,
+        "lower": 1291.4481391037211,
+        "upper": 1573.0125247629621,
+        "half_width": 140.78219282962058
+      },
+      "mean_batch_size": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_group_size_per_call": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_backend_ms_per_call": {
+        "n": 3,
+        "mean": 1432.230331933342,
+        "lower": 1291.4481391037216,
+        "upper": 1573.0125247629626,
+        "half_width": 140.78219282962044
+      },
+      "occupancy_predicted_group_size": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "occupancy_fit_ratio": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_gpu_utilization_percent": {
+        "n": 3,
+        "mean": 37.75706214689266,
+        "lower": 33.18706140815446,
+        "upper": 42.32706288563085,
+        "half_width": 4.570000738738198
+      },
+      "max_vram_used_mb": {
+        "n": 3,
+        "mean": 11044.666666666666,
+        "lower": 11018.573364865091,
+        "upper": 11070.759968468241,
+        "half_width": 26.093301801574313
+      },
+      "mean_power_draw_w": {
+        "n": 3,
+        "mean": 95.82016403171438,
+        "lower": 95.04206362231791,
+        "upper": 96.59826444111086,
+        "half_width": 0.7781004093964677
+      },
+      "p95_arrival_drift_ms": {
+        "n": 3,
+        "mean": 1.898061699997318,
+        "lower": 1.2517345720315929,
+        "upper": 2.5443888279630436,
+        "half_width": 0.6463271279657252
+      }
+    },
+    {
+      "mode": "fixed",
+      "rate_rps": 1.0,
+      "run_ids": [
+        "fixed-rate-1p0-rep-1",
+        "fixed-rate-1p0-rep-2",
+        "fixed-rate-1p0-rep-3"
+      ],
+      "repetitions": [
+        1,
+        2,
+        3
+      ],
+      "achieved_request_throughput": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "p50_latency_ms": {
+        "n": 3,
+        "mean": 2302.75547049996,
+        "lower": 1794.8036072953396,
+        "upper": 2810.707333704581,
+        "half_width": 507.95186320462074
+      },
+      "p95_latency_ms": {
+        "n": 3,
+        "mean": 3393.483693100037,
+        "lower": 2630.6056080369135,
+        "upper": 4156.36177816316,
+        "half_width": 762.8780850631234
+      },
+      "p99_latency_ms": {
+        "n": 3,
+        "mean": 3713.1716159434177,
+        "lower": 2785.977291839805,
+        "upper": 4640.365940047031,
+        "half_width": 927.1943241036131
+      },
+      "mean_queue_ms": {
+        "n": 3,
+        "mean": 767.265412533337,
+        "lower": 652.7746653324566,
+        "upper": 881.7561597342174,
+        "half_width": 114.49074720088038
+      },
+      "mean_backend_ms": {
+        "n": 3,
+        "mean": 1577.6455854944634,
+        "lower": 1257.179516346141,
+        "upper": 1898.1116546427857,
+        "half_width": 320.4660691483224
+      },
+      "mean_batch_size": {
+        "n": 3,
+        "mean": 1.7055555555555557,
+        "lower": 1.3948084139516665,
+        "upper": 2.016302697159445,
+        "half_width": 0.31074714160388905
+      },
+      "mean_outer_group_size_per_call": {
+        "n": 3,
+        "mean": 1.538990037787702,
+        "lower": 1.2138153209969085,
+        "upper": 1.8641647545784954,
+        "half_width": 0.3251747167907935
+      },
+      "mean_outer_backend_ms_per_call": {
+        "n": 3,
+        "mean": 1546.2711701902163,
+        "lower": 1223.4832575961855,
+        "upper": 1869.059082784247,
+        "half_width": 322.78791259403084
+      },
+      "occupancy_predicted_group_size": {
+        "n": 3,
+        "mean": 1.5462711701902163,
+        "lower": 1.2234832575961856,
+        "upper": 1.869059082784247,
+        "half_width": 0.32278791259403083
+      },
+      "occupancy_fit_ratio": {
+        "n": 3,
+        "mean": 0.9952390238780585,
+        "lower": 0.9884843071571726,
+        "upper": 1.0019937405989443,
+        "half_width": 0.006754716720885859
+      },
+      "mean_gpu_utilization_percent": {
+        "n": 3,
+        "mean": 49.82072829131653,
+        "lower": 41.014442973749475,
+        "upper": 58.62701360888358,
+        "half_width": 8.806285317567054
+      },
+      "max_vram_used_mb": {
+        "n": 3,
+        "mean": 11057.333333333334,
+        "lower": 10956.938102969001,
+        "upper": 11157.728563697667,
+        "half_width": 100.39523036433334
+      },
+      "mean_power_draw_w": {
+        "n": 3,
+        "mean": 106.59871148459384,
+        "lower": 94.80639150875345,
+        "upper": 118.39103146043422,
+        "half_width": 11.792319975840385
+      },
+      "p95_arrival_drift_ms": {
+        "n": 3,
+        "mean": 2.069611883240441,
+        "lower": 1.8507081027066328,
+        "upper": 2.288515663774249,
+        "half_width": 0.21890378053380816
+      }
+    },
+    {
+      "mode": "fixed",
+      "rate_rps": 1.5,
+      "run_ids": [
+        "fixed-rate-1p5-rep-1",
+        "fixed-rate-1p5-rep-2",
+        "fixed-rate-1p5-rep-3"
+      ],
+      "repetitions": [
+        1,
+        2,
+        3
+      ],
+      "achieved_request_throughput": {
+        "n": 3,
+        "mean": 1.5,
+        "lower": 1.5,
+        "upper": 1.5,
+        "half_width": 0.0
+      },
+      "p50_latency_ms": {
+        "n": 3,
+        "mean": 2321.663961166602,
+        "lower": 1772.84554424588,
+        "upper": 2870.482378087324,
+        "half_width": 548.8184169207218
+      },
+      "p95_latency_ms": {
+        "n": 3,
+        "mean": 3219.60766496669,
+        "lower": 2369.240839289457,
+        "upper": 4069.974490643923,
+        "half_width": 850.366825677233
+      },
+      "p99_latency_ms": {
+        "n": 3,
+        "mean": 3512.8286176067327,
+        "lower": 2645.6068830509257,
+        "upper": 4380.05035216254,
+        "half_width": 867.221734555807
+      },
+      "mean_queue_ms": {
+        "n": 3,
+        "mean": 787.5173758759471,
+        "lower": 586.7834031499855,
+        "upper": 988.2513486019087,
+        "half_width": 200.73397272596162
+      },
+      "mean_backend_ms": {
+        "n": 3,
+        "mean": 1529.130319979635,
+        "lower": 1204.5490665910354,
+        "upper": 1853.7115733682347,
+        "half_width": 324.58125338859963
+      },
+      "mean_batch_size": {
+        "n": 3,
+        "mean": 2.3555555555555556,
+        "lower": 1.8533897282493863,
+        "upper": 2.857721382861725,
+        "half_width": 0.5021658273061693
+      },
+      "mean_outer_group_size_per_call": {
+        "n": 3,
+        "mean": 2.242851766802092,
+        "lower": 1.7672059747778335,
+        "upper": 2.7184975588263507,
+        "half_width": 0.47564579202425855
+      },
+      "mean_outer_backend_ms_per_call": {
+        "n": 3,
+        "mean": 1516.0252785735177,
+        "lower": 1189.9922149200138,
+        "upper": 1842.0583422270215,
+        "half_width": 326.0330636535038
+      },
+      "occupancy_predicted_group_size": {
+        "n": 3,
+        "mean": 2.2740379178602765,
+        "lower": 1.784988322380021,
+        "upper": 2.7630875133405324,
+        "half_width": 0.48904959548025567
+      },
+      "occupancy_fit_ratio": {
+        "n": 3,
+        "mean": 0.9863645112166596,
+        "lower": 0.9769728004549459,
+        "upper": 0.9957562219783732,
+        "half_width": 0.009391710761713686
+      },
+      "mean_gpu_utilization_percent": {
+        "n": 3,
+        "mean": 52.40896358543417,
+        "lower": 42.163297548852256,
+        "upper": 62.65462962201609,
+        "half_width": 10.245666036581918
+      },
+      "max_vram_used_mb": {
+        "n": 3,
+        "mean": 11035.0,
+        "lower": 11032.515862288163,
+        "upper": 11037.484137711837,
+        "half_width": 2.4841377118372434
+      },
+      "mean_power_draw_w": {
+        "n": 3,
+        "mean": 107.21661064425773,
+        "lower": 95.31997295687252,
+        "upper": 119.11324833164294,
+        "half_width": 11.896637687385207
+      },
+      "p95_arrival_drift_ms": {
+        "n": 3,
+        "mean": 1.8564443388078413,
+        "lower": 1.5830510192917244,
+        "upper": 2.129837658323958,
+        "half_width": 0.273393319516117
+      }
+    },
+    {
+      "mode": "fixed",
+      "rate_rps": 1.8,
+      "run_ids": [
+        "fixed-rate-1p8-rep-1",
+        "fixed-rate-1p8-rep-2",
+        "fixed-rate-1p8-rep-3"
+      ],
+      "repetitions": [
+        1,
+        2,
+        3
+      ],
+      "achieved_request_throughput": {
+        "n": 3,
+        "mean": 1.8,
+        "lower": 1.8,
+        "upper": 1.8,
+        "half_width": 0.0
+      },
+      "p50_latency_ms": {
+        "n": 3,
+        "mean": 2474.5258703332333,
+        "lower": 1996.9989933836746,
+        "upper": 2952.052747282792,
+        "half_width": 477.52687694955864
+      },
+      "p95_latency_ms": {
+        "n": 3,
+        "mean": 3490.113213166637,
+        "lower": 2803.2261521831124,
+        "upper": 4177.000274150161,
+        "half_width": 686.8870609835244
+      },
+      "p99_latency_ms": {
+        "n": 3,
+        "mean": 3852.866271250036,
+        "lower": 3246.6700971803148,
+        "upper": 4459.062445319757,
+        "half_width": 606.1961740697209
+      },
+      "mean_queue_ms": {
+        "n": 3,
+        "mean": 833.4319168364077,
+        "lower": 650.2537208896499,
+        "upper": 1016.6101127831655,
+        "half_width": 183.17819594675785
+      },
+      "mean_backend_ms": {
+        "n": 3,
+        "mean": 1657.7365900555585,
+        "lower": 1330.2351814869119,
+        "upper": 1985.2379986242051,
+        "half_width": 327.5014085686467
+      },
+      "mean_batch_size": {
+        "n": 3,
+        "mean": 3.0277777777777772,
+        "lower": 2.483954470924126,
+        "upper": 3.5716010846314283,
+        "half_width": 0.5438233068536512
+      },
+      "mean_outer_group_size_per_call": {
+        "n": 3,
+        "mean": 2.9034782608695653,
+        "lower": 2.3664679728299953,
+        "upper": 3.4404885489091352,
+        "half_width": 0.53701028803957
+      },
+      "mean_outer_backend_ms_per_call": {
+        "n": 3,
+        "mean": 1641.80953846726,
+        "lower": 1320.8229540362456,
+        "upper": 1962.7961228982742,
+        "half_width": 320.98658443101436
+      },
+      "occupancy_predicted_group_size": {
+        "n": 3,
+        "mean": 2.9552571692410683,
+        "lower": 2.3774813172652425,
+        "upper": 3.533033021216894,
+        "half_width": 0.5777758519758257
+      },
+      "occupancy_fit_ratio": {
+        "n": 3,
+        "mean": 0.9826953020318508,
+        "lower": 0.9724194966901657,
+        "upper": 0.992971107373536,
+        "half_width": 0.010275805341685143
+      },
+      "mean_gpu_utilization_percent": {
+        "n": 3,
+        "mean": 48.83193277310924,
+        "lower": 41.91754402373196,
+        "upper": 55.74632152248651,
+        "half_width": 6.914388749377275
+      },
+      "max_vram_used_mb": {
+        "n": 3,
+        "mean": 11086.333333333334,
+        "lower": 10878.356948517165,
+        "upper": 11294.309718149503,
+        "half_width": 207.9763848161692
+      },
+      "mean_power_draw_w": {
+        "n": 3,
+        "mean": 103.90868347338937,
+        "lower": 95.55395204458121,
+        "upper": 112.26341490219754,
+        "half_width": 8.35473142880816
+      },
+      "p95_arrival_drift_ms": {
+        "n": 3,
+        "mean": 1.6899432222454713,
+        "lower": 1.5146427751794218,
+        "upper": 1.8652436693115209,
+        "half_width": 0.17530044706604953
+      }
+    },
+    {
+      "mode": "adaptive",
+      "rate_rps": 0.5,
+      "run_ids": [
+        "adaptive-rate-0p5-rep-1",
+        "adaptive-rate-0p5-rep-2",
+        "adaptive-rate-0p5-rep-3"
+      ],
+      "repetitions": [
+        1,
+        2,
+        3
+      ],
+      "achieved_request_throughput": {
+        "n": 3,
+        "mean": 0.5,
+        "lower": 0.5,
+        "upper": 0.5,
+        "half_width": 0.0
+      },
+      "p50_latency_ms": {
+        "n": 3,
+        "mean": 1377.7872218334057,
+        "lower": 1139.5406463112529,
+        "upper": 1616.0337973555586,
+        "half_width": 238.2465755221528
+      },
+      "p95_latency_ms": {
+        "n": 3,
+        "mean": 1927.1909895498482,
+        "lower": 1392.2216109040219,
+        "upper": 2462.1603681956744,
+        "half_width": 534.9693786458264
+      },
+      "p99_latency_ms": {
+        "n": 3,
+        "mean": 2110.804770796753,
+        "lower": 1745.3853129160582,
+        "upper": 2476.224228677448,
+        "half_width": 365.41945788069484
+      },
+      "mean_queue_ms": {
+        "n": 3,
+        "mean": 6.964704644442715,
+        "lower": -14.467829737785621,
+        "upper": 28.397239026671052,
+        "half_width": 21.432534382228337
+      },
+      "mean_backend_ms": {
+        "n": 3,
+        "mean": 1454.4442217611024,
+        "lower": 1221.155334880595,
+        "upper": 1687.7331086416098,
+        "half_width": 233.28888688050725
+      },
+      "mean_batch_size": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_group_size_per_call": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_outer_backend_ms_per_call": {
+        "n": 3,
+        "mean": 1454.4442217611024,
+        "lower": 1221.1553348805949,
+        "upper": 1687.73310864161,
+        "half_width": 233.2888868805076
+      },
+      "occupancy_predicted_group_size": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "occupancy_fit_ratio": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "mean_gpu_utilization_percent": {
+        "n": 2,
+        "mean": 39.055725680102555,
+        "lower": 28.97952977907834,
+        "upper": 49.13192158112677,
+        "half_width": 10.076195901024215
+      },
+      "max_vram_used_mb": {
+        "n": 2,
+        "mean": 11051.0,
+        "lower": 11038.2937952636,
+        "upper": 11063.7062047364,
+        "half_width": 12.706204736399998
+      },
+      "mean_power_draw_w": {
+        "n": 2,
+        "mean": 96.1267607890614,
+        "lower": 94.88545362566468,
+        "upper": 97.3680679524581,
+        "half_width": 1.2413071633967159
+      },
+      "p95_arrival_drift_ms": {
+        "n": 3,
+        "mean": 1.7567689166469327,
+        "lower": 1.1342674871665093,
+        "upper": 2.379270346127356,
+        "half_width": 0.6225014294804234
+      }
+    },
+    {
+      "mode": "adaptive",
+      "rate_rps": 1.0,
+      "run_ids": [
+        "adaptive-rate-1p0-rep-1",
+        "adaptive-rate-1p0-rep-2",
+        "adaptive-rate-1p0-rep-3"
+      ],
+      "repetitions": [
+        1,
+        2,
+        3
+      ],
+      "achieved_request_throughput": {
+        "n": 3,
+        "mean": 1.0,
+        "lower": 1.0,
+        "upper": 1.0,
+        "half_width": 0.0
+      },
+      "p50_latency_ms": {
+        "n": 3,
+        "mean": 1968.8962773334424,
+        "lower": 1614.825314983956,
+        "upper": 2322.9672396829287,
+        "half_width": 354.0709623494862
+      },
+      "p95_latency_ms": {
+        "n": 3,
+        "mean": 2743.5034903999854,
+        "lower": 1966.515936646253,
+        "upper": 3520.4910441537177,
+        "half_width": 776.9875537537323
+      },
+      "p99_latency_ms": {
+        "n": 3,
+        "mean": 2906.5907115965297,
+        "lower": 2111.235105696198,
+        "upper": 3701.9463174968614,
+        "half_width": 795.3556059003315
+      },
+      "mean_queue_ms": {
+        "n": 3,
+        "mean": 658.9375512499926,
+        "lower": 553.2655687969083,
+        "upper": 764.6095337030769,
+        "half_width": 105.6719824530843
+      },
+      "mean_backend_ms": {
+        "n": 3,
+        "mean": 1353.1209330194301,
+        "lower": 1054.180995698746,
+        "upper": 1652.0608703401142,
+        "half_width": 298.9399373206841
+      },
+      "mean_batch_size": {
+        "n": 3,
+        "mean": 1.4777777777777779,
+        "lower": 1.1725967070676488,
+        "upper": 1.7829588484879069,
+        "half_width": 0.305181070710129
+      },
+      "mean_outer_group_size_per_call": {
+        "n": 3,
+        "mean": 1.319830759757609,
+        "lower": 1.0444641896432239,
+        "upper": 1.5951973298719944,
+        "half_width": 0.27536657011438537
+      },
+      "mean_outer_backend_ms_per_call": {
+        "n": 3,
+        "mean": 1330.4194545634064,
+        "lower": 1056.5382881759424,
+        "upper": 1604.3006209508703,
+        "half_width": 273.88116638746385
+      },
+      "occupancy_predicted_group_size": {
+        "n": 3,
+        "mean": 1.3304194545634063,
+        "lower": 1.0565382881759422,
+        "upper": 1.6043006209508703,
+        "half_width": 0.273881166387464
+      },
+      "occupancy_fit_ratio": {
+        "n": 3,
+        "mean": 0.9919858386316743,
+        "lower": 0.9865654444672834,
+        "upper": 0.9974062327960652,
+        "half_width": 0.005420394164390855
+      },
+      "mean_gpu_utilization_percent": {
+        "n": 2,
+        "mean": 55.03361344537815,
+        "lower": 24.282462486695817,
+        "upper": 85.78476440406048,
+        "half_width": 30.751150958682334
+      },
+      "max_vram_used_mb": {
+        "n": 2,
+        "mean": 11103.5,
+        "lower": 10195.0063613474,
+        "upper": 12011.9936386526,
+        "half_width": 908.4936386526
+      },
+      "mean_power_draw_w": {
+        "n": 2,
+        "mean": 114.62789915966388,
+        "lower": 65.34917974837535,
+        "upper": 163.90661857095242,
+        "half_width": 49.27871941128854
+      },
+      "p95_arrival_drift_ms": {
+        "n": 3,
+        "mean": 2.1464709832552367,
+        "lower": 1.7103851981800868,
+        "upper": 2.5825567683303863,
+        "half_width": 0.4360857850751498
+      }
+    },
+    {
+      "mode": "adaptive",
+      "rate_rps": 1.5,
+      "run_ids": [
+        "adaptive-rate-1p5-rep-1",
+        "adaptive-rate-1p5-rep-2",
+        "adaptive-rate-1p5-rep-3"
+      ],
+      "repetitions": [
+        1,
+        2,
+        3
+      ],
+      "achieved_request_throughput": {
+        "n": 3,
+        "mean": 1.5,
+        "lower": 1.5,
+        "upper": 1.5,
+        "half_width": 0.0
+      },
+      "p50_latency_ms": {
+        "n": 3,
+        "mean": 2275.1389320000612,
+        "lower": 1762.6388818659193,
+        "upper": 2787.638982134203,
+        "half_width": 512.5000501341418
+      },
+      "p95_latency_ms": {
+        "n": 3,
+        "mean": 3435.2690306832023,
+        "lower": 2852.3546984434834,
+        "upper": 4018.1833629229213,
+        "half_width": 582.9143322397188
+      },
+      "p99_latency_ms": {
+        "n": 3,
+        "mean": 3853.1078403634256,
+        "lower": 3352.784667393441,
+        "upper": 4353.43101333341,
+        "half_width": 500.3231729699847
+      },
+      "mean_queue_ms": {
+        "n": 3,
+        "mean": 746.3638773462975,
+        "lower": 564.3000112299115,
+        "upper": 928.4277434626835,
+        "half_width": 182.06386611638598
+      },
+      "mean_backend_ms": {
+        "n": 3,
+        "mean": 1531.9906361500107,
+        "lower": 1259.1539401499022,
+        "upper": 1804.8273321501192,
+        "half_width": 272.8366960001085
+      },
+      "mean_batch_size": {
+        "n": 3,
+        "mean": 2.3555555555555556,
+        "lower": 1.9244058720270152,
+        "upper": 2.786705239084096,
+        "half_width": 0.43114968352854033
+      },
+      "mean_outer_group_size_per_call": {
+        "n": 3,
+        "mean": 2.2201680672268904,
+        "lower": 1.8320257818086036,
+        "upper": 2.6083103526451774,
+        "half_width": 0.38814228541828677
+      },
+      "mean_outer_backend_ms_per_call": {
+        "n": 3,
+        "mean": 1501.5247548596415,
+        "lower": 1232.538279169626,
+        "upper": 1770.5112305496568,
+        "half_width": 268.9864756900153
+      },
+      "occupancy_predicted_group_size": {
+        "n": 3,
+        "mean": 2.252287132289462,
+        "lower": 1.848807418754439,
+        "upper": 2.655766845824485,
+        "half_width": 0.40347971353502304
+      },
+      "occupancy_fit_ratio": {
+        "n": 3,
+        "mean": 0.9858189604170553,
+        "lower": 0.9816318972298419,
+        "upper": 0.9900060236042687,
+        "half_width": 0.004187063187213427
+      },
+      "mean_gpu_utilization_percent": {
+        "n": 1,
+        "mean": 48.596638655462186,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "max_vram_used_mb": {
+        "n": 1,
+        "mean": 11046.0,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_power_draw_w": {
+        "n": 1,
+        "mean": 103.35151260504205,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "p95_arrival_drift_ms": {
+        "n": 3,
+        "mean": 1.8495478777175238,
+        "lower": 1.8175246048452267,
+        "upper": 1.881571150589821,
+        "half_width": 0.0320232728722971
+      }
+    },
+    {
+      "mode": "adaptive",
+      "rate_rps": 1.8,
+      "run_ids": [
+        "adaptive-rate-1p8-rep-1",
+        "adaptive-rate-1p8-rep-2",
+        "adaptive-rate-1p8-rep-3"
+      ],
+      "repetitions": [
+        1,
+        2,
+        3
+      ],
+      "achieved_request_throughput": {
+        "n": 3,
+        "mean": 1.8,
+        "lower": 1.8,
+        "upper": 1.8,
+        "half_width": 0.0
+      },
+      "p50_latency_ms": {
+        "n": 3,
+        "mean": 2301.998711166675,
+        "lower": 2224.826407577905,
+        "upper": 2379.1710147554454,
+        "half_width": 77.17230358877035
+      },
+      "p95_latency_ms": {
+        "n": 3,
+        "mean": 3207.8798979998687,
+        "lower": 2781.9554056238085,
+        "upper": 3633.804390375929,
+        "half_width": 425.92449237606
+      },
+      "p99_latency_ms": {
+        "n": 3,
+        "mean": 3651.3933354001056,
+        "lower": 3045.2166462412683,
+        "upper": 4257.570024558942,
+        "half_width": 606.1766891588371
+      },
+      "mean_queue_ms": {
+        "n": 3,
+        "mean": 766.1479833271616,
+        "lower": 716.5468590518915,
+        "upper": 815.7491076024316,
+        "half_width": 49.601124275270074
+      },
+      "mean_backend_ms": {
+        "n": 3,
+        "mean": 1552.7605742098795,
+        "lower": 1449.116483233017,
+        "upper": 1656.4046651867418,
+        "half_width": 103.64409097686227
+      },
+      "mean_batch_size": {
+        "n": 3,
+        "mean": 2.8950617283950617,
+        "lower": 2.6294658808703706,
+        "upper": 3.160657575919753,
+        "half_width": 0.2655958475246913
+      },
+      "mean_outer_group_size_per_call": {
+        "n": 3,
+        "mean": 2.747368421052632,
+        "lower": 2.5435585548994744,
+        "upper": 2.95117828720579,
+        "half_width": 0.20380986615315758
+      },
+      "mean_outer_backend_ms_per_call": {
+        "n": 3,
+        "mean": 1543.124878613821,
+        "lower": 1436.2179700891766,
+        "upper": 1650.0317871384655,
+        "half_width": 106.90690852464448
+      },
+      "occupancy_predicted_group_size": {
+        "n": 3,
+        "mean": 2.777624781504878,
+        "lower": 2.5851923461605186,
+        "upper": 2.9700572168492374,
+        "half_width": 0.19243243534435958
+      },
+      "occupancy_fit_ratio": {
+        "n": 3,
+        "mean": 0.989072768148112,
+        "lower": 0.9821859266891424,
+        "upper": 0.9959596096070815,
+        "half_width": 0.006886841458969608
+      },
+      "mean_gpu_utilization_percent": {
+        "n": 1,
+        "mean": 51.596638655462186,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "max_vram_used_mb": {
+        "n": 1,
+        "mean": 11136.0,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_power_draw_w": {
+        "n": 1,
+        "mean": 108.02378151260504,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "p95_arrival_drift_ms": {
+        "n": 3,
+        "mean": 1.8385491481793064,
+        "lower": 1.6949889840899681,
+        "upper": 1.9821093122686446,
+        "half_width": 0.1435601640893383
+      }
+    }
+  ],
+  "paired_effects": [
+    {
+      "comparison": "Proxy minus direct",
+      "treatment": "pass_through",
+      "baseline": "direct",
+      "rate_rps": 0.5,
+      "p95_latency_ms_absolute": {
+        "n": 3,
+        "mean": -179.78775634994545,
+        "lower": -676.0973757647329,
+        "upper": 316.521863064842,
+        "half_width": 496.30961941478745
+      },
+      "p95_latency_ms_relative_percent": {
+        "n": 3,
+        "mean": -7.98887233203914,
+        "lower": -28.87365208222815,
+        "upper": 12.895907418149871,
+        "half_width": 20.88477975018901
+      },
+      "achieved_request_throughput_absolute": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "achieved_request_throughput_relative_percent": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_gpu_utilization_percent_absolute": {
+        "n": 3,
+        "mean": -1.4076579784456176,
+        "lower": -4.010009928963457,
+        "upper": 1.1946939720722225,
+        "half_width": 2.60235195051784
+      },
+      "mean_gpu_utilization_percent_relative_percent": {
+        "n": 3,
+        "mean": -3.5556457036727855,
+        "lower": -10.15493929791448,
+        "upper": 3.043647890568908,
+        "half_width": 6.5992935942416935
+      },
+      "mean_outer_group_size_per_call_absolute": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_outer_group_size_per_call_relative_percent": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      }
+    },
+    {
+      "comparison": "Proxy minus direct",
+      "treatment": "pass_through",
+      "baseline": "direct",
+      "rate_rps": 1.0,
+      "p95_latency_ms_absolute": {
+        "n": 3,
+        "mean": -450.67357291669333,
+        "lower": -1662.453252867605,
+        "upper": 761.1061070342184,
+        "half_width": 1211.7796799509117
+      },
+      "p95_latency_ms_relative_percent": {
+        "n": 3,
+        "mean": -18.44817376291672,
+        "lower": -64.82857071188359,
+        "upper": 27.932223186050148,
+        "half_width": 46.38039694896687
+      },
+      "achieved_request_throughput_absolute": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "achieved_request_throughput_relative_percent": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_gpu_utilization_percent_absolute": {
+        "n": 3,
+        "mean": 5.061624649859944,
+        "lower": -16.504576753343713,
+        "upper": 26.6278260530636,
+        "half_width": 21.566201403203657
+      },
+      "mean_gpu_utilization_percent_relative_percent": {
+        "n": 3,
+        "mean": 11.791426548743784,
+        "lower": -38.830707259467665,
+        "upper": 62.41356035695524,
+        "half_width": 50.62213380821145
+      },
+      "mean_outer_group_size_per_call_absolute": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_outer_group_size_per_call_relative_percent": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      }
+    },
+    {
+      "comparison": "Proxy minus direct",
+      "treatment": "pass_through",
+      "baseline": "direct",
+      "rate_rps": 1.5,
+      "p95_latency_ms_absolute": {
+        "n": 3,
+        "mean": 162.28173106650334,
+        "lower": -309.43784704076904,
+        "upper": 634.0013091737758,
+        "half_width": 471.7195781072724
+      },
+      "p95_latency_ms_relative_percent": {
+        "n": 3,
+        "mean": 8.049394909273209,
+        "lower": -14.816093805190585,
+        "upper": 30.914883623737005,
+        "half_width": 22.865488714463794
+      },
+      "achieved_request_throughput_absolute": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "achieved_request_throughput_relative_percent": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_gpu_utilization_percent_absolute": {
+        "n": 3,
+        "mean": -1.6254094858282286,
+        "lower": -10.58540049695701,
+        "upper": 7.334581525300553,
+        "half_width": 8.959991011128782
+      },
+      "mean_gpu_utilization_percent_relative_percent": {
+        "n": 3,
+        "mean": -3.1603937813305536,
+        "lower": -21.440781265631067,
+        "upper": 15.119993702969959,
+        "half_width": 18.280387484300512
+      },
+      "mean_outer_group_size_per_call_absolute": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_outer_group_size_per_call_relative_percent": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      }
+    },
+    {
+      "comparison": "Proxy minus direct",
+      "treatment": "pass_through",
+      "baseline": "direct",
+      "rate_rps": 1.8,
+      "p95_latency_ms_absolute": {
+        "n": 3,
+        "mean": 250.58554399999852,
+        "lower": -424.233790325595,
+        "upper": 925.4048783255921,
+        "half_width": 674.8193343255936
+      },
+      "p95_latency_ms_relative_percent": {
+        "n": 3,
+        "mean": 15.013588608616864,
+        "lower": -27.27965553637673,
+        "upper": 57.30683275361046,
+        "half_width": 42.293244144993594
+      },
+      "achieved_request_throughput_absolute": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "achieved_request_throughput_relative_percent": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_gpu_utilization_percent_absolute": {
+        "n": 3,
+        "mean": -3.0818971656459175,
+        "lower": -21.097224933598596,
+        "upper": 14.933430602306762,
+        "half_width": 18.01532776795268
+      },
+      "mean_gpu_utilization_percent_relative_percent": {
+        "n": 3,
+        "mean": -4.991887764662354,
+        "lower": -37.83534727228874,
+        "upper": 27.851571742964037,
+        "half_width": 32.84345950762639
+      },
+      "mean_outer_group_size_per_call_absolute": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_outer_group_size_per_call_relative_percent": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      }
+    },
+    {
+      "comparison": "Fixed minus pass-through",
+      "treatment": "fixed",
+      "baseline": "pass_through",
+      "rate_rps": 0.5,
+      "p95_latency_ms_absolute": {
+        "n": 3,
+        "mean": -122.98873156662656,
+        "lower": -754.1409176881864,
+        "upper": 508.16345455493325,
+        "half_width": 631.1521861215598
+      },
+      "p95_latency_ms_relative_percent": {
+        "n": 3,
+        "mean": -5.727817361989845,
+        "lower": -37.283869610683844,
+        "upper": 25.828234886704156,
+        "half_width": 31.556052248694
+      },
+      "achieved_request_throughput_absolute": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "achieved_request_throughput_relative_percent": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_gpu_utilization_percent_absolute": {
+        "n": 3,
+        "mean": -0.3954802259887013,
+        "lower": -3.460290118808069,
+        "upper": 2.6693296668306665,
+        "half_width": 3.0648098928193677
+      },
+      "mean_gpu_utilization_percent_relative_percent": {
+        "n": 3,
+        "mean": -1.0548241295196217,
+        "lower": -9.032111040681228,
+        "upper": 6.922462781641984,
+        "half_width": 7.977286911161606
+      },
+      "mean_outer_group_size_per_call_absolute": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_outer_group_size_per_call_relative_percent": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      }
+    },
+    {
+      "comparison": "Fixed minus pass-through",
+      "treatment": "fixed",
+      "baseline": "pass_through",
+      "rate_rps": 1.0,
+      "p95_latency_ms_absolute": {
+        "n": 3,
+        "mean": 1509.9683469500178,
+        "lower": 1330.2283142536758,
+        "upper": 1689.7083796463598,
+        "half_width": 179.74003269634196
+      },
+      "p95_latency_ms_relative_percent": {
+        "n": 3,
+        "mean": 82.62474530471572,
+        "lower": 35.35509851462181,
+        "upper": 129.89439209480963,
+        "half_width": 47.26964679009391
+      },
+      "achieved_request_throughput_absolute": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "achieved_request_throughput_relative_percent": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_gpu_utilization_percent_absolute": {
+        "n": 3,
+        "mean": -1.7254901960784323,
+        "lower": -9.049063592883527,
+        "upper": 5.598083200726662,
+        "half_width": 7.323573396805094
+      },
+      "mean_gpu_utilization_percent_relative_percent": {
+        "n": 3,
+        "mean": -2.9827618594047345,
+        "lower": -15.752216114525014,
+        "upper": 9.786692395715546,
+        "half_width": 12.76945425512028
+      },
+      "mean_outer_group_size_per_call_absolute": {
+        "n": 3,
+        "mean": 0.5389900377877018,
+        "lower": 0.2138153209969083,
+        "upper": 0.8641647545784954,
+        "half_width": 0.3251747167907935
+      },
+      "mean_outer_group_size_per_call_relative_percent": {
+        "n": 3,
+        "mean": 53.89900377877018,
+        "lower": 21.38153209969081,
+        "upper": 86.41647545784954,
+        "half_width": 32.51747167907937
+      }
+    },
+    {
+      "comparison": "Fixed minus pass-through",
+      "treatment": "fixed",
+      "baseline": "pass_through",
+      "rate_rps": 1.5,
+      "p95_latency_ms_absolute": {
+        "n": 3,
+        "mean": 1047.148029366852,
+        "lower": 303.1466276871471,
+        "upper": 1791.1494310465569,
+        "half_width": 744.0014016797048
+      },
+      "p95_latency_ms_relative_percent": {
+        "n": 3,
+        "mean": 48.67966097251652,
+        "lower": 8.453869293797375,
+        "upper": 88.90545265123566,
+        "half_width": 40.22579167871915
+      },
+      "achieved_request_throughput_absolute": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "achieved_request_throughput_relative_percent": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_gpu_utilization_percent_absolute": {
+        "n": 3,
+        "mean": 4.010705977306176,
+        "lower": -9.95348655147389,
+        "upper": 17.97489850608624,
+        "half_width": 13.964192528780066
+      },
+      "mean_gpu_utilization_percent_relative_percent": {
+        "n": 3,
+        "mean": 8.76067434672999,
+        "lower": -19.985599651414823,
+        "upper": 37.50694834487481,
+        "half_width": 28.746273998144815
+      },
+      "mean_outer_group_size_per_call_absolute": {
+        "n": 3,
+        "mean": 1.242851766802092,
+        "lower": 0.7672059747778335,
+        "upper": 1.7184975588263505,
+        "half_width": 0.47564579202425855
+      },
+      "mean_outer_group_size_per_call_relative_percent": {
+        "n": 3,
+        "mean": 124.28517668020919,
+        "lower": 76.72059747778333,
+        "upper": 171.84975588263507,
+        "half_width": 47.56457920242586
+      }
+    },
+    {
+      "comparison": "Fixed minus pass-through",
+      "treatment": "fixed",
+      "baseline": "pass_through",
+      "rate_rps": 1.8,
+      "p95_latency_ms_absolute": {
+        "n": 3,
+        "mean": 1369.9462697499694,
+        "lower": 483.71942777512675,
+        "upper": 2256.173111724812,
+        "half_width": 886.2268419748426
+      },
+      "p95_latency_ms_relative_percent": {
+        "n": 3,
+        "mean": 65.11916018445282,
+        "lower": 17.566441553031922,
+        "upper": 112.67187881587373,
+        "half_width": 47.5527186314209
+      },
+      "achieved_request_throughput_absolute": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "achieved_request_throughput_relative_percent": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_gpu_utilization_percent_absolute": {
+        "n": 3,
+        "mean": -0.988795518207283,
+        "lower": -13.18200837294446,
+        "upper": 11.204417336529895,
+        "half_width": 12.193212854737178
+      },
+      "mean_gpu_utilization_percent_relative_percent": {
+        "n": 3,
+        "mean": -1.7043908622544903,
+        "lower": -25.38111674917116,
+        "upper": 21.972335024662176,
+        "half_width": 23.676725886916667
+      },
+      "mean_outer_group_size_per_call_absolute": {
+        "n": 3,
+        "mean": 1.903478260869565,
+        "lower": 1.366467972829995,
+        "upper": 2.4404885489091352,
+        "half_width": 0.53701028803957
+      },
+      "mean_outer_group_size_per_call_relative_percent": {
+        "n": 3,
+        "mean": 190.34782608695653,
+        "lower": 136.64679728299953,
+        "upper": 244.04885489091353,
+        "half_width": 53.701028803957
+      }
+    },
+    {
+      "comparison": "Adaptive minus fixed",
+      "treatment": "adaptive",
+      "baseline": "fixed",
+      "rate_rps": 0.5,
+      "p95_latency_ms_absolute": {
+        "n": 3,
+        "mean": 115.00164938317607,
+        "lower": -696.0773234252754,
+        "upper": 926.0806221916275,
+        "half_width": 811.0789728084515
+      },
+      "p95_latency_ms_relative_percent": {
+        "n": 3,
+        "mean": 7.086600722526512,
+        "lower": -37.87093074468648,
+        "upper": 52.04413218973951,
+        "half_width": 44.957531467212995
+      },
+      "achieved_request_throughput_absolute": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "achieved_request_throughput_relative_percent": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_gpu_utilization_percent_absolute": {
+        "n": 2,
+        "mean": 0.4201324597635683,
+        "lower": -22.792986982284397,
+        "upper": 23.633251901811533,
+        "half_width": 23.213119442047965
+      },
+      "mean_gpu_utilization_percent_relative_percent": {
+        "n": 2,
+        "mean": 1.2148311072674403,
+        "lower": -59.2804503873574,
+        "upper": 61.710112601892284,
+        "half_width": 60.49528149462484
+      },
+      "mean_outer_group_size_per_call_absolute": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_outer_group_size_per_call_relative_percent": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      }
+    },
+    {
+      "comparison": "Adaptive minus fixed",
+      "treatment": "adaptive",
+      "baseline": "fixed",
+      "rate_rps": 1.0,
+      "p95_latency_ms_absolute": {
+        "n": 3,
+        "mean": -649.9802027000518,
+        "lower": -1669.268290685602,
+        "upper": 369.3078852854984,
+        "half_width": 1019.2880879855502
+      },
+      "p95_latency_ms_relative_percent": {
+        "n": 3,
+        "mean": -18.799876078883848,
+        "lower": -44.89926139277042,
+        "upper": 7.2995092350027235,
+        "half_width": 26.09938531388657
+      },
+      "achieved_request_throughput_absolute": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "achieved_request_throughput_relative_percent": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_gpu_utilization_percent_absolute": {
+        "n": 2,
+        "mean": 3.1974789915966397,
+        "lower": -19.70572198283864,
+        "upper": 26.10067996603192,
+        "half_width": 22.90320097443528
+      },
+      "mean_gpu_utilization_percent_relative_percent": {
+        "n": 2,
+        "mean": 6.127872552995811,
+        "lower": -37.1282244489326,
+        "upper": 49.38396955492422,
+        "half_width": 43.25609700192841
+      },
+      "mean_outer_group_size_per_call_absolute": {
+        "n": 3,
+        "mean": -0.2191592780300927,
+        "lower": -0.7644081642141923,
+        "upper": 0.3260896081540069,
+        "half_width": 0.5452488861840996
+      },
+      "mean_outer_group_size_per_call_relative_percent": {
+        "n": 3,
+        "mean": -13.591633478419046,
+        "lower": -45.437310325103745,
+        "upper": 18.25404336826565,
+        "half_width": 31.845676846684697
+      }
+    },
+    {
+      "comparison": "Adaptive minus fixed",
+      "treatment": "adaptive",
+      "baseline": "fixed",
+      "rate_rps": 1.5,
+      "p95_latency_ms_absolute": {
+        "n": 3,
+        "mean": 215.66136571651214,
+        "lower": -1157.353908947061,
+        "upper": 1588.6766403800852,
+        "half_width": 1373.015274663573
+      },
+      "p95_latency_ms_relative_percent": {
+        "n": 3,
+        "mean": 8.022496555613365,
+        "lower": -39.60769794260339,
+        "upper": 55.65269105383012,
+        "half_width": 47.63019449821675
+      },
+      "achieved_request_throughput_absolute": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "achieved_request_throughput_relative_percent": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_gpu_utilization_percent_absolute": {
+        "n": 1,
+        "mean": -8.57142857142857,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_gpu_utilization_percent_relative_percent": {
+        "n": 1,
+        "mean": -14.993385271203877,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_outer_group_size_per_call_absolute": {
+        "n": 3,
+        "mean": -0.02268369957520126,
+        "lower": -0.8864717636944054,
+        "upper": 0.841104364544003,
+        "half_width": 0.8637880641192042
+      },
+      "mean_outer_group_size_per_call_relative_percent": {
+        "n": 3,
+        "mean": -0.08496732026143701,
+        "lower": -40.522958529037766,
+        "upper": 40.3530238885149,
+        "half_width": 40.43799120877633
+      }
+    },
+    {
+      "comparison": "Adaptive minus fixed",
+      "treatment": "adaptive",
+      "baseline": "fixed",
+      "rate_rps": 1.8,
+      "p95_latency_ms_absolute": {
+        "n": 3,
+        "mean": -282.23331516676825,
+        "lower": -994.9895049233887,
+        "upper": 430.52287458985217,
+        "half_width": 712.7561897566204
+      },
+      "p95_latency_ms_relative_percent": {
+        "n": 3,
+        "mean": -7.779959506136763,
+        "lower": -26.13664547487574,
+        "upper": 10.576726462602213,
+        "half_width": 18.356685968738976
+      },
+      "achieved_request_throughput_absolute": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "achieved_request_throughput_relative_percent": {
+        "n": 3,
+        "mean": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "half_width": 0.0
+      },
+      "mean_gpu_utilization_percent_absolute": {
+        "n": 1,
+        "mean": 0.529411764705884,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_gpu_utilization_percent_relative_percent": {
+        "n": 1,
+        "mean": 1.036695738028636,
+        "lower": null,
+        "upper": null,
+        "half_width": null
+      },
+      "mean_outer_group_size_per_call_absolute": {
+        "n": 3,
+        "mean": -0.1561098398169336,
+        "lower": -0.7481462743086738,
+        "upper": 0.43592659467480654,
+        "half_width": 0.5920364344917401
+      },
+      "mean_outer_group_size_per_call_relative_percent": {
+        "n": 3,
+        "mean": -5.021929824561402,
+        "lower": -23.869846046091133,
+        "upper": 13.825986396968327,
+        "half_width": 18.84791622152973
+      }
+    }
+  ]
+}

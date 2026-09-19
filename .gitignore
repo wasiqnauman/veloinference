@@ -16,7 +16,8 @@ tmp/
 results/raw/
 results/system/
 results/system/runtime/
-results/summaries/generated/
+results/summaries/generated/*
+!results/summaries/generated/exp003-analysis.json
 results/figures/generated/
 
 paper/*.aux

@@ -188,6 +188,8 @@ def test_complete_matrix_generates_all_publication_artifacts(tmp_path) -> None:
     payload = json.loads(summary_path.read_text(encoding="utf-8"))
     assert payload["completed_run_count"] == 48
     assert payload["excluded_run_count"] == 0
+    assert payload["occupancy_fit"]["n"] == 24
+    assert payload["occupancy_fit"]["r_squared"] is None
     assert len(payload["aggregates"]) == 16
     assert len(payload["paired_effects"]) == 12
     assert {path.name for path in figure_dir.iterdir()} == {
@@ -203,3 +205,6 @@ def test_complete_matrix_generates_all_publication_artifacts(tmp_path) -> None:
     assert "Direct vLLM" in (table_dir / "primary_results.tex").read_text(
         encoding="utf-8"
     )
+    table_text = (table_dir / "primary_results.tex").read_text(encoding="utf-8")
+    assert "Queue delay" in table_text
+    assert "GPU util." not in table_text
