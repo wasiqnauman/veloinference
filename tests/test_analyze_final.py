@@ -2,14 +2,25 @@
 
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from bench.analyze_final import (
+    MODES,
+    RATES,
+    REPETITIONS,
     RunResult,
     aggregate_runs,
+    load_terminal_matrix,
     mean_ci95,
     paired_effects,
     parse_run_id,
+    plot_mechanism,
+    plot_overview,
+    write_analysis_json,
+    write_effect_table,
+    write_primary_table,
 )
 
 
@@ -84,4 +95,59 @@ def test_paired_effects_pair_matching_repetition_seeds() -> None:
     assert effect["p95_latency_ms_absolute"]["mean"] == 10.0  # type: ignore[index]
     assert effect["p95_latency_ms_relative_percent"]["mean"] == pytest.approx(
         9.804549844
+    )
+
+
+def test_complete_matrix_generates_all_publication_artifacts(tmp_path) -> None:
+    raw_root = tmp_path / "raw"
+    for mode_index, mode in enumerate(MODES):
+        for rate in RATES:
+            for repetition in REPETITIONS:
+                run = _run(
+                    mode,
+                    rate,
+                    repetition,
+                    p95=100.0 + 10.0 * mode_index + rate + repetition,
+                )
+                run_dir = raw_root / mode / run.run_id
+                run_dir.mkdir(parents=True)
+                (run_dir / "manifest.json").write_text(
+                    json.dumps({"run_id": run.run_id, "status": "complete"}),
+                    encoding="utf-8",
+                )
+                (run_dir / "summary.json").write_text(
+                    json.dumps({"run_id": run.run_id, **run.summary}),
+                    encoding="utf-8",
+                )
+
+    runs, excluded = load_terminal_matrix(raw_root)
+    aggregates = aggregate_runs(runs)
+    effects = paired_effects(runs)
+    summary_path = tmp_path / "summary.json"
+    figure_dir = tmp_path / "figures"
+    table_dir = tmp_path / "tables"
+
+    write_analysis_json(summary_path, runs, excluded, aggregates, effects)
+    plot_overview(runs, aggregates, figure_dir)
+    plot_mechanism(aggregates, effects, figure_dir)
+    write_primary_table(aggregates, table_dir / "primary_results.tex")
+    write_effect_table(effects, table_dir / "paired_effects.tex")
+
+    payload = json.loads(summary_path.read_text(encoding="utf-8"))
+    assert payload["completed_run_count"] == 48
+    assert payload["excluded_run_count"] == 0
+    assert len(payload["aggregates"]) == 16
+    assert len(payload["paired_effects"]) == 12
+    assert {path.name for path in figure_dir.iterdir()} == {
+        "mechanism_effects.pdf",
+        "mechanism_effects.png",
+        "primary_overview.pdf",
+        "primary_overview.png",
+    }
+    assert {path.name for path in table_dir.iterdir()} == {
+        "paired_effects.tex",
+        "primary_results.tex",
+    }
+    assert "Direct vLLM" in (table_dir / "primary_results.tex").read_text(
+        encoding="utf-8"
     )

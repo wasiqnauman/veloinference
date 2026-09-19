@@ -2148,5 +2148,62 @@ result macros, and rebuild and inspect the final PDF.
 
 ## Next task
 
+ANA-001-E2E-GATE — Exercise the full publication artifact pipeline with a
+synthetic complete matrix before using final experiment data.
+
+### ANA-001-E2E-GATE — Verify the publication artifact pipeline end to end
+
+Status: complete
+
+Date: 2026-09-19 05:26 -04:00
+
+Commit: 7215a1f (tracker checkpoint)
+
+Files changed:
+
+- `tests/test_analyze_final.py`
+- `docs/PROGRESS.md`
+
+Functional summary:
+
+- Added a synthetic 48-condition integration test that writes terminal
+  manifests and summaries, reloads the matrix, computes aggregate and paired
+  statistics, and generates the analysis JSON, both figure formats, and both
+  LaTeX tables.
+- The test asserts the exact run, aggregate, effect, figure, and table counts,
+  and checks that publication-facing table content is present.
+- No experiment configuration, metric, statistical formula, or live result
+  artifact changed.
+
+Commands run:
+
+~~~text
+uv run --group research ruff check bench/analyze_final.py tests/test_analyze_final.py
+uv run --group research pytest -q tests/test_analyze_final.py --basetemp tmp/pytest-analysis
+uv run --group research ruff check .
+uv run --group research pytest -q --basetemp tmp/pytest-full
+~~~
+
+Observed result:
+
+- Focused analysis suite: 5 passed.
+- Repository-wide Ruff: passed.
+- Repository-wide test suite: 88 passed; only dependency deprecation and the
+  pre-existing inaccessible `.pytest_cache` warning remain.
+- EXP-003 remained healthy at 28 complete conditions with
+  `fixed-rate-0p5-rep-2` active during this gate.
+
+Current status:
+
+The final analyzer has now been exercised through every file format the paper
+will consume. The live matrix remains the only source of final numbers.
+
+Exact next action:
+
+Let EXP-003 reach 48 terminal conditions, audit statuses and exclusions, stop
+the vLLM process cleanly, and run the analyzer against the immutable raw tree.
+
+## Next task
+
 EXP-003-FINALIZE — Let the frozen primary matrix reach 48 terminal conditions,
 then verify manifests, exclusions, summaries, and process shutdown.
