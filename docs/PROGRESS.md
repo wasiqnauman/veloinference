@@ -2940,3 +2940,57 @@ through their arXiv account and inspect arXiv's generated preview.
 ## Next task
 
 SUBMIT-001 — Confirm author metadata and complete the arXiv account submission.
+
+### TITLE-001 — Replace the manuscript title and re-audit the release package
+
+Status: complete
+
+Date: 2026-09-19
+
+Commit message: `paper: sharpen manuscript title`
+
+Files changed:
+
+- `paper/main.tex`: replaces the descriptive working title with the
+  result-forward title, "When Batching Backfires: The Hidden Cost of Adding a
+  Gateway to Continuous LLM Serving."
+- `paper/ARXIV_SUBMISSION.md`: records the rebuilt v2 source archive and its
+  new checksum.
+- `docs/PROGRESS.md`: records title verification and the next writing task.
+
+Verification:
+
+- Rebuilt the paper with LuaLaTeX, BibTeX, and two final LuaLaTeX passes.
+- The paper remains 12 letter-size pages; the generated PDF is 320,902 bytes.
+- The final log scan found no LaTeX/package warning, box warning, undefined
+  citation, or undefined reference.
+- Rendered and visually inspected page 1. The two-line title is centered,
+  legible, unclipped, and does not disturb the abstract or introduction.
+- Rebuilt the source in `tmp/arxiv-source-20260919-title-v2` and independently
+  obtained the same 12-page PDF with a clean warning scan.
+- New source archive:
+  `dist/veloinference-arxiv-source-2026-09-19-v2.zip`.
+- Archive size: 77,026 bytes.
+- Archive SHA-256:
+  `89b2570e347157dea971b462237927e1dd33ace28dcbf9f973e97557548c1ddd`.
+
+Simple summary:
+
+The title now begins with the surprising result instead of the implementation
+setup. It invites a systems professor to ask why batching became harmful, while
+the subtitle still says exactly which architectural decision the paper tests.
+
+Current status:
+
+The new title is fully propagated into a verified PDF and v2 arXiv source
+archive. The next task is to create a complete reader and interview manual;
+the scientific claims and experiment results have not changed.
+
+Exact next action:
+
+Write a self-contained manual that teaches the paper from first principles and
+provides concise, evidence-bounded answers to likely faculty questions.
+
+## Next task
+
+MANUAL-001 — Create the paper understanding and faculty-question manual.
