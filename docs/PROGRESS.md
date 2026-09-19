@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: EXP-003 running; 22 conditions complete and pass-through repetition 3 resumed
-Last updated: 2026-09-19 05:04 -04:00
+Status: EXP-003 running; 24 conditions complete and fixed repetition 1 started
+Last updated: 2026-09-19 05:11 -04:00
 Current branch: main
-Current commit before this tracker: d71af67
+Current commit before this tracker: e3d1f0c
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -1943,6 +1943,59 @@ Exact next action:
 Monitor sessions `9030` and `44899` until all 48 conditions are terminal.
 Record every harness-invalid condition and do not include it in performance
 claims.
+
+### ANA-001-TOOLING — Add reproducible run-level final analysis
+
+Status: complete  
+Date: 2026-09-19 05:11 -04:00  
+Commit: e3d1f0c (tracker checkpoint)
+
+Files changed:
+
+- `bench/analyze_final.py`
+- `tests/test_analyze_final.py`
+- `docs/PROGRESS.md`
+
+Functional summary:
+
+- Validates that all 48 declared conditions are terminal before analysis.
+- Keeps harness-invalid conditions in explicit exclusion accounting.
+- Aggregates metrics across runs, not requests, using two-sided 95 percent
+  Student-t intervals.
+- Computes paired effects by shared repetition seed for proxy minus direct,
+  fixed minus pass-through, and adaptive minus fixed.
+- Generates two publication figures, a machine-readable JSON artifact, and
+  complete LaTeX result/effect tables.
+
+Commands run:
+
+~~~text
+uv run --group research ruff check bench/analyze_final.py tests/test_analyze_final.py
+uv run --group research pytest -q tests/test_analyze_final.py
+uv run --group research ruff check .
+uv run --group research pytest -q
+~~~
+
+Observed result:
+
+- Focused lint and analysis tests passed: 4 passed.
+- Repository-wide Ruff passed.
+- The Windows full test run reached 74 passed and 13 setup errors because
+  pytest cannot access `C:\\Users\\Wasiq\\AppData\\Local\\Temp\\pytest-of-Wasiq`.
+  No test assertion failed. The authoritative WSL full gate remains required
+  after the live matrix finishes.
+- During this work, pass-through mode completed all 12 conditions. The matrix
+  now has 24 complete conditions and fixed repetition 1 at 0.5 rps is active.
+
+Current status:
+
+The analysis implementation is complete but has not been run on final data;
+it intentionally rejects the still-running matrix.
+
+Exact next action:
+
+Continue EXP-003 to 48 terminal conditions. Then run the WSL quality gate and
+execute `python -m bench.analyze_final` against the immutable final tree.
 
 ## Remaining task sequence
 
