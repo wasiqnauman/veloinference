@@ -1,9 +1,9 @@
 # ADIP Project Progress Tracker
 
-Status: EXP-003 running; 16 conditions complete, pass-through repetition 2 at 0.5 rps
-Last updated: 2026-09-15 08:36 -04:00
+Status: EXP-003 recovery complete; 22 conditions complete and safe resume pending
+Last updated: 2026-09-19 05:00 -04:00
 Current branch: main
-Current commit before this tracker: 19c7071
+Current commit before this tracker: 27460c4
 Primary execution target: local Windows machine, RTX 3060 12 GB  
 Storage target: C: drive  
 
@@ -1850,6 +1850,56 @@ Continue monitoring the same sessions until all gateway modes and repetitions
 reach terminal status. Do not stop the server or change the configuration
 unless a new terminal failure requires recovery.
 
+### EXP-003-RECOVERY-2 — Archive the interrupted pass-through condition
+
+Status: complete  
+Date: 2026-09-19 05:00 -04:00  
+Commit: 27460c4 (tracker checkpoint)
+
+Files changed:
+
+- `docs/PROGRESS.md`
+- WSL-only ignored artifact move from
+  `results/raw/exp003-primary-final/pass_through/pass_through-rate-1p5-rep-3`
+  to
+  `results/raw/exp003-primary-final-interrupted/pass_through/2026-09-19/pass_through-rate-1p5-rep-3`
+
+Commands run:
+
+~~~text
+inspect all final manifests, summaries, ports, and processes
+verify the exact incomplete directory
+move only pass_through-rate-1p5-rep-3 into the interrupted archive
+~~~
+
+Observed result:
+
+- The earlier runner and vLLM processes were no longer active after the host
+  had been left idle.
+- The final tree contained 22 complete conditions and one incomplete
+  `started` manifest for pass-through repetition 3 at 1.5 rps.
+- The incomplete directory contained only `manifest.json` and no request
+  records or summary, so it cannot support a result.
+- The directory was preserved in the dated interrupted-artifact tree rather
+  than deleted.
+
+Verification:
+
+- source directory resolved inside the expected experiment tree: pass
+- archived manifest exists at the exact dated destination: pass
+- no process was listening on ports 8000 or 8001: pass
+
+Current status:
+
+Twenty-two of 48 primary conditions are complete. The live output tree has no
+incomplete run directory and is safe for the committed resume logic.
+
+Exact next action:
+
+Start vLLM with the recorded environment and command, then run
+`python -m bench.final --config configs/experiments/primary_final.toml` from
+the WSL execution checkout. Verify that the first 22 conditions are reused.
+
 ## Remaining task sequence
 
 The remaining tasks are defined in docs/RESEARCH_TO_ARXIV_DESIGN.md:
@@ -1921,5 +1971,5 @@ agent should execute.
 
 ## Next task
 
-EXP-003-RUN-RETRY-CONTINUE — Monitor the active safe-resume primary matrix,
-then verify all 48 conditions after completion.
+EXP-003-RUN-RESUME-2 — Restart the safe-resume primary matrix from 22 complete
+conditions, then verify all 48 conditions after completion.
