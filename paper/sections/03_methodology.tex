@@ -1,0 +1,106 @@
+\section{Research Questions and Methodology}
+\label{sec:methodology}
+
+\subsection{Research questions}
+
+We organize the evaluation around three questions.
+
+\begin{description}[leftmargin=3.2em,style=nextline]
+  \item[RQ1: Layering cost.] What latency and utilization change is introduced
+        by a pass-through gateway relative to direct \vllm{}?
+  \item[RQ2: Outer batching.] At matched offered load, does fixed gateway
+        batching improve throughput or latency after accounting for queue time
+        and the backend's own continuous batching?
+  \item[RQ3: Adaptation.] Does a frozen low-load bypass policy avoid harmful
+        waiting while preserving useful backlog coalescing?
+\end{description}
+
+For RQ2 and RQ3, the confirmatory comparison is paired by repetition seed.
+The null is zero mean paired difference. We report effect direction and 95\%
+Student-$t$ intervals over three run-level differences; we do not label a
+difference statistically significant from request counts within a run.
+
+\subsection{Testbed}
+
+All measurements run locally in WSL2 Ubuntu on a Windows host with an
+\gpu{}. The backend is \vllm{} 0.29.0 in eager mode with float16 weights,
+maximum model length 2,048, GPU-memory utilization 0.85, and at most eight
+sequences. The model is \model{} at immutable revision
+\texttt{989aa7980e4cf806f80c7fef2b1adb7bc71aa306}
+\citep{qwen2025technical}. Generation is deterministic
+($T=0$) with at most 64 output tokens. Direct traffic targets port 8001;
+gateway modes target \adip{} on port 8000, which forwards to the same backend.
+
+\begin{table}[t]
+  \centering
+  \small
+  \caption{Frozen primary experiment. Every cell has three run-level
+  repetitions.}
+  \label{tab:experiment}
+  \begin{tabular}{ll}
+    \toprule
+    Factor & Value \\
+    \midrule
+    GPU & NVIDIA RTX 3060, 12\,GB \\
+    Model & Qwen2.5-1.5B-Instruct, float16 \\
+    Backend & vLLM 0.29.0, eager execution \\
+    Modes & direct, pass-through, fixed, adaptive \\
+    Offered rates & 0.5, 1.0, 1.5, 1.8 requests/s \\
+    Prompt bucket & 8--128 tokenizer-derived input tokens \\
+    Output cap & 64 tokens \\
+    Warmup & 50 sequential requests per condition \\
+    Measurement & 120 seconds, open loop \\
+    Repetitions & seeds 1729, 2718, 3141 \\
+    Fixed policy & max batch 8, max wait 1\,ms \\
+    Adaptive policy & max batch 8, max wait 20\,ms \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Workload and controls}
+
+The workload is synthetic and length controlled, not a production trace. Four
+project-authored seed passages are expanded deterministically until they fall
+inside the 8--128 token bucket under the exact model tokenizer. All requests
+use the same model, output cap, and temperature, making them compatible for
+gateway batching. The benchmark generates the complete constant-rate arrival
+schedule before execution. Each request sleeps until an absolute target time;
+later requests do not wait for earlier completions. This open-loop design
+avoids coordinated omission when the system slows down.
+
+Fifty warmup requests precede each measured interval. Warmups are excluded
+from every aggregate. A five-second cooldown separates conditions. The final
+matrix contains $4\times4\times3=48$ conditions and 5,760 seconds of measured
+traffic, excluding warmup and cooldown. The fixed 1\,ms comparator and adaptive
+parameters were frozen from calibration and pilot data before the final matrix.
+
+\subsection{Validity gate and failure accounting}
+
+Host scheduling can invalidate an open-loop experiment even when the server
+returns success. We therefore record target and actual arrival time for every
+request. A condition is marked \texttt{invalid\_harness} when more than 1\%
+of measured requests arrive over 50\,ms late. The raw records remain stored,
+but the condition is excluded from performance claims. Ordinary incomplete
+directories are rejected by the resume logic rather than appended to. Request
+failures remain in the denominator and are never converted to zero latency.
+
+\subsection{Metrics and uncertainty}
+
+The request is the latency observation unit; the run is the replication unit.
+For each run we compute achieved requests/s, output tokens/s, success and
+failure counts, p50/p95/p99 end-to-end latency, mean and p95 gateway queue time,
+mean backend time, mean batch size, GPU utilization, peak VRAM, power, and p95
+arrival drift. We then average the three run-level values for each condition
+and report a two-sided 95\% Student-$t$ interval. With only three repetitions,
+these intervals are necessarily wide; figures show each run point to prevent
+the mean from hiding instability.
+
+The primary effects are paired by rate and seed:
+\begin{align}
+  \Delta_{\mathrm{proxy}} &= M_{\mathrm{pass}}-M_{\mathrm{direct}},\\
+  \Delta_{\mathrm{fixed}} &= M_{\mathrm{fixed}}-M_{\mathrm{pass}},\\
+  \Delta_{\mathrm{adaptive}} &= M_{\mathrm{adaptive}}-M_{\mathrm{fixed}},
+\end{align}
+for metric $M$. Absolute and relative deltas are both retained. We interpret
+throughput separately from goodput and offered load separately from achieved
+load.

@@ -1,0 +1,89 @@
+\section{ADIP Design}
+\label{sec:design}
+
+\subsection{Two scheduling layers}
+
+Figure~\ref{fig:architecture} shows the paths under comparison. Direct mode
+sends one OpenAI-compatible completion per client request. Pass-through adds
+HTTP translation and telemetry but calls the backend once per request. Fixed
+and adaptive modes place requests in compatibility-keyed queues and send one
+backend prompt list per outer batch. In every mode, \vllm{} retains control of
+its token-level continuous scheduler.
+
+\begin{figure}[t]
+  \centering
+  \begin{tikzpicture}[
+    node distance=10mm,
+    box/.style={draw,rounded corners,align=center,minimum height=8mm,minimum width=24mm,font=\small},
+    sched/.style={box,fill=orange!12},
+    engine/.style={box,fill=blue!10},
+    arrow/.style={-{Latex[length=2mm]},thick}
+  ]
+    \node[box] (client) {Open-loop\\client};
+    \node[sched,right=of client] (gateway) {ADIP\\outer scheduler};
+    \node[engine,right=of gateway] (vllm) {vLLM\\inner scheduler};
+    \node[box,right=of vllm] (gpu) {RTX 3060\\GPU};
+    \draw[arrow] (client) -- (gateway);
+    \draw[arrow] (gateway) -- (vllm);
+    \draw[arrow] (vllm) -- (gpu);
+    \draw[arrow,bend right=28] (client.south) to node[below,font=\scriptsize]{direct mode} (vllm.south);
+  \end{tikzpicture}
+  \caption{The experimental boundary. Gateway batching controls when and in
+  what HTTP grouping prompts become visible; \vllm{} independently controls
+  token-level GPU scheduling.}
+  \label{fig:architecture}
+\end{figure}
+
+\subsection{Compatibility and queue discipline}
+
+A batch key consists of model identifier, output-token cap, and temperature.
+Only equal keys share a backend request. The ingress queue is bounded; a full
+queue rejects before creating unresolved work. One coordinator drains ingress
+into per-key FIFO queues, selects the oldest compatible queue, obtains a pure
+policy decision, and awaits one backend batch. This simple coordinator makes
+the mechanism measurable, but it is intentionally serial: arrivals during a
+backend call accumulate until that call returns. Section~\ref{sec:mechanism-model}
+predicts that this occupancy-driven backlog can dominate the nominal
+micro-wait.
+
+\subsection{Fixed batch closure}
+
+For the oldest compatible queue, the fixed policy dispatches when (i) the batch
+reaches eight requests, (ii) the oldest request reaches the 1\,ms window, or
+(iii) further waiting would consume estimated service slack before the earliest
+soft deadline. Otherwise it waits only for the remaining window. Policy code
+does not perform I/O or sleep; the coordinator owns timing and queue mutation.
+
+\subsection{Adaptive closure}
+
+The adaptive policy was frozen before final evaluation. It maintains
+exponentially weighted moving averages of compatible arrival rate $\hat\lambda$
+and backend time $\hat S$ with smoothing factor 0.2. For remaining window
+$w_r$, it computes expected companions $\hat\lambda w_r$. If this value is
+below 1.0, it dispatches immediately. Otherwise it waits for the minimum of
+the remaining 20\,ms cap, estimated time to fill the batch,
+\begin{equation}
+  t_{\mathrm{fill}}=
+  \frac{B_{\max}-B_{\mathrm{queue}}}{\hat\lambda},
+\end{equation}
+and positive deadline slack after reserving $\hat S$. Full queues, expired
+windows, and exhausted slack dispatch immediately. Importantly, low-load
+bypass does not split requests already accumulated during an in-flight backend
+call; it closes the existing backlog without adding intentional wait.
+
+\subsection{Instrumentation and failure semantics}
+
+Every accepted request receives a UUID and optional experiment identifier.
+Structured events record enqueue, policy reason, batch dispatch, backend
+completion, and request completion without prompt text or credentials. The
+response carries batch ID, batch size, queue time, backend time, total gateway
+time, and deadline outcome. Backend failures resolve every future in the
+affected batch. Cancellation and shutdown settle queued and in-flight futures
+exactly once, preventing a successful test run from hiding leaked asynchronous
+work.
+
+The benchmark writes request JSONL as each request completes, while a separate
+sampler records GPU utilization, VRAM, power, and temperature through
+\texttt{nvidia-smi}. A manifest created before traffic binds the run to the
+Git commit, model revision, mode, rate, seed, and frozen parameters. Atomic
+summary writes occur only after traffic and validity checks complete.

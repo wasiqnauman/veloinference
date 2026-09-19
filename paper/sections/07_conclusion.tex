@@ -1,0 +1,16 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+Gateway micro-batching in front of a continuously batching LLM engine is not a
+free second optimization. It is a second scheduler with less information and
+its own queue. This paper separates two mechanisms that are easy to conflate:
+companions found during an intentional micro-window and backlog accumulated
+while a serial outer worker awaits the backend. \adip{} turns that distinction
+into a falsifiable, request-level experiment on commodity hardware.
+
+\PrimaryFinding\ \AdaptiveFinding
+Within the tested scope, the practical conclusion follows the full
+throughput--latency decomposition, not batch size alone. The artifact and
+methodology make that conclusion auditable and provide a base for bursty,
+heterogeneous, and larger-model validation without changing the frozen primary
+hypothesis.

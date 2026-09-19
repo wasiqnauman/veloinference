@@ -11,6 +11,7 @@ htmlcov/
 dist/
 build/
 .uv-cache/
+tmp/
 
 results/raw/
 results/system/

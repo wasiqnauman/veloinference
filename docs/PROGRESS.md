@@ -2068,5 +2068,85 @@ agent should execute.
 
 ## Next task
 
-EXP-003-RUN-RESUME-2 — Restart the safe-resume primary matrix from 22 complete
-conditions, then verify all 48 conditions after completion.
+PAPER-001-HYPOTHESIS-DRAFT — Replace the paper scaffold with a technically
+grounded, hypothesis-driven manuscript while EXP-003 continues unchanged.
+
+### PAPER-001-HYPOTHESIS-DRAFT — Establish the full manuscript argument
+
+Status: complete
+
+Date: 2026-09-19 05:23 -04:00
+
+Commit: a42b02f (tracker checkpoint)
+
+Files changed:
+
+- `paper/main.tex`
+- `paper/macros.tex`
+- `paper/references.bib`
+- `paper/README.md`
+- `paper/sections/01_introduction.tex`
+- `paper/sections/02_background.tex`
+- `paper/sections/03_methodology.tex`
+- `paper/sections/04_design.tex`
+- `paper/sections/05_evaluation.tex`
+- `paper/sections/06_discussion.tex`
+- `paper/sections/07_conclusion.tex`
+- `.gitignore`
+- `docs/PROGRESS.md`
+
+Functional summary:
+
+- Reframed the paper around a falsifiable systems hypothesis: gateway batching
+  is useful only when backend-time savings exceed added queueing delay and the
+  loss of vLLM scheduling freedom.
+- Derived the low-load mechanism from the arrival process and distinguished
+  batching caused by the configured wait window from batching caused by
+  backlog behind the gateway's serialized worker.
+- Defined three causal comparisons: direct versus pass-through, fixed versus
+  pass-through, and adaptive versus fixed.
+- Documented the exact 48-condition open-loop matrix, run-level statistical
+  estimands, validity gates, instrumentation, policy algorithms, threats, and
+  reproducibility boundary.
+- Added primary literature for continuous LLM serving, inference systems,
+  disaggregated serving, traces, and the evaluated model family.
+- Kept four explicit result macros so no partial measurement can silently
+  become a paper claim.
+
+Commands run:
+
+~~~text
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+bibtex main
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+lualatex -interaction=nonstopmode -halt-on-error main.tex
+pdftoppm -png -r 110 main.pdf ../tmp/pdfs/paper-draft
+~~~
+
+Observed result:
+
+- The draft builds to an eight-page PDF, 186178 bytes before final generated
+  figures and tables are inserted.
+- The final LaTeX log contains no overfull box, underfull box, undefined
+  reference, or warning match.
+- All pages were rendered and inspected. The architecture figure was simplified
+  after the first visual pass; the corrected figure has no overlapping labels.
+- EXP-003 continued unchanged during writing and reached 27 complete
+  conditions, with `fixed-rate-1p8-rep-1` running at this checkpoint.
+
+Current status:
+
+The manuscript now has a clear technical thesis and complete argument, but its
+headline result macros remain intentionally unresolved. It is not yet valid to
+call the paper final or submission-ready.
+
+Exact next action:
+
+Continue monitoring EXP-003 without changing its configuration. At 48 terminal
+conditions, run the final analyzer, audit every result claim, replace the four
+result macros, and rebuild and inspect the final PDF.
+
+## Next task
+
+EXP-003-FINALIZE — Let the frozen primary matrix reach 48 terminal conditions,
+then verify manifests, exclusions, summaries, and process shutdown.

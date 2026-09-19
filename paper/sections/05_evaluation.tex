@@ -1,0 +1,78 @@
+\section{Evaluation}
+\label{sec:evaluation}
+
+The final evaluation is populated by the claim-audited output of
+\texttt{python -m bench.analyze\_final}. The script refuses to run until all
+48 declared conditions are terminal and keeps any harness-invalid condition in
+explicit exclusion accounting. This section is organized by research question
+rather than by implementation component.
+
+\subsection{RQ1: What does the pass-through layer cost?}
+
+\ProxyFinding
+
+\IfFileExists{figures/primary_overview.pdf}{
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=0.96\textwidth]{figures/primary_overview.pdf}
+  \caption{Primary matrix on \model{} and one \gpu{}. Lines show means across
+  three run-level repetitions; error bars are two-sided 95\% Student-$t$
+  intervals; translucent points are individual repetitions. Offered load is
+  fixed by the open-loop schedule.}
+  \label{fig:overview}
+\end{figure*}
+}{}
+
+\subsection{RQ2: Does fixed outer batching help?}
+
+\PrimaryFinding
+
+\IfFileExists{tables/primary_results.tex}{
+\begin{table*}[t]
+  \centering
+  \small
+  \caption{All primary conditions. Values are run-level mean $\pm$ 95\%
+  Student-$t$ half-width over three repetitions. Throughput is achieved
+  successful requests/s.}
+  \label{tab:primary}
+  \resizebox{\textwidth}{!}{\input{tables/primary_results}}
+\end{table*}
+}{}
+
+\IfFileExists{figures/mechanism_effects.pdf}{
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=0.96\textwidth]{figures/mechanism_effects.pdf}
+  \caption{Mechanism accounting for \model{} on one \gpu{}. Panel A separates
+  gateway queue and backend time for gateway modes. Hatching denotes queue
+  time stacked above backend time. Panel B shows paired p95-latency effects by
+  repetition seed; error bars are 95\% Student-$t$ intervals over the three
+  paired differences.}
+  \label{fig:mechanism}
+\end{figure*}
+}{}
+
+\subsection{RQ3: Does the frozen adaptive policy help?}
+
+\AdaptiveFinding
+
+\IfFileExists{tables/paired_effects.tex}{
+\begin{table}[t]
+  \centering
+  \scriptsize
+  \caption{Paired p95-latency effects. Positive values mean the treatment is
+  slower than its comparator. Values are mean $\pm$ 95\% Student-$t$
+  half-width across shared repetition seeds.}
+  \label{tab:effects}
+  \resizebox{\columnwidth}{!}{\input{tables/paired_effects}}
+\end{table}
+}{}
+
+\subsection{Validity and negative-result accounting}
+
+The final paper reports the exact number of complete, harness-invalid, failed,
+and interrupted runs. Interrupted attempts are operational history, not
+samples. Any harness-invalid terminal condition remains visible with its
+predeclared reason but contributes to no performance mean. If fewer than three
+valid repetitions remain for a condition, we report the reduced $n$ and avoid
+a confirmatory claim for that comparison.
