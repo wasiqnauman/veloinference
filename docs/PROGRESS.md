@@ -2267,5 +2267,60 @@ the vLLM process cleanly, and run the analyzer against the immutable raw tree.
 
 ## Next task
 
+ANA-001-METRIC-LABEL — Distinguish outer HTTP grouping from vLLM's internal
+continuous batch in every publication-facing artifact.
+
+### ANA-001-METRIC-LABEL — Remove ambiguity from the batch metric
+
+Status: complete
+
+Date: 2026-09-19 05:32 -04:00
+
+Commit: 54d30be (tracker checkpoint)
+
+Files changed:
+
+- `bench/analyze_final.py`
+- `paper/sections/05_evaluation.tex`
+- `docs/PROGRESS.md`
+
+Functional summary:
+
+- Renamed the batch-size plot panel to `Outer request grouping` and its axis to
+  `prompts per backend HTTP call`.
+- Renamed the table column to `Outer group`.
+- Added an explicit figure-caption statement that this metric is not vLLM's
+  token-level active set.
+- No stored metric, calculation, experiment condition, or statistical result
+  changed.
+
+Commands run:
+
+~~~text
+uv run --group research ruff check bench/analyze_final.py tests/test_analyze_final.py
+uv run --group research pytest -q tests/test_analyze_final.py --basetemp tmp/pytest-labels
+git diff --check
+~~~
+
+Observed result:
+
+- Focused Ruff: passed.
+- Analysis tests: 5 passed.
+- Diff whitespace check: passed.
+- EXP-003 remained at 30 complete conditions with
+  `fixed-rate-1p5-rep-2` active during the check.
+
+Current status:
+
+Publication artifacts now preserve the paper's distinction between the outer
+HTTP scheduler and the backend's unobserved token-level schedule.
+
+Exact next action:
+
+Let EXP-003 reach 48 terminal conditions, audit statuses and exclusions, stop
+the vLLM process cleanly, and run the analyzer against the immutable raw tree.
+
+## Next task
+
 EXP-003-FINALIZE — Let the frozen primary matrix reach 48 terminal conditions,
 then verify manifests, exclusions, summaries, and process shutdown.

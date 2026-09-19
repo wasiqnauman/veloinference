@@ -18,7 +18,8 @@ rather than by implementation component.
   \caption{Primary matrix on \model{} and one \gpu{}. Lines show means across
   three run-level repetitions; error bars are two-sided 95\% Student-$t$
   intervals; translucent points are individual repetitions. Offered load is
-  fixed by the open-loop schedule.}
+  fixed by the open-loop schedule. Outer request grouping is the number of
+  prompts per backend HTTP call, not \vllm{}'s token-level active set.}
   \label{fig:overview}
 \end{figure*}
 }{}
