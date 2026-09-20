@@ -2994,3 +2994,59 @@ provides concise, evidence-bounded answers to likely faculty questions.
 ## Next task
 
 MANUAL-001 — Create the paper understanding and faculty-question manual.
+
+### MANUAL-001 — Create the paper understanding and faculty-question manual
+
+Status: complete
+
+Date: 2026-09-19
+
+Commit message: `docs: add paper defense manual`
+
+Files changed:
+
+- `docs/PAPER_DEFENSE_MANUAL.md`: self-contained explanation, presentation
+  scripts, mathematical intuition, experimental design, exact results,
+  limitations, code map, 52 faculty questions and answers, hard-question
+  responses, number sheet, and readiness checklist.
+- `README.md`: adds the manual to the project-document index.
+- `docs/PROGRESS.md`: records the manual verification and handoff.
+
+Verification:
+
+- The manual contains 1,216 lines and 7,858 words.
+- All 52 numbered faculty questions have written answers.
+- Required facts were checked against the paper and claim ledger: 48
+  conditions, 6,912 requests, all three resolved fixed-batching penalties,
+  555.6 ms minimum scheduled gap, 0.86% occupancy MAPE, descriptive
+  R-squared 0.9985, incomplete GPU telemetry, and 89 passing tests.
+- The manual explicitly separates p95 from a 95% confidence interval,
+  request observations from run-level replication, completion rate from
+  capacity, mechanism consistency from causality, and unresolved effects from
+  equivalence.
+- No TODO, TBD, placeholder, or unfinished insertion remains.
+
+Simple summary:
+
+The manual teaches the paper from first principles and prepares the author to
+defend both the result and its limitations. It includes short speaking scripts,
+the exact numbers worth memorizing, likely challenges from systems and
+statistics faculty, and safe answers that do not overstate the evidence.
+
+Current status:
+
+The requested title revision and complete defense manual are finished. The
+paper remains technically ready for arXiv packaging. Submission still requires
+the user's confirmed public author metadata, category, license, and arXiv
+account action.
+
+Exact next action:
+
+The user should read the 30-second and two-minute scripts, attempt the 12-item
+self-test without notes, and then request a mock faculty interview if practice
+is needed. Any manuscript change after this point requires rebuilding and
+rechecksumming the arXiv source archive.
+
+## Next task
+
+SUBMIT-001 — Confirm author metadata and complete the arXiv account submission.

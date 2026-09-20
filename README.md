@@ -19,6 +19,8 @@ production inference engines.
 
 - Research-to-arXiv design: docs/RESEARCH_TO_ARXIV_DESIGN.md
 - Implementation progress tracker: docs/PROGRESS.md
+- Paper understanding and faculty-defense manual:
+  docs/PAPER_DEFENSE_MANUAL.md
 
 The design document is normative. The progress tracker records what has
 actually been completed and tells the next agent exactly where to continue.
