@@ -26,13 +26,14 @@ The Hidden Cost of Adding a Gateway to Continuous LLM Serving}
 \maketitle
 
 \begin{abstract}
-Modern large-language-model (LLM) engines continuously batch work at token
-granularity, yet production stacks often place another batching layer in an
-API gateway. The interaction between these schedulers is poorly understood:
-the gateway may amortize request overhead, or it may delay work that the engine
-could already schedule efficiently. We present \adip{}, a compact gateway and
-measurement artifact for isolating this interaction on a commodity
-\gpu{}. Our central hypothesis is that, below saturation, intentional
+Production LLM stacks often add request batching at an API gateway even though
+engines such as \vllm{} already continuously batch sequences at token
+granularity. This creates two schedulers: the gateway can report larger batches
+while delaying requests that the engine could have admitted immediately. We
+ask when this layered design produces useful coalescing and when it merely
+moves queueing in front of the GPU. We present \adip{}, a compact gateway and
+measurement artifact for isolating this interaction on a single consumer-grade
+GPU. Our central hypothesis is that, below saturation, intentional
 micro-waiting is too short relative to inter-arrival time to create useful
 batches; multi-request gateway batches instead emerge from backlog accumulated
 while a serial gateway worker awaits the backend. We test this claim with a
@@ -41,9 +42,10 @@ a fixed 1\,ms policy, and a frozen adaptive policy over four offered loads and
 three run-level repetitions. The study records request traces, gateway queue
 and backend time, batch formation, available GPU telemetry, and harness
 validity.
-\HeadlineResults{} The result is a reproducible account of how a second scheduler can report
-larger batches while merely moving queueing in front of an engine that already
-batches continuously.
+\HeadlineResults{} The result is a reproducible account of why a larger gateway
+batch is not necessarily evidence of better serving: it can be a symptom of
+withheld scheduling opportunity in front of an engine that already batches
+continuously.
 \end{abstract}
 
 \input{sections/01_introduction}

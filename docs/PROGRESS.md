@@ -2941,6 +2941,84 @@ through their arXiv account and inspect arXiv's generated preview.
 
 SUBMIT-001 — Confirm author metadata and complete the arXiv account submission.
 
+### PAPER-004 — Put the production motivation in the first glimpse
+
+Status: complete
+
+Date: 2026-09-20 05:16 -04:00
+
+Commit message: `paper: foreground production motivation`
+
+Files changed:
+
+- `paper/main.tex`: rewrites the abstract opening and closing takeaway so the
+  two-scheduler production risk is immediately visible to a skimming reader.
+- `paper/sections/01_introduction.tex`: uses the accessible single-consumer-GPU
+  framing in the high-level experiment overview.
+- `paper/sections/05_evaluation.tex`: uses the same high-level framing in the
+  two result-figure captions.
+- `paper/sections/07_conclusion.tex`: carries the accessible hardware framing
+  into the final summary.
+- `docs/PAPER_DEFENSE_MANUAL.md`: updates the spoken paper overview and
+  five-minute presentation script.
+- `README.md`: updates the project-level hardware framing.
+- `paper/ARXIV_SUBMISSION.md`: records the matching v3 source archive and
+  checksum.
+- `docs/PROGRESS.md`: records this verified framing revision.
+
+Why the wording changed:
+
+- The previous abstract said the scheduler interaction was poorly understood,
+  but the practical danger was not explicit until its last lines.
+- The revised first sentences now explain that a gateway can report larger
+  batches while delaying work that vLLM could admit immediately.
+- The final abstract sentence now states the diagnostic takeaway: a larger
+  gateway batch can be a symptom of withheld scheduling opportunity.
+- High-level prose says `a single consumer-grade GPU`; the methodology,
+  hardware table, architecture figure, and exact reproducibility context still
+  disclose `NVIDIA GeForce RTX 3060 12 GB`.
+
+Verification:
+
+- Built with LuaLaTeX, BibTeX, and two final LuaLaTeX passes.
+- Final PDF: 12 letter-size pages, 320,867 bytes.
+- Final log scan: no LaTeX/package warning, box warning, undefined citation,
+  or undefined reference.
+- Rendered all 12 pages and visually inspected every changed page, including
+  the abstract, introduction continuation, both result-figure captions, and
+  conclusion. No clipping, overlap, or legibility defect was found.
+- PDF text checks found the new two-scheduler motivation, the larger-batch
+  warning, the consumer-grade description, and the exact RTX 3060 disclosure.
+- Rebuilt independently from `tmp/arxiv-source-20260920-why-v3` with the same
+  12-page result and a clean warning scan.
+- New source archive:
+  `dist/veloinference-arxiv-source-2026-09-20-v3.zip`.
+- Archive size: 77,093 bytes.
+- Archive SHA-256:
+  `b8c3d31bb135bdb64fb8b25c68760d1f851800ee515fe3aba6e7059a65313888`.
+
+Simple summary:
+
+A professor skimming only the title and first abstract sentences can now see
+the real production problem: two schedulers can make the batch-size metric look
+better while requests wait longer. The paper also emphasizes that the study
+was feasible on accessible hardware without hiding the exact GPU used.
+
+Current status:
+
+The requested abstract and hardware-framing changes are complete in the source,
+PDF, defense manual, and v3 arXiv archive. Scientific results and claim
+boundaries are unchanged.
+
+Exact next action:
+
+Confirm public author metadata, arXiv category, and license. Any further source
+change requires another PDF and archive rebuild with a new checksum.
+
+## Next task
+
+SUBMIT-001 — Confirm author metadata and complete the arXiv account submission.
+
 ### TITLE-001 — Replace the manuscript title and re-audit the release package
 
 Status: complete

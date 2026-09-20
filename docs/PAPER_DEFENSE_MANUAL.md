@@ -84,8 +84,8 @@ I tested whether the outer scheduler actually helps in a controlled,
 below-saturation regime. I compared direct vLLM, gateway pass-through, fixed
 one-millisecond batching, and a frozen adaptive policy at four request rates
 with three repetitions. Arrivals were open loop and periodic, all prompts were
-compatible, and every run used the same Qwen2.5-1.5B-Instruct revision on one
-RTX 3060.
+compatible, and every run used the same Qwen2.5-1.5B-Instruct revision on a
+single consumer-grade GPU.
 
 The key mechanism is that the scheduled gaps were 556 milliseconds or longer,
 so a one-millisecond window could not collect the next scheduled request. Even
@@ -1094,7 +1094,7 @@ second can.
 ### Slide or minute 3: Experiment
 
 State four modes, four rates, three repetitions, 48 conditions, 6,912 requests,
-open-loop periodic arrivals, and one RTX 3060.
+open-loop periodic arrivals, and a single consumer-grade GPU.
 
 ### Slide or minute 4: Results
 

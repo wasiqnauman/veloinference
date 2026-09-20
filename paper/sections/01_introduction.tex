@@ -50,10 +50,10 @@ We study the question with \adip{}, an asynchronous gateway and measurement
 artifact. The final matrix compares four paths---direct \vllm{}, gateway
 pass-through, fixed-window batching, and a frozen adaptive policy---at
 0.5, 1.0, 1.5, and 1.8 requests/s. Every condition uses identical prompts,
-generation parameters, open-loop arrivals, and one local \gpu{}. Three seeds
-serve as the replication unit. We retain request-level latency, queue and
-backend decomposition, batch identifiers and sizes, available GPU telemetry,
-failures, and arrival drift.
+generation parameters, open-loop arrivals, and a single consumer-grade GPU.
+Three seeds serve as the replication unit. We retain request-level latency,
+queue and backend decomposition, batch identifiers and sizes, available GPU
+telemetry, failures, and arrival drift.
 
 The paper makes four contributions:
 

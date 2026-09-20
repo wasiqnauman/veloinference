@@ -10,10 +10,10 @@ account decisions that must be supplied before an arXiv submission.
 
 - Paper PDF: `paper/main.pdf`
 - LaTeX entry point: `paper/main.tex`
-- Source archive: `dist/veloinference-arxiv-source-2026-09-19-v2.zip`
-- Archive size: 77,026 bytes
+- Source archive: `dist/veloinference-arxiv-source-2026-09-20-v3.zip`
+- Archive size: 77,093 bytes
 - Archive SHA-256:
-  `89b2570e347157dea971b462237927e1dd33ace28dcbf9f973e97557548c1ddd`
+  `b8c3d31bb135bdb64fb8b25c68760d1f851800ee515fe3aba6e7059a65313888`
 
 The PDF and archive are intentionally ignored by Git because they are build
 outputs. The committed LaTeX sources, generated paper tables, generated paper
@@ -48,8 +48,8 @@ local experiment traces are excluded from the source archive.
 
 ## Independent build verification
 
-After the final title revision, the archive inputs were copied to the isolated
-directory `tmp/arxiv-source-20260919-title-v2` and built there with:
+After the abstract and GPU-framing revision, the archive inputs were copied to
+the isolated directory `tmp/arxiv-source-20260920-why-v3` and built there with:
 
 ```powershell
 lualatex -interaction=nonstopmode -halt-on-error main.tex

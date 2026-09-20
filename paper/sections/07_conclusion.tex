@@ -6,7 +6,7 @@ free second optimization. It is a second scheduler with less information and
 its own queue. This paper separates two mechanisms that are easy to conflate:
 companions found during an intentional micro-window and backlog accumulated
 while a serial outer worker awaits the backend. \adip{} turns that distinction
-into a falsifiable, request-level experiment on commodity hardware.
+into a falsifiable, request-level experiment on a single consumer-grade GPU.
 
 Across the 48-condition experiment, fixed batching forms larger calls at
 1.0--1.8 requests/s but adds 1.05--1.51 seconds of paired p95 latency relative

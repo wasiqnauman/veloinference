@@ -22,8 +22,8 @@ its overhead is zero.
 \begin{figure*}[t]
   \centering
   \includegraphics[width=0.96\textwidth]{figures/primary_overview.pdf}
-  \caption{Primary matrix on \model{} and one \gpu{}. Lines show means across
-  three run-level repetitions; error bars are two-sided 95\% Student-$t$
+  \caption{Primary matrix on \model{} and a single consumer-grade GPU. Lines
+  show means across three run-level repetitions; error bars are two-sided 95\% Student-$t$
   intervals; translucent points are individual repetitions. ``Throughput'' is
   successful request count divided by the fixed 120-second schedule, not an
   independent saturation measurement. Outer grouping is call-weighted prompts
@@ -84,8 +84,8 @@ to account quantitatively for the observed groups.
 \begin{figure*}[t]
   \centering
   \includegraphics[width=0.96\textwidth]{figures/mechanism_effects.pdf}
-  \caption{Mechanism accounting for \model{} on one \gpu{}. Panel A compares
-  measured call-weighted outer grouping with the serial-occupancy prediction
+  \caption{Mechanism accounting for \model{} on a single consumer-grade GPU.
+  Panel A compares measured call-weighted outer grouping with the serial-occupancy prediction
   $\max(1,\lambda\bar S_{\mathrm{call}})$. Panel B stacks gateway queue time
   (hatched) above backend time. Panel C shows paired p95-latency effects;
   positive values mean the treatment is slower. Error bars are two-sided 95\%

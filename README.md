@@ -10,8 +10,8 @@ The research question is practical:
 > continuous batching?
 
 The project will compare direct vLLM serving, gateway pass-through, fixed
-gateway batching, and a small adaptive batching policy on one local NVIDIA
-RTX 3060 with 12 GB of VRAM. The final result will be an empirical systems
+gateway batching, and a small adaptive batching policy on a single
+consumer-grade GPU. The final result will be an empirical systems
 paper and reproducible benchmark artifact, not a claim that ADIP replaces
 production inference engines.
 
