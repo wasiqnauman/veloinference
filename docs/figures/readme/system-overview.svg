@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 440" role="img" aria-labelledby="title desc">
+  <title id="title">VeloInference: two schedulers, four experimental paths</title>
+  <desc id="desc">Open-loop clients either send directly to vLLM or pass through ADIP. ADIP can pass through requests individually or batch them with fixed or adaptive policies. vLLM independently schedules token-level work on the GPU.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#101a31"/><stop offset="1" stop-color="#172746"/></linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#94a9c5" stroke-width="1.8"/></marker>
+    <marker id="mintArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9" fill="none" stroke="#73e0c1" stroke-width="1.8"/></marker>
+    <style>
+      .title{font:700 25px Arial,sans-serif;fill:#f5f8ff}.sub{font:15px Arial,sans-serif;fill:#b7c5db}.eyebrow{font:700 12px Arial,sans-serif;letter-spacing:2px;fill:#8fa6c7}.box{fill:#213353;stroke:#456083;stroke-width:1.4}.main{font:700 20px Arial,sans-serif;fill:#fff}.detail{font:14px Arial,sans-serif;fill:#b8c9df}.tag{font:700 13px Arial,sans-serif;fill:#102b31}.direct{font:700 13px Arial,sans-serif;fill:#aad7ff}
+    </style>
+  </defs>
+  <rect width="1200" height="440" rx="22" fill="url(#bg)"/>
+  <text x="38" y="50" class="eyebrow">SYSTEM QUESTION</text>
+  <text x="38" y="84" class="title">What changes when a gateway schedules before vLLM?</text>
+  <text x="38" y="111" class="sub">ADIP controls admission to the engine. vLLM still controls continuous, token-level GPU scheduling.</text>
+  <rect x="40" y="165" width="190" height="106" rx="16" class="box"/>
+  <text x="62" y="200" class="eyebrow">LOAD GENERATOR</text><text x="62" y="232" class="main">Open-loop client</text>
+  <text x="62" y="255" class="detail">Scheduled arrivals</text>
+  <rect x="329" y="182" width="342" height="178" rx="18" fill="#203e4b" stroke="#388b83" stroke-width="1.5"/>
+  <text x="352" y="214" class="eyebrow" fill="#8ee8d0">OUTER SCHEDULER</text>
+  <text x="352" y="247" class="main">ADIP gateway</text>
+  <text x="352" y="274" class="detail">Pass-through · fixed · adaptive</text>
+  <rect x="351" y="297" width="295" height="42" rx="10" fill="#2c665e"/>
+  <text x="368" y="323" style="font:700 14px Arial,sans-serif;fill:#e6fff8">Bounded queue → compatible groups</text>
+  <rect x="766" y="165" width="225" height="106" rx="16" class="box"/>
+  <text x="788" y="200" class="eyebrow">INNER SCHEDULER</text><text x="788" y="232" class="main">vLLM</text>
+  <text x="788" y="255" class="detail">Continuous batching</text>
+  <rect x="1061" y="165" width="99" height="106" rx="16" class="box"/>
+  <text x="1082" y="202" class="eyebrow">EXECUTE</text><text x="1082" y="235" class="main">GPU</text>
+  <path d="M230 222 H314" fill="none" stroke="#73e0c1" stroke-width="3" marker-end="url(#mintArrow)"/>
+  <path d="M671 222 H751" fill="none" stroke="#73e0c1" stroke-width="3" marker-end="url(#mintArrow)"/>
+  <path d="M991 222 H1046" fill="none" stroke="#94a9c5" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M135 165 V144 H877 V151" fill="none" stroke="#77b8f5" stroke-width="2.4" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+  <rect x="455" y="132" width="150" height="27" rx="14" fill="#294363" stroke="#4a729d"/><text x="479" y="150" class="direct">DIRECT BASELINE</text>
+  <text x="352" y="393" class="sub">The study changes only the path in front of the same vLLM engine.</text>
+</svg>

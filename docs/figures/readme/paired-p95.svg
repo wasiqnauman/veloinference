@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 510" role="img" aria-labelledby="title desc">
+<title id="title">Paired p95 latency effect of fixed gateway batching</title>
+<desc id="desc">Fixed batching minus gateway pass-through at four offered loads. The 95 percent intervals cross zero at 0.5 requests per second and are above zero at 1.0, 1.5, and 1.8 requests per second. Means are approximately minus 123, plus 1510, plus 1047, and plus 1370 milliseconds.</desc>
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#101a31"/><stop offset="1" stop-color="#172746"/></linearGradient></defs>
+<rect width="1200" height="510" rx="22" fill="url(#bg)"/>
+<text x="40" y="47" style="font:700 12px Arial,sans-serif;letter-spacing:2px;fill:#93aaca">PAIRED EXPERIMENT RESULT</text>
+<text x="40" y="81" style="font:700 25px Arial,sans-serif;fill:#f5f8ff">Fixed batching raised p95 at 1.0–1.8 req/s</text>
+<text x="40" y="110" style="font:15px Arial,sans-serif;fill:#bdcbe0">p95 latency difference vs gateway pass-through · positive means slower</text>
+<rect x="558.6" y="150" width="521.4" height="280" fill="#523c3e" opacity=".40"/>
+<line x1="558.6" y1="150" x2="558.6" y2="430" stroke="#9aabc1" stroke-width="2"/>
+<text x="40" y="157" style="font:700 13px Arial,sans-serif;fill:#93aaca">OFFERED LOAD</text>
+<text x="815" y="157" style="font:700 13px Arial,sans-serif;fill:#f1b18f">FIXED IS SLOWER →</text>
+<line x1="40" y1="234" x2="1158" y2="234" stroke="#39506d" stroke-width="1"/>
+<text x="45" y="206" style="font:700 20px Arial,sans-serif;fill:#f5f8ff">0.5 req/s</text>
+<line x1="401.3" y1="200" x2="664.6" y2="200" stroke="#8fc2f1" stroke-width="5" stroke-linecap="round"/>
+<line x1="401.3" y1="191" x2="401.3" y2="209" stroke="#8fc2f1" stroke-width="3"/>
+<line x1="664.6" y1="191" x2="664.6" y2="209" stroke="#8fc2f1" stroke-width="3"/>
+<circle cx="532.9" cy="200" r="9" fill="#8fc2f1" stroke="#172746" stroke-width="3"/>
+<text x="1100" y="206" style="font:700 19px Arial,sans-serif;fill:#8fc2f1">-0.12 s</text>
+<line x1="40" y1="299" x2="1158" y2="299" stroke="#39506d" stroke-width="1"/>
+<text x="45" y="271" style="font:700 20px Arial,sans-serif;fill:#f5f8ff">1.0 req/s</text>
+<line x1="836.0" y1="265" x2="911.0" y2="265" stroke="#ffad81" stroke-width="5" stroke-linecap="round"/>
+<line x1="836.0" y1="256" x2="836.0" y2="274" stroke="#ffad81" stroke-width="3"/>
+<line x1="911.0" y1="256" x2="911.0" y2="274" stroke="#ffad81" stroke-width="3"/>
+<circle cx="873.5" cy="265" r="9" fill="#ffad81" stroke="#172746" stroke-width="3"/>
+<text x="1100" y="271" style="font:700 19px Arial,sans-serif;fill:#ffad81">+1.51 s</text>
+<line x1="40" y1="364" x2="1158" y2="364" stroke="#39506d" stroke-width="1"/>
+<text x="45" y="336" style="font:700 20px Arial,sans-serif;fill:#f5f8ff">1.5 req/s</text>
+<line x1="621.8" y1="330" x2="932.2" y2="330" stroke="#ffad81" stroke-width="5" stroke-linecap="round"/>
+<line x1="621.8" y1="321" x2="621.8" y2="339" stroke="#ffad81" stroke-width="3"/>
+<line x1="932.2" y1="321" x2="932.2" y2="339" stroke="#ffad81" stroke-width="3"/>
+<circle cx="777.0" cy="330" r="9" fill="#ffad81" stroke="#172746" stroke-width="3"/>
+<text x="1100" y="336" style="font:700 19px Arial,sans-serif;fill:#ffad81">+1.05 s</text>
+<line x1="40" y1="429" x2="1158" y2="429" stroke="#39506d" stroke-width="1"/>
+<text x="45" y="401" style="font:700 20px Arial,sans-serif;fill:#f5f8ff">1.8 req/s</text>
+<line x1="659.5" y1="395" x2="1029.1" y2="395" stroke="#ffad81" stroke-width="5" stroke-linecap="round"/>
+<line x1="659.5" y1="386" x2="659.5" y2="404" stroke="#ffad81" stroke-width="3"/>
+<line x1="1029.1" y1="386" x2="1029.1" y2="404" stroke="#ffad81" stroke-width="3"/>
+<circle cx="844.3" cy="395" r="9" fill="#ffad81" stroke="#172746" stroke-width="3"/>
+<text x="1100" y="401" style="font:700 19px Arial,sans-serif;fill:#ffad81">+1.37 s</text>
+<text x="350.0" y="458" text-anchor="middle" style="font:13px Arial,sans-serif;fill:#a8bad2">-1 s</text>
+<text x="558.6" y="458" text-anchor="middle" style="font:13px Arial,sans-serif;fill:#a8bad2">+0 s</text>
+<text x="767.1" y="458" text-anchor="middle" style="font:13px Arial,sans-serif;fill:#a8bad2">+1 s</text>
+<text x="975.7" y="458" text-anchor="middle" style="font:13px Arial,sans-serif;fill:#a8bad2">+2 s</text>
+<text x="40" y="488" style="font:14px Arial,sans-serif;fill:#bdcbe0">● mean of 3 paired runs     ━  two-sided 95% Student-t interval</text>
+</svg>

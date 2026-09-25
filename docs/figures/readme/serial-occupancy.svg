@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 450" role="img" aria-labelledby="title desc">
+  <title id="title">How the serial gateway creates an occupancy backlog</title>
+  <desc id="desc">In pass-through mode arrivals are sent to vLLM individually while earlier work is underway. In batched mode one gateway coordinator awaits a backend call. New arrivals queue behind it and are dispatched together only after that call returns.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#101a31"/><stop offset="1" stop-color="#172746"/></linearGradient>
+    <style>.eyebrow{font:700 12px Arial,sans-serif;letter-spacing:2px;fill:#93aaca}.title{font:700 25px Arial,sans-serif;fill:#f5f8ff}.sub{font:15px Arial,sans-serif;fill:#bdcbe0}.label{font:700 17px Arial,sans-serif;fill:#fff}.tiny{font:13px Arial,sans-serif;fill:#c0d0e4}.time{font:700 13px Arial,sans-serif;fill:#829ab9}</style>
+  </defs>
+  <rect width="1200" height="450" rx="22" fill="url(#bg)"/>
+  <text x="40" y="47" class="eyebrow">THE MECHANISM</text><text x="40" y="80" class="title">A larger outer batch can be a symptom of waiting</text>
+  <text x="40" y="111" class="sub">Illustrative event order, not a to-scale latency trace</text>
+  <line x1="241" y1="158" x2="1144" y2="158" stroke="#526b8c" stroke-width="2"/>
+  <text x="251" y="146" class="time">EARLIER</text><text x="1082" y="146" class="time">LATER</text>
+  <rect x="38" y="183" width="184" height="85" rx="13" fill="#244a51" stroke="#46998d"/>
+  <text x="57" y="218" class="label">Pass-through</text><text x="57" y="244" class="tiny">Concurrent submissions</text>
+  <rect x="264" y="197" width="178" height="46" rx="10" fill="#2c7469"/><text x="280" y="225" class="label">A → vLLM</text>
+  <rect x="458" y="197" width="178" height="46" rx="10" fill="#2c7469"/><text x="474" y="225" class="label">B → vLLM</text>
+  <rect x="652" y="197" width="178" height="46" rx="10" fill="#2c7469"/><text x="668" y="225" class="label">C → vLLM</text>
+  <path d="M40 287 H1160" stroke="#314867" stroke-width="2"/>
+  <rect x="38" y="306" width="184" height="85" rx="13" fill="#563d35" stroke="#db8b63"/>
+  <text x="57" y="341" class="label">Outer batching</text><text x="57" y="367" class="tiny">One serial coordinator</text>
+  <rect x="264" y="320" width="393" height="46" rx="10" fill="#915b45"/><text x="281" y="348" class="label">Await backend call for A</text>
+  <rect x="459" y="376" width="94" height="30" rx="8" fill="#604d55" stroke="#df9a80"/><text x="475" y="396" class="tiny">B waits</text>
+  <rect x="564" y="376" width="94" height="30" rx="8" fill="#604d55" stroke="#df9a80"/><text x="580" y="396" class="tiny">C waits</text>
+  <rect x="675" y="320" width="251" height="46" rx="10" fill="#b87554"/><text x="691" y="348" class="label">B + C → vLLM</text>
+  <path d="M656 343 H669" stroke="#ffb487" stroke-width="3"/>
+  <text x="954" y="339" class="tiny">Bigger outer call</text><text x="954" y="360" class="tiny">after longer queueing</text>
+  <text x="40" y="431" class="sub">The final 1 ms fixed window cannot explain hundreds of milliseconds of measured gateway queue delay.</text>
+</svg>
