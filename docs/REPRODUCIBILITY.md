@@ -68,8 +68,8 @@ so an interrupted matrix can be resumed with the same command.
 uv run --group research python -m bench.analyze_final \
   --input results/raw/exp003-primary-final \
   --summary results/summaries/generated/exp003-analysis.json \
-  --figure-dir paper/figures \
-  --table-dir paper/tables
+  --figure-dir tmp/paper-figures \
+  --table-dir tmp/paper-tables
 ```
 
 The analyzer requires all 48 declared conditions, excludes runs that fail the
@@ -79,7 +79,9 @@ bit-for-bit timing agreement across machines.
 
 ## Public artifact boundary
 
-This repository includes the implementation, frozen final configuration,
-tests, analysis code, paper source, generated figures and tables, and the final
-machine-readable summary. Raw request-level and GPU-monitor traces are excluded
-because they remain part of the private research archive.
+This public repository includes the implementation, frozen final configuration,
+tests, analysis code, final machine-readable summary, and the published paper
+PDF at `paper/main.pdf`. The LaTeX source, manuscript figures and tables, and raw
+request-level and GPU-monitor traces remain in the private research archive.
+Generated figures and tables from the command above go under `tmp/` and stay out
+of the public source tree.

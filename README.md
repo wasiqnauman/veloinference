@@ -12,7 +12,7 @@ VeloInference is a working inference gateway and open-loop experiment harness fo
 | :---: | :---: | :---: |
 | 4 paths × 4 rates × 3 runs | All completed; no harness-invalid runs | Fixed 1 ms batching vs pass-through at 1.0–1.8 requests/s |
 
-The final study used `Qwen/Qwen2.5-1.5B-Instruct` on a single RTX 3060. At 0.5 requests/s, the fixed-policy latency effect was unresolved. The tested adaptive policy showed no statistically resolved p95 advantage over fixed batching at any rate. [Read the paper PDF](paper/main.pdf) · [Browse the source](paper/main.tex) · [Inspect the analysis](results/summaries/generated/exp003-analysis.json) · [Reproduce the experiment](docs/REPRODUCIBILITY.md)
+The final study used `Qwen/Qwen2.5-1.5B-Instruct` on a single RTX 3060. At 0.5 requests/s, the fixed-policy latency effect was unresolved. The tested adaptive policy showed no statistically resolved p95 advantage over fixed batching at any rate. [Read the paper PDF](paper/main.pdf) · [Inspect the analysis](results/summaries/generated/exp003-analysis.json) · [Reproduce the experiment](docs/REPRODUCIBILITY.md)
 
 ## The result in one picture
 
@@ -22,7 +22,7 @@ The final study used `Qwen/Qwen2.5-1.5B-Instruct` on a single RTX 3060. At 0.5 r
 
 ![Timeline showing that a pass-through gateway can submit new requests to vLLM while earlier work is underway, whereas ADIP's serial batch coordinator waits for its backend call to return. New arrivals then form a larger outer batch after waiting in the gateway.](docs/figures/readme/serial-occupancy.svg)
 
-The fixed policy's outer group grew from 1.54 prompts per backend call at 1.0 requests/s to 2.90 at 1.8 requests/s. Its nominal wait was only **1 ms**, yet mean gateway queue delay reached **767–833 ms**. The coordinator awaits one backend call before dispatching the next batch; requests arriving during that call can accumulate. Across fixed and adaptive runs, measured group sizes closely matched a serial-occupancy prediction (0.86% mean absolute percentage error; descriptive R² = 0.9985). This is a within-run consistency check, not an independent causal estimate. [See the full mechanism figure](paper/figures/mechanism_effects.png).
+The fixed policy's outer group grew from 1.54 prompts per backend call at 1.0 requests/s to 2.90 at 1.8 requests/s. Its nominal wait was only **1 ms**, yet mean gateway queue delay reached **767–833 ms**. The coordinator awaits one backend call before dispatching the next batch; requests arriving during that call can accumulate. Across fixed and adaptive runs, measured group sizes closely matched a serial-occupancy prediction (0.86% mean absolute percentage error; descriptive R² = 0.9985). This is a within-run consistency check, not an independent causal estimate.
 
 ## System design
 
@@ -92,8 +92,8 @@ Scheduled arrivals continue independently of service slowdown, so offered load d
 
 | Evidence | Open |
 | --- | --- |
-| Full result plots and uncertainty | [Primary overview](paper/figures/primary_overview.png) · [Mechanism and paired effects](paper/figures/mechanism_effects.png) |
-| Research method and limits | [Paper PDF](paper/main.pdf) · [Paper source](paper/main.tex) · [Evaluation](paper/sections/05_evaluation.tex) |
+| Results and uncertainty | [Paired p95 chart](docs/figures/readme/paired-p95.svg) · [Machine-readable analysis](results/summaries/generated/exp003-analysis.json) |
+| Paper | [PDF](paper/main.pdf) |
 | Frozen setup and replication | [Final experiment config](configs/experiments/primary_final.toml) · [Reproduction guide](docs/REPRODUCIBILITY.md) |
 
 ## Run it locally
@@ -121,7 +121,7 @@ Run the quality gates with `uv run ruff check .` and `uv run pytest -q`. Docker 
 | [`bench/`](bench/) | Open-loop arrivals, run recording, validity checks, and analysis |
 | [`configs/`](configs/) | Mock setup and frozen final-experiment configuration |
 | [`results/summaries/generated/`](results/summaries/generated/) | Audited machine-readable final summary |
-| [`paper/`](paper/) | Manuscript, generated tables, and full-size scientific figures |
+| [`paper/main.pdf`](paper/main.pdf) | Published paper |
 | [`tests/`](tests/) | Gateway and experiment-harness tests |
 
 The result characterizes one model, one GPU, short prompts, four offered rates, and three repetitions per condition. It is evidence about this two-scheduler configuration, not a universal claim about gateway batching.
