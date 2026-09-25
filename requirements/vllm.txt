@@ -1,12 +1,11 @@
-# Runtime-only requirements for ENV-003 and later GPU experiments.
+# Runtime-only requirements for the GPU experiment environment.
 #
 # Keep these separate from the CPU-safe project lockfile. The vLLM environment
-# is created at /home/kennarr/src/veloinference/.venv-vllm inside WSL.
+# should use its own Python 3.12 virtual environment on Linux or WSL2.
 vllm==0.29.0
 ninja==1.13.2
 
-# vLLM 0.29.0's resolved environment contains a mixed CUDA package set on
-# this host. Pin the compiler/runtime pair used by FlashInfer JIT explicitly.
+# Pin the compiler/runtime pair used in the published experiment.
 nvidia-cuda-nvcc==13.4.59
 nvidia-cuda-runtime==13.4.49
 flashinfer-python==0.6.18

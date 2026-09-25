@@ -1,7 +1,10 @@
-FROM python:3.14-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 
 COPY . .
+RUN pip install --no-cache-dir .
 
-CMD ["uv", "run", "python", "-m", "gateway.main"]
+EXPOSE 8000
+
+CMD ["python", "-m", "gateway.main"]

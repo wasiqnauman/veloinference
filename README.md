@@ -1,102 +1,104 @@
-# ADIP
+# VeloInference (ADIP)
 
-ADIP is an Async Dynamic Inference Proxy for studying request batching at an
-inference gateway.
+[![CI](https://github.com/wasiqnauman/veloinference/actions/workflows/ci.yml/badge.svg)](https://github.com/wasiqnauman/veloinference/actions/workflows/ci.yml)
 
-The research question is practical:
+VeloInference is a research artifact for studying a deceptively simple systems
+question: what happens when an API gateway batches requests before sending them
+to an LLM engine that already performs continuous batching?
 
-> When does batching requests in an external gateway improve throughput, and
-> when does the added waiting hurt latency when the backend already performs
-> continuous batching?
+The included Async Dynamic Inference Proxy (ADIP), open-loop benchmark harness,
+and analysis pipeline support four controlled paths:
 
-The project will compare direct vLLM serving, gateway pass-through, fixed
-gateway batching, and a small adaptive batching policy on a single
-consumer-grade GPU. The final result will be an empirical systems
-paper and reproducible benchmark artifact, not a claim that ADIP replaces
-production inference engines.
+- direct requests to vLLM;
+- gateway pass-through without outer batching;
+- fixed-window gateway batching; and
+- adaptive gateway batching.
 
-## Project documents
+The project is intentionally narrow. It characterizes the interaction between
+two schedulers on a single consumer GPU; it does not claim to replace a
+production inference engine.
 
-- Research-to-arXiv design: docs/RESEARCH_TO_ARXIV_DESIGN.md
-- Implementation progress tracker: docs/PROGRESS.md
-- Paper understanding and faculty-defense manual:
-  docs/PAPER_DEFENSE_MANUAL.md
+## Main finding
 
-The design document is normative. The progress tracker records what has
-actually been completed and tells the next agent exactly where to continue.
+Across a 48-condition, 6,912-request experiment using
+`Qwen/Qwen2.5-1.5B-Instruct` on an RTX 3060, a 1 ms fixed gateway window formed
+larger outer batches but increased paired p95 latency by 1.05-1.51 seconds at
+1.0-1.8 requests/second relative to pass-through. The low-load effect was
+unresolved, and the adaptive policy did not produce a statistically resolved
+improvement over the fixed policy at any tested rate.
 
-## Repository status
+The observed outer group sizes closely matched a serial-occupancy model
+(0.86% mean absolute percentage error; descriptive R² = 0.9985). In this
+regime, larger gateway batches primarily reflected requests accumulating while
+the gateway awaited vLLM, rather than useful millisecond-scale coalescing.
 
-The repository currently contains the phase-one mock gateway and the
-research-to-arXiv design. The Linux GPU environment is still being prepared.
-The next environment milestone is WSL2 with Ubuntu 24.04 and CUDA visibility.
+![Measured latency, queue delay, and outer group size across the final experiment](paper/figures/primary_overview.png)
 
-## Target architecture
+See the [paper source](paper/main.tex),
+[machine-readable analysis](results/summaries/generated/exp003-analysis.json),
+and [reproduction guide](docs/REPRODUCIBILITY.md) for the full evidence and
+limitations.
 
-~~~text
+## System design
+
+```text
 Open-loop benchmark client
     |
-    +--> direct mode:   vLLM on 127.0.0.1:8001
+    +--> direct ------------------------------> vLLM
     |
-    +--> gateway modes: ADIP on 127.0.0.1:8000
-                              |
-                              +--> vLLM on 127.0.0.1:8001
-                                      |
-                                      +--> local RTX 3060
-~~~
+    +--> pass-through / fixed / adaptive ----> ADIP ----> vLLM
+```
 
-## Development prerequisites
+ADIP provides bounded asynchronous queueing, fixed and adaptive batch-closing
+policies, vLLM and mock backends, request-level event logging, and metrics for
+queue delay, backend time, batch size, and failures. The benchmark runner uses
+scheduled open-loop arrivals so service slowdown does not silently reduce
+offered load.
 
-The supported vLLM path runs under Linux. On the current Windows machine, use
-WSL2 with Ubuntu 24.04. Store the WSL distribution and project files on C:.
-Do not run the Linux project from /mnt/c; keep the repository inside the WSL
-filesystem.
+## Repository map
 
-After WSL2 and Ubuntu are available:
+| Path | Purpose |
+| --- | --- |
+| `gateway/` | FastAPI gateway, batching policies, backends, and observability |
+| `bench/` | Open-loop load generation, GPU monitoring, validation, and analysis |
+| `configs/` | Public mock and frozen final-experiment configurations |
+| `results/summaries/generated/` | Audited machine-readable final summary |
+| `paper/` | LaTeX manuscript, generated tables, and publication figures |
+| `tests/` | Unit and integration tests for the gateway and research harness |
 
-~~~bash
-cd ~/src/veloinference
+## Quick start
+
+The CPU-safe development path uses Python 3.12 and the mock backend:
+
+```bash
 uv sync --all-groups
+uv run python -m gateway.main
+```
+
+In another terminal:
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+Run the quality gates with:
+
+```bash
 uv run ruff check .
 uv run pytest -q
-~~~
+```
 
-The gateway-only development environment uses Python 3.12. The vLLM server is
-installed into a separate Python environment so its dependencies do not
-pollute the gateway environment.
+Docker is also supported for the mock service:
 
-## Local service ports
+```bash
+docker compose up --build
+```
 
-- vLLM: http://127.0.0.1:8001
-- ADIP: http://127.0.0.1:8000
+## Research scope
 
-## Mock gateway
-
-The current mock service can be started with:
-
-~~~bash
-uv run python -m gateway.main
-~~~
-
-Then check:
-
-~~~bash
-curl http://127.0.0.1:8000/health
-~~~
-
-The mock backend is for development and unit tests. It must not be used for
-headline research results.
-
-## Research workflow
-
-The eventual local workflow is:
-
-1. Start the pinned vLLM server.
-2. Start ADIP in direct pass-through or batched mode.
-3. Run an open-loop benchmark from a committed TOML configuration.
-4. Save immutable request-level and GPU-level JSONL records.
-5. Generate summaries and figures from raw records.
-6. Map every paper claim to run IDs in docs/RESULT_CLAIMS.md.
-
-All final experiments must run on the local RTX 3060. Cloud endpoints and
-remote GPUs are outside the project scope.
+The final matrix used one GPU, one 1.5B-parameter model, short prompts, four
+offered rates, and three repetitions per condition. Confidence intervals are
+computed over run-level values. The committed summary contains the complete
+48-condition analysis; raw request and GPU traces are not included in this
+public repository. Conclusions should therefore be read as a controlled
+single-system result, not a universal statement about gateway batching.
