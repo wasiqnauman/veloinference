@@ -12,7 +12,7 @@ VeloInference is a working inference gateway and open-loop experiment harness fo
 | :---: | :---: | :---: |
 | 4 paths × 4 rates × 3 runs | All completed; no harness-invalid runs | Fixed 1 ms batching vs pass-through at 1.0–1.8 requests/s |
 
-The final study used `Qwen/Qwen2.5-1.5B-Instruct` on a single RTX 3060. At 0.5 requests/s, the fixed-policy latency effect was unresolved. The tested adaptive policy showed no statistically resolved p95 advantage over fixed batching at any rate. [Read the paper source](paper/main.tex) · [Inspect the analysis](results/summaries/generated/exp003-analysis.json) · [Reproduce the experiment](docs/REPRODUCIBILITY.md)
+The final study used `Qwen/Qwen2.5-1.5B-Instruct` on a single RTX 3060. At 0.5 requests/s, the fixed-policy latency effect was unresolved. The tested adaptive policy showed no statistically resolved p95 advantage over fixed batching at any rate. [Read the paper PDF](paper/main.pdf) · [Browse the source](paper/main.tex) · [Inspect the analysis](results/summaries/generated/exp003-analysis.json) · [Reproduce the experiment](docs/REPRODUCIBILITY.md)
 
 ## The result in one picture
 
@@ -93,7 +93,7 @@ Scheduled arrivals continue independently of service slowdown, so offered load d
 | Evidence | Open |
 | --- | --- |
 | Full result plots and uncertainty | [Primary overview](paper/figures/primary_overview.png) · [Mechanism and paired effects](paper/figures/mechanism_effects.png) |
-| Research method and limits | [Paper source](paper/main.tex) · [Evaluation](paper/sections/05_evaluation.tex) |
+| Research method and limits | [Paper PDF](paper/main.pdf) · [Paper source](paper/main.tex) · [Evaluation](paper/sections/05_evaluation.tex) |
 | Frozen setup and replication | [Final experiment config](configs/experiments/primary_final.toml) · [Reproduction guide](docs/REPRODUCIBILITY.md) |
 
 ## Run it locally
